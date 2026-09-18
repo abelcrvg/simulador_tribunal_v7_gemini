@@ -1,0 +1,47 @@
+name: Aplicar melhorias do simulador
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: ${{ !contains(github.event.head_commit.message, '[tribunal-auto-fix]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Corrigir detalhe do script de migração
+        run: sed -i 's/recursoComponent/recursosComponent/g' scripts/apply-tribunal-improvements.mjs
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Aplicar melhorias
+        run: node scripts/apply-tribunal-improvements.mjs
+
+      - name: Verificar TypeScript
+        run: npm run check
+
+      - name: Commitar alterações
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add drizzle/schema.ts server/db.ts server/feedback.ts server/routers.ts client/src/pages/Trial.tsx .gitignore scripts/apply-tribunal-improvements.mjs
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração para commitar."
+            exit 0
+          fi
+          git commit -m "[tribunal-auto-fix] recursos, habeas corpus e feedback automático"
+          git push
