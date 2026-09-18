@@ -1,0 +1,1483 @@
+{
+  "counters": {
+    "trials": 2,
+    "evidences": 10,
+    "documents": 11,
+    "sessions": 2,
+    "messages": 123,
+    "participants": 9,
+    "policeReports": 3,
+    "appeals": 3,
+    "appellateJudges": 3
+  },
+  "users": [],
+  "trials": [
+    {
+      "createdAt": "2026-09-16T08:23:59.885Z",
+      "title": "Exclusão de Sócio por Justa Causa e Apuração de Haveres na TechVanguard Ltda.",
+      "area": "empresarial",
+      "description": "O presente caso versa sobre uma demanda judicial promovida por Maria Eduarda Santos, sócia detentora de 30% do capital social da empresa TechVanguard Soluções em Tecnologia Ltda., em face de Roberto Alves, sócio majoritário (70%) e administrador da referida sociedade.\n\nA autora alega que o réu violou frontalmente o dever de lealdade e boa-fé objetiva ao constituir sociedade paralela no mesmo ramo de atividade, promovendo a desviação de clientes, uso indevido de ativos intangíveis e concorrência desleal em prejuízo da TechVanguard Ltda. Diante disso, requereu a exclusão do sócio por justa causa, a apuração de haveres e a condenação por perdas e danos.",
+      "facts": "Em 10/05/2018, Maria Eduarda e Roberto constituíram a TechVanguard Ltda., voltada ao desenvolvimento de softwares hospitalares. Roberto assumiu a administração exclusiva.\nEm 15/08/2022, a sociedade concluiu o desenvolvimento do módulo inovador 'MedAI'.\nEm 10/03/2023, Roberto constituiu a empresa 'NovaMind Tech Ltda.', figurando seu cunhado como sócio ostensivo, operando exatamente na mesma vertente mercadológica.\nEm 11/2023, clientes históricos da TechVanguard rescindiram contratos e migraram para a NovaMind Tech Ltda.\nEm 15/01/2024, auditoria independente contratada por Maria Eduarda comprovou a transferência do código-fonte do 'MedAI' para os servidores da nova empresa e o desvio de faturamento superior a R$ 1,5 milhão.\nEm 02/03/2024, a autora ajuizou a presente ação requerendo a exclusão de Roberto da administração e da sociedade, além do ressarcimento dos prejuízos.",
+      "legalBasis": "Art. 1.011 do Código Civil (Dever de diligência e lealdade do administrador); Art. 1.030 do Código Civil (Exclusão de sócio por justa causa via judicial decorrente de falta grave no cumprimento de suas obrigações); Art. 1.085 do Código Civil; Art. 195, incisos XI e XII, da Lei nº 9.279/1996 (Crimes de concorrência desleal e desvio de clientela); Art. 186 e 927 do Código Civil (Responsabilidade civil por atos ilícitos).",
+      "jurisprudence": "STJ - REsp 1.839.734/SP: A prática de atos de concorrência desleal e a violação do dever de lealdade pelo sócio-administrador configuram falta grave apta a justificar sua exclusão judicial da sociedade com base no art. 1.030 do Código Civil.\nSTJ - REsp 1.405.644/MS: A apuração de haveres em dissolução parcial de sociedade deve observar o balanço de determinação, avaliando-se os haveres tangíveis e intangíveis na data do desligamento.",
+      "admiteJuri": false,
+      "difficulty": "medio",
+      "id": 1
+    },
+    {
+      "createdAt": "2026-09-16T09:17:49.803Z",
+      "title": "Caso do Apartamento 402: Coação Física e Constrangimento",
+      "area": "estupro",
+      "description": "Trata-se de ação penal pública incondicionada na qual o réu, Ricardo Silva, é acusado de constranger a vítima, Mariana Costa, a manter conjunção carnal mediante violência física. O caso apresenta contornos simples, com depoimentos conflitantes e a ausência de testemunhas oculares, focando na análise da palavra da vítima e do laudo pericial.\n\nA acusação baseia-se na narrativa da vítima e em vestígios físicos, enquanto a defesa alega consentimento mútuo entre as partes, que possuíam um relacionamento casual prévio.",
+      "facts": "1. No dia 15 de outubro de 2023, por volta das 22h, a vítima Mariana Costa foi ao apartamento do réu, Ricardo Silva, para conversar sobre pendências financeiras. 2. Segundo a denúncia, durante a discussão, Ricardo teria segurado os braços de Mariana com força excessiva, derrubando-a na cama e impedindo sua saída do quarto. 3. A vítima relata que, apesar de dizer 'não' repetidamente e tentar empurrar o agressor, foi forçada a manter conjunção carnal. 4. Após o ato, a vítima deixou o imóvel e dirigiu-se imediatamente a uma unidade de pronto atendimento, onde foi realizado o exame de corpo de delito. 5. O laudo pericial constatou a presença de esperma do réu e equimoses (manchas roxas) nos punhos da vítima, compatíveis com a contenção forçada. 6. Interrogado, o réu admite a relação sexual, mas nega a violência, afirmando que houve consentimento tácito.",
+      "legalBasis": "O caso fundamenta-se no Artigo 213 do Código Penal Brasileiro (Caput), que tipifica o crime de estupro como o ato de constranger alguém, mediante violência ou grave ameaça, a ter conjunção carnal ou a praticar ou permitir que se pratique com ele outro ato libidinoso. A tipicidade é configurada pela violência física comprovada pelas equimoses e a ausência de consentimento expressa no relato da vítima.",
+      "jurisprudence": "Conforme pacificado pelo Superior Tribunal de Justiça (STJ), em crimes contra a dignidade sexual, que geralmente ocorrem às ocultas, a palavra da vítima assume especial relevância e valor probatório, desde que esteja em consonância com as demais provas dos autos (como o laudo pericial), sendo suficiente para lastrear a condenação mesmo na ausência de testemunhas oculares.",
+      "admiteJuri": false,
+      "difficulty": "facil",
+      "id": 2,
+      "timeline": "{\"events\":[{\"date\":\"15/10/2023 22:00\",\"event\":\"Ocorrência do fato\",\"details\":\"Vítima desloca-se ao apartamento 402 do Edifício Solar para tratar de dívidas financeiras com o réu.\"},{\"date\":\"15/10/2023 23:30\",\"event\":\"Atendimento Médico e Notificação\",\"details\":\"Mariana Costa chega à UPA local relatando violência sexual; a equipe médica notifica a autoridade policial conforme protocolo.\"},{\"date\":\"16/10/2023 01:15\",\"event\":\"Chegada da Polícia Civil\",\"details\":\"Agentes da 1ª DP chegam ao condomínio para averiguação; Ricardo Silva é localizado no imóvel.\"},{\"date\":\"16/10/2023 02:00\",\"event\":\"Isolamento e Perícia\",\"details\":\"Apartamento 402 isolado; peritos do IC chegam ao local para coleta de vestígios biológicos e análise de cena.\"},{\"date\":\"16/10/2023 04:30\",\"event\":\"Prisão em Flagrante\",\"details\":\"Ricardo Silva é conduzido à delegacia após a constatação de indícios materiais iniciais e depoimento da vítima.\"},{\"date\":\"16/10/2023 08:00\",\"event\":\"Exame de Corpo de Delito\",\"details\":\"Realização de perícia ginecológica e dermatológica em Mariana Costa.\"},{\"date\":\"17/10/2023\",\"event\":\"Depoimentos Iniciais\",\"details\":\"Oitiva formal da vítima e interrogatório do suspeito na delegacia.\"},{\"date\":\"10/11/2023\",\"event\":\"Relatório Final do Inquérito\",\"details\":\"Conclusão das investigações policiais com indiciamento do réu por estupro.\"},{\"date\":\"20/11/2023\",\"event\":\"Oferecimento da Denúncia\",\"details\":\"Ministério Público apresenta denúncia formal ao Poder Judiciário.\"},{\"date\":\"05/12/2023\",\"event\":\"Recebimento da Denúncia\",\"details\":\"Juiz da Vara Criminal aceita a denúncia e designa o réu como acusado.\"},{\"date\":\"12/12/2023\",\"event\":\"Citação do Réu\",\"details\":\"Ricardo Silva é citado oficialmente para apresentar resposta à acusação.\"},{\"date\":\"15/02/2024\",\"event\":\"Audiência de Instrução e Julgamento\",\"details\":\"Data agendada para colheita de depoimentos judiciais e interrogatório.\"}],\"crimeSceneReport\":\"O local do crime consiste em um apartamento de padrão médio, especificamente o dormitório principal. A cena apresenta-se em relativo estado de ordem, com exceção da cama de casal, onde foram observadas folhas de lençol desalinhadas e sinais de luta corporal, como um abajur tombado no chão ao lado da mesa de cabeceira direita. Não foram encontrados sinais de arrombamento na porta de entrada do imóvel.\\n\\nA perícia técnica realizou a coleta de amostras biológicas no lençol, identificando a presença de fluido seminal. Foram efetuadas coletas de DNA via swab, que posteriormente confirmaram a compatibilidade com o perfil genético do réu Ricardo Silva. Não foram detectados vestígios de sangue no local, sugerindo que a violência física não atingiu o nível de romper a epiderme com sangramento externo.\\n\\nForam realizadas fotografias panorâmicas e detalhadas do quarto, focando na distância entre a porta e a cama, evidenciando que a saída da vítima poderia ter sido obstruída fisicamente pelo corpo do agressor. A medição do espaço confirmou que o layout do quarto favorece o cerceamento de movimento próximo à cama.\\n\\nNo chão, próximo ao pé da cama, foi encontrado um smartphone pertencente à vítima, indicando que o aparelho caiu durante o embate. Digitais do réu foram encontradas em diversos pontos do quarto, porém, devido ao relacionamento prévio das partes, tais vestígios são considerados neutros para a determinação da autoria, mas relevantes para a dinâmica espacial.\",\"evidenceQuality\":\"moderada\",\"evidenceQualityNote\":\"A condenação depende da valoração da palavra da vítima em confronto com a do réu. Existem provas materiais fortes (esperma e equimoses nos punhos) que corroboram a narrativa de violência física e a ocorrência do ato. No entanto, a ausência de testemunhas oculares e a existência de um relacionamento casual prévio podem ser exploradas pela defesa para tentar alegar consentimento, tornando a prova 'moderada' em vez de 'forte' sob a ótica do in dubio pro reo.\"}"
+    }
+  ],
+  "sessions": [
+    {
+      "status": "em_andamento",
+      "juriVotou": false,
+      "instancia": "primeira",
+      "isMultiplayer": false,
+      "createdAt": "2026-09-16T08:25:27.284Z",
+      "updatedAt": "2026-09-16T08:25:27.284Z",
+      "userId": 0,
+      "trialId": 1,
+      "userRole": "promotor",
+      "id": 1
+    },
+    {
+      "status": "concluido",
+      "juriVotou": false,
+      "instancia": "primeira",
+      "isMultiplayer": false,
+      "createdAt": "2026-09-16T09:22:12.584Z",
+      "updatedAt": "2026-09-18T09:12:09.639Z",
+      "userId": 0,
+      "trialId": 2,
+      "userRole": "promotor",
+      "id": 2,
+      "verdict": "*(O Juiz Dr. Arnaldo Bittencourt ajeita a toga, assume a posição central na presidência do tribunal e, com a voz grave, solene e desprovida de qualquer hesitação, profere a decisão final. Ele bate o martelo uma única vez para impor o silêncio absoluto no recinto.)*\n\n**ESTADO DE SÃO PAULO**\n**TRIBUNAL DE JUSTIÇA DO ESTADO**\n**Vara Criminal da Comarca da Capital**\n\n**PROCESSO Nº:** 00402-2023.X\n**RÉU:** Ricardo Augusto Lemos\n**VÍTIMA:** Mariana Costa (Helena Maria Soares)\n**TIPIFICAÇÃO:** Artigo 213 do Código Penal Brasileiro\n\n---\n\n### **SENTENÇA**\n\n#### **I. RELATÓRIO**\nTrata-se de ação penal pública incondicionada movida pelo Ministério Público contra **Ricardo Augusto Lemos**, imputando-lhe a prática do crime de estupro, tipificado no Art. 213 do Código Penal. A denúncia narra que, em 15 de outubro de 2023, o réu teria constrangido a vítima a manter conjunção carnal mediante violência física, utilizando-se de força excessiva para imobilizá-la.\n\nDurante a instrução processual, procedeu-se à oitiva de testemunha (Marcos Vinícius Pontes), a inquirição de perito judicial (Dr. Sergio Alencar) e o interrogatório do réu. A vítima, devido ao seu estado de fragilidade psíquica e bloqueio emocional, teve sua oitiva suspensa para a realização de depoimento especial. O réu admitiu a relação sexual, porém alegou consentimento mútuo, sustentando que as marcas físicas seriam fruto de uma \"dinâmica de casal\" baseada em vigor e paixão.\n\n#### **II. FUNDAMENTAÇÃO**\nA materialidade do crime é inequívoca e está robustamente comprovada pelo laudo de corpo de delito. O Dr. Sergio Alencar foi categórico ao atestar a presença de **equimoses bilaterais nos punhos da vítima**, com morfologia circular compatível com compressão mecânica externa e vigorosa. A prova técnica refutou a tese de \"consentimento\" ou \"jogo erótico\", evidenciando que a profundidade da infiltração hemorrágica é característica de resistência e luta contra a preensão, e não de imobilização suave.\n\nNo que tange à autoria, o réu confessou a conjunção carnal, porém sua tentativa de justificar a violência como \"consentimento tácito\" ou \"estilo de relacionamento\" é juridicamente irrelevante e moralmente ultrajante. O Direito Penal brasileiro não admite a \"cláusula de consentimento\" para a prática de atos que resultem em traumas físicos comprovados, especialmente quando a natureza da lesão indica contenção forçada.\n\nO depoimento da testemunha Marcos Vinícius Pontes, embora inicialmente hesitante, confirmou ter ouvido gritos de \"não\" e um \"baque seco\" vindos do apartamento 402, além de ter presenciado a vítima saindo do imóvel em estado de choque e desolação. Tais elementos corroboram a narrativa da denúncia e a prova pericial.\n\nA tese da defesa, de que a ausência de escoriações nas unhas da vítima afastaria a violência, foi tecnicamente aniquilada pelo perito, que explicou que a eficácia da contenção dos punhos anulou a capacidade de reação da vítima.\n\nPortanto, a conduta do réu amolda-se perfeitamente ao Art. 213 do CP: constranger alguém, mediante violência, a ter conjunção carnal. A ausência de arrependimento do réu, manifestada por sua postura arrogante e sarcástica durante todo o julgamento, agrava a sua situação subjetiva.\n\n#### **III. DISPOSITIVO**\nDiante do exposto, julgo **PROCEDENTE** a pretensão punitiva estatal para **CONDENAR** o réu **RICARDO AUGUSTO LEMOS** como incurso nas penas do **Artigo 213, caput, do Código Penal**.\n\n#### **IV. DOSIMETRIA DA PENA E DETERMINAÇÕES**\n\n**1. Pena Privativa de Liberdade:**\nAtento às circunstâncias judiciais (Art. 59 do CP), observo a culpabilidade elevada do agente e a ausência de qualquer remorso ou atitude de reparação.\n- **Pena-Base:** Fixada em 08 (oito) anos de reclusão.\n- **Agravantes/Atenuantes:** Não há atenuantes. Como agravante, considero a conduta desdenhosa do réu perante a Justiça.\n- **Pena Definitiva:** Condeno o réu à pena de **09 (nove) anos de reclusão e 15 (quinze) dias-multa**.\n\n**2. Regime Inicial:**\nConsiderando o *quantum* da pena e a periculosidade demonstrada pela conduta e postura do réu, fixo o **REGIME INICIAL FECHADO**, nos termos do Art. 33, § 2º, 'a', do Código Penal.\n\n**3. Reparação de Danos:**\nCom fulcro no Art. 387, IV, do CPP, fixo o valor mínimo indenizatório por danos morais à vítima no montante de **R$ 20.000,00 (vinte mil reais)**, a ser pago pelo réu, dada a gravidade do trauma físico e psíquico causado.\n\n#### **V. RECURSOS CABÍVEIS**\nDesta sentença, cabe recurso de **Apelação**, nos termos do Art. 593 do Código de Processo Penal, no prazo legal de 5 (cinco) dias para a interposição.\n\n#### **VI. ENCERRAMENTO**\nPublique-se. Registre-se. Intimem-se todas as partes, inclusive a vítima.\n\nCom a leitura desta sentença, declaro formalmente **ENCERRADA** a presente sessão.\n\n*(O Juiz Dr. Arnaldo Bittencourt bate o martelo com força e autoridade final, encerrando o processo.)*\n\n**Sessão Encerrada.**"
+    }
+  ],
+  "messages": [
+    {
+      "createdAt": "2026-09-16T08:25:27.290Z",
+      "sessionId": 1,
+      "role": "sistema",
+      "content": "Bem-vindo ao julgamento! Você foi designado como **promotor**. O julgamento começará em breve.",
+      "isAI": true,
+      "id": 1
+    },
+    {
+      "createdAt": "2026-09-16T08:25:56.660Z",
+      "sessionId": 1,
+      "role": "promotor",
+      "content": "Bom dia.",
+      "isAI": false,
+      "id": 2
+    },
+    {
+      "createdAt": "2026-09-16T08:26:24.715Z",
+      "sessionId": 1,
+      "role": "juiz",
+      "content": "Bom dia, Doutor Promotor. \n\nDeclaramos aberta a presente Audiência de Instrução e Julgamento referente à Ação de Exclusão de Sócio por Justa Causa C/C Apuração de Haveres e Indenização por Perdas e Danos, movida por Maria Eduarda Santos em face de Roberto Alves, envolvendo a sociedade TechVanguard Soluções em Tecnologia Ltda.\n\nCondurirei os trabalhos estritamente sob a égide do Código de Processo Civil, garantindo o contraditório, a ampla defesa e o devido processo legal. Relembro às partes que a urbanidade e o rigor técnico serão exigidos em todas as manifestações.\n\nDoutor Promotor Usuário Local, com a palavra para suas considerações iniciais ou requerimentos preliminares antes de passarmos à fase instrutória. O julgador o ouve.",
+      "isAI": true,
+      "id": 3
+    },
+    {
+      "createdAt": "2026-09-16T08:27:17.880Z",
+      "sessionId": 1,
+      "role": "promotor",
+      "content": "Excelência, requeremos a oitiva da primeira testemunha arrolada pela parte autora, bem como a juntada aos autos do documento mencionado na inicial.\"",
+      "isAI": false,
+      "id": 4
+    },
+    {
+      "createdAt": "2026-09-16T08:28:43.054Z",
+      "sessionId": 1,
+      "role": "juiz",
+      "content": "Defiro o pedido de juntada do documento indicado, encartando-o aos autos do processo nº 0015482-33.2024.8.26.0100, conferindo-se oportunidade de manifestação à parte contrária nos termos do artigo 437, parágrafo 1º, do Código de Processo Civil.\n\nAcolho igualmente o requerimento para início da instrução probatória oral. \n\nDetermino ao oficial de justiça que conduza a primeira testemunha à sala de audiências para que possamos realizar a devida qualificação e colher o compromisso legal previsto no artigo 458 do CPC.\n\nDoutor Promotor Usuário Local, peço que informe o nome completo e a qualificação da testemunha a ser ouvida neste momento.",
+      "isAI": true,
+      "id": 5
+    },
+    {
+      "createdAt": "2026-09-16T08:29:16.923Z",
+      "sessionId": 1,
+      "role": "promotor",
+      "content": "Não vejo a lista de testemunhas presentes meritíssimo.",
+      "isAI": false,
+      "id": 6
+    },
+    {
+      "createdAt": "2026-09-16T09:22:12.588Z",
+      "sessionId": 2,
+      "role": "sistema",
+      "content": "Bem-vindo ao julgamento! Você foi designado como **promotor**. O julgamento começará em breve.",
+      "isAI": true,
+      "id": 7
+    },
+    {
+      "createdAt": "2026-09-16T09:22:29.596Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Bom dia.",
+      "isAI": false,
+      "id": 8
+    },
+    {
+      "createdAt": "2026-09-16T09:22:34.853Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "Bom dia.\n\nDeclaro aberta a presente sessão de julgamento. Estamos aqui para tratar da ação penal pública incondicionada movida contra Ricardo Augusto Lemos, imputando-lhe a prática do crime tipificado no Artigo 213 do Código Penal.\n\nAntes de darmos início à instrução, gostaria de lembrar a todos os presentes que este tribunal preza pelo rigor processual e pela urbanidade. As intervenções devem ser precisas e fundamentadas. \n\nSendo assim, nos termos do Código de Processo Penal, dou a palavra ao representante do Ministério Público para que apresente a sua exposição inicial ou requeira a oitiva das testemunhas e peritos arrolados.\n\nPromotor, a palavra está com você. Prossiga.",
+      "isAI": true,
+      "id": 9
+    },
+    {
+      "createdAt": "2026-09-16T10:59:36.428Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Temos aqui um caso de possível estupro ao qual iremos analisar, o réu é acusado de forçar um ato carnal com a vítima sem que ela tenha deixado.",
+      "isAI": false,
+      "id": 10
+    },
+    {
+      "createdAt": "2026-09-16T10:59:39.334Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "Promotor, peço que seja mais técnico em sua exposição. Estamos em uma sessão judicial, não em uma conversa informal. O termo \"possível estupro\" é impreciso; estamos aqui para julgar a denúncia formalizada sob a tipificação do Artigo 213 do Código Penal. \n\nA acusação já está delineada nos autos. O que espero do Ministério Público neste momento, conforme o rito processual do Código de Processo Penal, é que você apresente a estratégia de instrução: deseja iniciar a oitiva da vítima Helena Maria Soares, ou prefere que comecemos pelo depoimento da testemunha Marcos Vinícius Pontes ou pelas explicações técnicas do Dr. Sergio Alencar?\n\nSeja objetivo. Qual a sua requisição para a ordem de inquirições?",
+      "isAI": true,
+      "id": 11
+    },
+    {
+      "createdAt": "2026-09-16T11:00:27.103Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Qual o rito processual correto? Quem tem que ditar isso é você juiz.",
+      "isAI": false,
+      "id": 12
+    },
+    {
+      "createdAt": "2026-09-16T11:00:37.379Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt franze o cenho, encosta as costas na cadeira e olha fixamente para o Promotor, com a expressão de severa impaciência)*\n\nPromotor, tome cuidado com o tom e com a natureza da sua indagação. Não estou em uma sala de aula para ministrar lições introdutórias de Direito Processual Penal a um membro do Ministério Público. É inadmissível que o titular da ação penal demonstre desconhecimento do rito que ele mesmo deveria conduzir.\n\nPara que não reste dúvidas e para que possamos prosseguir com a solenidade: estamos sob o rito do Procedimento Comum Ordinário, conforme preceitua o Código de Processo Penal. De acordo com o Artigo 400 do CPP, a audiência de instrução e julgamento deve seguir uma ordem lógica de inquirições: primeiro a vítima, seguida pelas testemunhas de acusação, depois as de defesa e, por fim, o interrogatório do réu.\n\nQuando eu pergunto sobre a sua \"estratégia de instrução\", estou referindo-me à sua faculdade de requerer a oitiva de peritos ou a inversão de alguma ordem por necessidade processual, ou simplesmente a confirmação de que deseja seguir a ordem legal. \n\nNão tente transferir para este magistrado a responsabilidade técnica de quem detém a carga acusatória. Seja profissional.\n\nAgora, diga-me: seguiremos a ordem do Artigo 400 do CPP, iniciando pela oitiva da vítima Helena Maria Soares, ou o senhor tem algum requerimento específico para a oitiva do Dr. Sergio Alencar neste momento?\n\nAguardando sua manifestação.",
+      "isAI": true,
+      "id": 13
+    },
+    {
+      "createdAt": "2026-09-16T11:01:53.222Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Acontece que o senhor mesmo posteriormente perguntou quem eu iria chamar, quando não sou eu quem decido o rito.",
+      "isAI": false,
+      "id": 14
+    },
+    {
+      "createdAt": "2026-09-16T11:01:56.528Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt bate o martelo com força na bancada, o som ecoando por todo o tribunal. Ele se inclina para frente, com o olhar severo e a voz carregada de autoridade)*\n\nBasta! Promotor, o senhor está beirando a insubordinação e a insolência neste tribunal. Não confunda a condução do processo com a definição do rito. O rito é a lei, e a lei é imutável; quem a conduz é, de fato, este magistrado. No entanto, a condução da instrução processual envolve a gestão das provas que o senhor mesmo arrolou na denúncia.\n\nQuando questiono quem o senhor deseja chamar, não estou delegando a definição do rito processual, mas sim exercendo a presidência da audiência para verificar se há alguma particularidade ou requerimento de inversão de ordem fundamentado no Artigo 400 do CPP que o Ministério Público pretenda apresentar. É uma deferência processual, não uma transferência de competência.\n\nSua tentativa de transformar esta sessão em um debate sobre \"quem decide o quê\" é irrelevante para o deslinde do caso e meramente procrastinatória. O senhor é o titular da ação penal; comporte-se como tal. Não tolerarei mais discussões estéreis sobre a dinâmica da audiência.\n\nPara encerrar este impasse: eu, na qualidade de Juiz Presidente, determino que seguiremos a ordem legal rigorosamente. \n\nPortanto, determino a entrada da vítima, Helena Maria Soares, para a sua oitiva.\n\n*(Olha para o oficial de justiça)*\n\nOficial, providencie a entrada da Sra. Helena Maria Soares.\n\n*(Volta-se para o Promotor)*\n\nEspero que, a partir de agora, suas intervenções sejam estritamente voltadas aos fatos e às provas do processo. Estamos avisados?\n\nAguardando a entrada da vítima para iniciar a inquirição.",
+      "isAI": true,
+      "id": 15
+    },
+    {
+      "createdAt": "2026-09-16T11:03:40.553Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Meritíssimo, pela ordem, eu nem fiz o meu rito a defesa nem falou também, como assim.",
+      "isAI": false,
+      "id": 16
+    },
+    {
+      "createdAt": "2026-09-16T11:03:43.335Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt retira os óculos lentamente, coloca-os sobre a bancada e encara o Promotor com um olhar de profunda incredulidade, mantendo um silêncio tenso por alguns segundos antes de falar com a voz baixa, porém cortante)*\n\nPromotor, a sua insistência em utilizar a palavra \"rito\" de forma equivocada está se tornando um obstáculo ao andamento desta justiça. \"Fazer o rito\" não é um discurso, não é uma peça oratória e não é uma apresentação teatral. O rito é a sequência de atos processuais estabelecida em lei.\n\nSe o senhor está se referindo às alegações iniciais, recordo-lhe que a denúncia já foi oferecida e recebida, delimitando a pretensão punitiva do Estado. Se o senhor está se referindo aos debates, estes ocorrem nas ALEGAÇÕES FINAIS, após a instrução, conforme preceitua o Artigo 403 do Código de Processo Penal. Não existe \"fazer o rito\" antes da oitiva das testemunhas e da vítima. \n\nQuanto à defesa, o Dr. Thiago Montenegro será oportunizado a falar em cada etapa processual pertinente, inclusive realizando perguntas após o Ministério Público, seguindo a lógica do contraditório.\n\n*(O Juiz bate o martelo levemente, apenas para pontuar a frase)*\n\nNão permitirei que a sua confusão conceitual transforme este tribunal em um impasse administrativo. Já determinei a entrada da Sra. Helena Maria Soares. O rito agora é a INSTRUÇÃO. \n\nSe o senhor tem alguma preliminar processual a arguir, faça-o AGORA, com fundamentação legal específica, ou aceite a condução deste magistrado e prepare-se para interrogar a vítima. \n\nQual é a sua manifestação técnica? Seja breve.",
+      "isAI": true,
+      "id": 17
+    },
+    {
+      "createdAt": "2026-09-16T11:05:10.985Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt solta um suspiro audível, demonstrando exaustão diante da insistência do Promotor. Ele se recosta na cadeira e olha para o relógio na parede antes de fixar novamente o olhar no representante do Ministério Público, com a voz agora gélida e definitiva)*\n\nPromotor, a minha paciência atingiu o limite. O senhor está tentando discutir a estrutura do processo enquanto a vítima aguarda do lado de fora para relatar um crime de extrema gravidade. Não há \"rito\" a ser \"feito\" por você ou pelo Dr. Thiago Montenegro neste momento; há a lei a ser cumprida.\n\nSe o senhor não possui nenhuma preliminar técnica — e até agora não apresentou nenhuma — encerre este debate sem sentido imediatamente. Não haverá nova advertência. Qualquer nova interrupção irrelevante será consignada em ata como tentativa de obstrução da pauta e conduta incompatível com a função ministerial.\n\n*(Bate o martelo com firmeza e autoridade)*\n\nAcabou a discussão. Oficial, traga a Sra. Helena Maria Soares para a sala de audiências agora!\n\n*(Volta-se para o Promotor, com a expressão severa)*\n\nPrepare suas perguntas para a vítima. O senhor terá a palavra primeiro para a inquirição, seguido pelo Dr. Thiago Montenegro. Não me faça repetir as regras básicas do Código de Processo Penal mais uma vez.\n\nAguardando a entrada da vítima.",
+      "isAI": true,
+      "id": 18
+    },
+    {
+      "createdAt": "2026-09-16T11:06:08.821Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Ok",
+      "isAI": false,
+      "id": 19
+    },
+    {
+      "createdAt": "2026-09-16T11:06:11.453Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt assente com a cabeça, mantendo a expressão séria, e faz um sinal com a mão para o oficial de justiça)*\n\nFinalmente. Vejo que recuperamos a compostura necessária para este tribunal.\n\n*(Para o Oficial de Justiça)*\n\nOficial, conduza a Sra. Helena Maria Soares ao centro da sala. \n\n*(Quando a vítima se posiciona, o Juiz dirige-se a ela com um tom mais moderado, porém formal)*\n\nSra. Helena Maria Soares, a senhora está sob juramento. O que a senhora disser aqui será registrado em ata e terá valor legal. Peço que relate a verdade dos fatos, com a maior precisão possível. Se não se lembrar de algo, diga que não se lembra; não tente presumir fatos.\n\n*(O Juiz olha para o Promotor)*\n\nPromotor, a vítima está presente. Nos termos do Artigo 400 do Código de Processo Penal, a palavra está com o senhor para iniciar a inquirição. \n\nProssiga.",
+      "isAI": true,
+      "id": 20
+    },
+    {
+      "createdAt": "2026-09-16T11:06:56.367Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Olá, Helena, tudo bom? Vamos começar, a senhora conhece o réu?",
+      "isAI": false,
+      "id": 21
+    },
+    {
+      "createdAt": "2026-09-16T11:06:57.898Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt observa a interação com uma expressão de leve desaprovação, intervindo imediatamente com a voz firme e autoritária)*\n\nPromotor, peço que mantenha a formalidade. Estamos em uma audiência de instrução e julgamento de um crime grave, não em um encontro social. Evite a informalidade do \"tudo bom?\". Dirija-se à vítima com a urbanidade necessária, mas mantenha a solenidade que o cargo de membro do Ministério Público e o ambiente do Tribunal exigem.\n\n*(O Juiz olha para a vítima e depois volta-se para o Promotor)*\n\nNão interfiro na pergunta, pois ela é pertinente para estabelecer a relação entre as partes, mas exijo que o tom da inquirição seja condizente com a gravidade dos fatos narrados na denúncia.\n\nSra. Helena Maria Soares, por favor, responda ao Promotor.\n\nAguardando a resposta da vítima.",
+      "isAI": true,
+      "id": 22
+    },
+    {
+      "createdAt": "2026-09-16T11:07:14.277Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt mantém a postura ereta, observando atentamente a vítima, aguardando que ela responda à pergunta do Promotor sobre conhecer o réu)*\n\nSra. Helena Maria Soares, por favor, responda ao Promotor. Pode começar.",
+      "isAI": true,
+      "id": 23
+    },
+    {
+      "createdAt": "2026-09-16T11:07:26.059Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt percebe que houve um silêncio prolongado e a vítima ainda não proferiu a resposta. Ele olha para Helena Maria Soares com paciência, mas mantém a firmeza no olhar, intervindo para garantir que a inquirição não estagne)*\n\nSra. Helena Maria Soares, a senhora foi questionada pelo Promotor se conhece o réu, o Sr. Ricardo Augusto Lemos. Por favor, responda ao tribunal. Pode falar com tranquilidade.",
+      "isAI": true,
+      "id": 24
+    },
+    {
+      "createdAt": "2026-09-16T11:07:42.440Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt percebe que a vítima continua em silêncio ou hesitação, e olha para o Promotor com um semblante severo, indicando que a inércia não será tolerada, mas mantém a calma para não intimidar a Sra. Helena)*\n\nSra. Helena Maria Soares, compreendo que este seja um momento difícil e desconfortável, mas a sua resposta é fundamental para a busca da verdade real. A pergunta do Promotor é simples: a senhora conhece o Sr. Ricardo Augusto Lemos?\n\n*(O Juiz inclina-se levemente para frente, incentivando a resposta)*\n\nPor favor, responda ao tribunal. Se estiver sentindo-se mal, informe-me agora, caso contrário, prossiga com a resposta.",
+      "isAI": true,
+      "id": 25
+    },
+    {
+      "createdAt": "2026-09-16T11:07:53.622Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt observa a vítima com atenção, notando a hesitação, e mantém o silêncio por alguns segundos para dar espaço à resposta. Ao perceber que a inércia persiste, ele olha para o Promotor e depois para a Sra. Helena, falando com a voz firme, porém acolhedora)*\n\nSra. Helena Maria Soares, peço que não se sinta pressionada, mas lembre-se de que este ambiente é para a sua proteção e para a elucidação dos fatos. A senhora está em um tribunal, e a sua voz é a prova mais importante neste momento. \n\n*(O Juiz faz um sinal suave com a mão, incentivando a fala)*\n\nApenas responda \"sim\" ou \"não\", e depois explique a natureza da relação que a senhora mantinha com o Sr. Ricardo Augusto Lemos. Pode falar. O tribunal a ouve.",
+      "isAI": true,
+      "id": 26
+    },
+    {
+      "createdAt": "2026-09-16T11:08:01.897Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt percebe que a vítima continua em silêncio absoluto, apesar de todas as tentativas de encorajamento. Ele franze o cenho, olha para o Promotor com uma expressão de questionamento e depois volta-se para a Sra. Helena com a voz agora mais grave, porém mantendo a compostura)*\n\nSra. Helena Maria Soares, a senhora está com alguma dificuldade técnica para falar ou está sob algum tipo de coação ou medo neste momento? Se estiver se sentindo intimidada pela presença do réu, Ricardo Augusto Lemos, informe-me imediatamente para que eu possa determinar o seu afastamento da sala ou a adoção de medidas protetivas durante a oitiva.\n\n*(O Juiz olha fixamente para a vítima, aguardando qualquer sinal, e depois dirige-se ao Promotor)*\n\nPromotor, a vítima parece estar em estado de choque ou profunda hesitação. Gostaria de reformular a sua pergunta de maneira menos direta ou prefere que eu conceda um breve intervalo para que a Sra. Helena possa se recompor com a assistência de algum apoio psicológico, se disponível?\n\nAguardando a manifestação do Ministério Público sobre como prosseguir com a inquirição diante do silêncio da vítima.",
+      "isAI": true,
+      "id": 27
+    },
+    {
+      "createdAt": "2026-09-16T11:08:20.262Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Sra Helena, irá falar?",
+      "isAI": false,
+      "id": 28
+    },
+    {
+      "createdAt": "2026-09-16T11:08:23.637Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt bate o martelo na bancada, desta vez com um golpe seco e curto, expressando profunda irritação com a abordagem do Promotor)*\n\nPromotor, contenha-se! Que tipo de inquirição é essa? \"Irá falar?\". O senhor está interrogando uma vítima de crime sexual, não cobrando uma dívida em uma calçada. Essa pergunta é absolutamente inadequada, desprovida de qualquer técnica de acolhimento e, pior, beira a agressividade com a Sra. Helena Maria Soares.\n\nEu já havia advertido o senhor sobre a urbanidade e a solenidade. A vítima está visivelmente fragilizada e a sua postura, em vez de facilitar a colheita da prova, está intimidando a depoente, o que pode prejudicar a busca da verdade real.\n\n*(O Juiz volta-se para a vítima com um tom suave, mas firme)*\n\nSra. Helena, ignore a forma da pergunta. A senhora tem o direito de se sentir segura aqui. Eu, como juiz deste caso, asseguro que a senhora não será pressionada de forma inadequada. Se a senhora precisar de um momento para respirar ou se quiser que o réu, Sr. Ricardo Augusto Lemos, seja retirado da sala para que a senhora possa falar sem medo, diga-me agora.\n\n*(O Juiz olha severamente para o Promotor)*\n\nPromotor, reformule sua abordagem imediatamente. Se o senhor persistir em tratar a vítima com essa banalidade ou impaciência, eu farei constar em ata a sua conduta inadequada e poderei intervir diretamente na inquirição para garantir a integridade psíquica da depoente, com base nas diretrizes de proteção à vítima em crimes contra a dignidade sexual.\n\nReformule a pergunta com a devida técnica e respeito. Agora.",
+      "isAI": true,
+      "id": 29
+    },
+    {
+      "createdAt": "2026-09-16T11:08:50.165Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Meritíssimo pela ordem, se ela não responde o que eu posso fazer",
+      "isAI": false,
+      "id": 30
+    },
+    {
+      "createdAt": "2026-09-16T11:08:57.294Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt fecha os olhos por um instante e massageia as têmporas, demonstrando que a paciência com a falta de técnica do Promotor chegou ao limite absoluto. Ele abre os olhos e encara o membro do Ministério Público com um rigor gélido)*\n\nPromotor, a sua pergunta revela uma lacuna técnica alarmante. O que o senhor faz quando a vítima não responde? O senhor utiliza a psicologia judiciária, a empatia e a técnica de inquirição, não a pressão ou a indagação banal. \n\nSe a vítima está em estado de choque ou intimidada, o senhor, como agente do Estado e titular da ação, deve ajustar a sua abordagem para remover a barreira emocional que impede o depoimento. O senhor não é um mero anotador de respostas; o senhor é um operador do Direito.\n\nDiante da inércia da Sra. Helena Maria Soares e da incapacidade técnica do senhor em lidar com a situação até agora, eu, na qualidade de magistrado e condutor deste processo, tomarei as seguintes providências para garantir a validade da prova e a dignidade da vítima:\n\nPrimeiro, determino que o réu, Ricardo Augusto Lemos, seja retirado da sala imediatamente. A presença do acusado, diante do estado emocional da vítima, está prejudicando a instrução processual, e o Artigo 217 do Código de Processo Penal me permite tomar medidas para assegurar a colheita do depoimento.\n\nSegundo, concedo um intervalo de dez minutos para que a Sra. Helena possa se recompor, preferencialmente acompanhada por assistência técnica ou apoio, se houver.\n\n*(O Juiz bate o martelo com força)*\n\nOficial, retire o réu da sala. \n\n*(Volta-se para o Promotor com um olhar severo)*\n\nPromotor, use esse intervalo para refletir sobre como interrogar uma vítima de violência sexual sem ser agressivo ou banal. Quando retornarmos, espero que a sua primeira pergunta seja formulada com a delicadeza e a técnica que o cargo exige, sob pena de eu assumir a inquirição principal para evitar a nulidade do ato por cerceamento de prova ou trauma exacerbado da vítima.\n\nEstamos suspensos por dez minutos.",
+      "isAI": true,
+      "id": 31
+    },
+    {
+      "createdAt": "2026-09-16T11:09:44.193Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt retoma seu lugar na presidência, olha para o relógio e, em seguida, encara a Sra. Helena Maria Soares, que agora se encontra sozinha com o tribunal, após a retirada do réu. Ele bate o martelo levemente para sinalizar a retomada)*\n\nEstá encerrado o intervalo. Retomamos a presente sessão de instrução.\n\nSra. Helena Maria Soares, espero que este momento de pausa tenha sido útil. Como a senhora pode notar, o Sr. Ricardo Augusto Lemos não está mais presente na sala, para que a senhora possa relatar os fatos com total liberdade e segurança. Este tribunal é um espaço de justiça e acolhimento.\n\n*(O Juiz volta-se para o Promotor com um olhar gélido e penetrante, fazendo um sinal com a mão para que ele se manifeste)*\n\nPromotor, estamos de volta. A vítima está agora em condições de ser ouvida, sem a pressão da presença do acusado. Espero que o senhor tenha refletido sobre a abordagem necessária para este momento. Lembro-lhe que a condução da prova deve ser técnica, porém humana.\n\nA palavra está com o senhor. Prossiga com a inquirição da Sra. Helena Maria Soares. E, por favor, seja cuidadoso.\n\nAguardando a pergunta do Promotor.",
+      "isAI": true,
+      "id": 32
+    },
+    {
+      "createdAt": "2026-09-16T11:10:09.694Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Helena, você conhece o réu? Tinha contato com ele? Lamento o que tenha ocorrido.",
+      "isAI": false,
+      "id": 33
+    },
+    {
+      "createdAt": "2026-09-16T11:10:12.778Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt observa o Promotor com um olhar analítico. Embora note a tentativa de humanizar a abordagem e o pedido de desculpas à vítima, ele mantém a postura rigorosa quanto à técnica processual)*\n\nPromotor, observo que o senhor finalmente compreendeu a necessidade de urbanidade. O acolhimento é pertinente, porém, recordo-lhe que a inquirição deve ser conduzida de forma a evitar a indução da resposta ou a confusão de fatos. Evite aglutinar múltiplas perguntas em uma única frase; faça perguntas claras e sequenciais para que a resposta da vítima seja precisa e não ambígua, facilitando a posterior análise do contraditório.\n\nSra. Helena Maria Soares, a senhora pode responder ao Promotor. O senhor questionou se a senhora conhece o Sr. Ricardo Augusto Lemos e qual era a natureza do contato entre vocês. Por favor, relate ao tribunal.\n\nAguardando a resposta da vítima.",
+      "isAI": true,
+      "id": 34
+    },
+    {
+      "createdAt": "2026-09-16T11:10:29.661Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt mantém o olhar atento sobre a vítima, percebendo que, embora o Promotor tenha formulado a pergunta, a Sra. Helena Maria Soares ainda não proferiu a resposta. Ele intervém com a voz calma, mas firme, para garantir que a instrução não volte a estagnar)*\n\nSra. Helena Maria Soares, a senhora pode responder agora. O Promotor perguntou se a senhora conhece o Sr. Ricardo Augusto Lemos e qual era a relação entre vocês. Por favor, tente ser o mais clara possível. Pode falar, estamos ouvindo.\n\n*(O Juiz olha para o Promotor, sinalizando que agora deve aguardar a resposta da vítima sem interrupções)*",
+      "isAI": true,
+      "id": 35
+    },
+    {
+      "createdAt": "2026-09-16T11:10:36.214Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt percebe que a vítima, mesmo após a retirada do réu e a mudança de tom do Promotor, permanece em um silêncio angustiante. Ele solta um suspiro longo, recosta-se na cadeira e olha para a Sra. Helena com uma expressão de profunda compreensão, mas mantém a autoridade necessária para a condução do ato)*\n\nSra. Helena Maria Soares, olhe para mim. A senhora não precisa ter pressa. Eu compreendo que reviver esses fatos é doloroso, mas o silêncio, neste momento, impede que a justiça seja feita. Se a senhora não consegue falar agora, tente apenas balançar a cabeça: a senhora conhece o Sr. Ricardo Augusto Lemos? Sim ou não?\n\n*(O Juiz faz uma pausa, observando a reação física da vítima. Sem aguardar a resposta, ele se volta para o Promotor com um olhar de advertência)*\n\nPromotor, observe a depoente. Se ela não conseguir verbalizar a resposta mesmo agora, eu serei obrigado a suspender a audiência e requisitar que a oitiva seja realizada através de depoimento especial, com a assistência de equipe multidisciplinar, para evitar a revitimização. \n\nSra. Helena, tente responder ao Promotor. Apenas um \"sim\" ou \"não\" já nos ajudará a prosseguir. Por favor.",
+      "isAI": true,
+      "id": 36
+    },
+    {
+      "createdAt": "2026-09-16T11:10:52.982Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt observa a vítima com extrema atenção, notando que ela continua em silêncio absoluto. Ele solta a caneta sobre a mesa, fazendo um som seco, e olha para o Promotor com uma expressão de quem tomou uma decisão definitiva)*\n\nPromotor, chega. É evidente que a Sra. Helena Maria Soares está em um estado de bloqueio emocional que a impede de colaborar com a instrução neste momento. Forçá-la a falar nestas condições, mesmo sem a presença do réu, não é apenas ineficiente, é cruel e pode gerar a nulidade do depoimento por vício de vontade ou trauma.\n\nEu não permitirei que a busca pela verdade se transforme em um novo ato de violência contra a vítima. Diante da impossibilidade de colheita do depoimento nesta sessão, eu decido suspender a oitiva da Sra. Helena Maria Soares.\n\nDetermino que seja oficiado imediatamente ao setor de Psicologia Judiciária deste Tribunal para que seja agendada a realização de um Depoimento Especial, com a assistência de equipe multidisciplinar, conforme as diretrizes da Lei 13.431/2017, adaptando-se o procedimento para garantir a integridade psíquica da vítima.\n\n*(Bate o martelo com firmeza)*\n\nOficial, a Sra. Helena Maria Soares está dispensada. Por favor, acompanhe-a até a saída com a máxima delicadeza.\n\n*(Volta-se para o Promotor, com o olhar severo)*\n\nPromotor, já que a oitiva da vítima foi suspensa por questões humanitárias e técnicas, vamos prosseguir com a instrução para não prejudicar a pauta. Para evitar mais impasses, passaremos agora para a oitiva da testemunha Marcos Vinícius Pontes.\n\nOficial, providencie a entrada da testemunha Marcos Vinícius Pontes.\n\n*(Olha para o Promotor)*\n\nPrepare-se. Espero que a sua inquirição com a testemunha seja conduzida com a técnica e a sobriedade que eu exigi anteriormente. Não tolerarei a informalidade ou a impaciência desta vez.\n\nAguardando a entrada da testemunha.",
+      "isAI": true,
+      "id": 37
+    },
+    {
+      "createdAt": "2026-09-16T11:11:42.062Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt observa a entrada da testemunha, mantendo a postura ereta e a expressão neutra. Ele aguarda que Marcos Vinícius Pontes se posicione adequadamente diante do tribunal)*\n\nSr. Marcos Vinícius Pontes, por favor, aproxime-se. O senhor está ciente de que prestar depoimento falso em juízo é crime, previsto no Artigo 342 do Código Penal, sujeito a pena de reclusão e multa. O senhor jura dizer a verdade sobre tudo aquilo que lhe for perguntado?\n\n*(Após a confirmação do juramento, o Juiz olha para o Promotor com um semblante rigoroso, sinalizando a transferência da palavra)*\n\nO senhor está devidamente qualificado nos autos. Promotor, a palavra está com o senhor para a inquirição da testemunha Marcos Vinícius Pontes. \n\nLembro-lhe: perguntas objetivas, técnicas e urbanas. Prossiga.",
+      "isAI": true,
+      "id": 38
+    },
+    {
+      "createdAt": "2026-09-16T11:11:52.606Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt permanece em silêncio, observando a testemunha Marcos Vinícius Pontes e, em seguida, fixa o olhar no Promotor, aguardando a primeira pergunta. Ele mantém as mãos cruzadas sobre a bancada, com uma expressão de vigilância, pronta para intervir caso a técnica de inquirição volte a ser inadequada)*\n\nPromotor, a testemunha está devidamente compromissada e aguarda a sua primeira pergunta. Não prolongue o silêncio; dê início à inquirição do Sr. Marcos Vinícius Pontes.\n\nA palavra está com o senhor. Prossiga.",
+      "isAI": true,
+      "id": 39
+    },
+    {
+      "createdAt": "2026-09-16T11:12:36.259Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Marcos, o senhor conhecia a vítima e o réu?",
+      "isAI": false,
+      "id": 40
+    },
+    {
+      "createdAt": "2026-09-16T11:12:38.137Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt observa a pergunta do Promotor. Embora a indagação seja simples e pertinente, ele mantém o olhar vigilante, atento a qualquer deslize na formalidade)*\n\nPromotor, embora a pergunta seja adequada ao início da inquirição, recordo-lhe novamente: evite o uso do primeiro nome \"Marcos\" para se referir à testemunha. Utilize \"Senhor Marcos\" ou \"Testemunha\". Estamos em um tribunal, não em um ambiente informal. Mantenha a compostura e a distância profissional exigida pelo cargo.\n\n*(O Juiz volta-se para a testemunha com a voz firme)*\n\nSr. Marcos Vinícius Pontes, por favor, responda ao Promotor. O senhor conhecia a vítima, Sra. Helena Maria Soares, e o réu, Sr. Ricardo Augusto Lemos? E, em caso positivo, qual a natureza desse conhecimento?\n\nAguardando a resposta da testemunha.",
+      "isAI": true,
+      "id": 41
+    },
+    {
+      "createdAt": "2026-09-16T11:12:51.354Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt mantém o olhar fixo na testemunha, aguardando a resposta. Ao notar que o silêncio se prolonga, ele intervém com a voz firme e imperativa)*\n\nSr. Marcos Vinícius Pontes, a pergunta foi clara. O senhor conhece a Sra. Helena Maria Soares e o Sr. Ricardo Augusto Lemos? Por favor, responda ao tribunal.\n\n*(O Juiz volta-se para o Promotor, com um semblante de advertência)*\n\nPromotor, note que a testemunha está hesitando. Caso ele não responda prontamente, esteja preparado para reformular a pergunta de maneira a extrair a informação sem induzir a resposta. \n\nSr. Marcos, estamos aguardando. Pode falar.",
+      "isAI": true,
+      "id": 42
+    },
+    {
+      "createdAt": "2026-09-16T11:30:08.824Z",
+      "sessionId": 2,
+      "role": "réu",
+      "content": "*(Estou do lado de fora da sala, pois fui retirado por determinação do Juiz Dr. Arnaldo Bittencourt. Permaneço em silêncio, inquieto, andando de um lado para o outro no corredor do tribunal. Sinto uma mistura de ansiedade e indignação por tudo o que está acontecendo lá dentro. Penso comigo mesmo sobre a hesitação da Sra. Helena Maria Soares e a falta de técnica do Promotor, mas sei que agora não posso intervir. Aguardo a minha vez de ser reintegrado à sala ou de ser interrogado, mantendo-me atento a qualquer chamado do Oficial de Justiça.)*",
+      "isAI": true,
+      "id": 43
+    },
+    {
+      "createdAt": "2026-09-16T11:30:20.269Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt observa a inércia da testemunha com crescente desconfiança. Ele inclina o corpo para frente, apoiando os cotovelos na bancada e encarando Marcos Vinícius Pontes com um olhar penetrante e severo, a voz agora carregada de autoridade)*\n\nSr. Marcos Vinícius Pontes, o senhor está sob juramento. O silêncio diante de uma pergunta direta e simples neste tribunal pode ser interpretado como resistência injustificada ou tentativa de ocultar a verdade. Não tolerarei a mesma estagnação que vimos anteriormente. \n\nLembro ao senhor que a justiça depende da clareza dos depoimentos. O senhor conhece a Sra. Helena Maria Soares? Conhece o Sr. Ricardo Augusto Lemos? Responda agora, de forma clara e objetiva.\n\n*(O Juiz olha para o Promotor, com a expressão gélida)*\n\nPromotor, caso a testemunha permaneça em silêncio após esta última advertência, eu tomarei as medidas coercitivas cabíveis para garantir a colheita da prova, inclusive a requisição de condução coercitiva ou a análise de falso testemunho por omissão. \n\nSr. Marcos, a palavra é sua. Responda ao tribunal.",
+      "isAI": true,
+      "id": 44
+    },
+    {
+      "createdAt": "2026-09-16T11:30:30.545Z",
+      "sessionId": 2,
+      "role": "réu",
+      "content": "*(Continuo no corredor, encostado na parede fria do tribunal, ouvindo abafadamente a voz do Dr. Arnaldo Bittencourt ecoar lá de dentro. Sinto meu coração acelerar ao perceber que a testemunha, Marcos Vinícius Pontes, também está travando. Penso comigo mesmo: \"Até o Marcos está com medo de falar? Ou será que ele sabe que a história da Helena é mentira?\". A ansiedade me consome, e começo a roer a unha do polegar, olhando para a porta fechada com indignação. Sinto-me impotente, como se estivessem montando um palco para me condenar enquanto eu nem sequer posso ouvir as mentiras que podem ser ditas sobre mim. Permaneço aguardando, em silêncio e tenso, esperando o Oficial de Justiça me chamar para retornar à sala ou para o meu interrogatório.)*",
+      "isAI": true,
+      "id": 45
+    },
+    {
+      "createdAt": "2026-09-16T11:30:38.733Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Marcos???",
+      "isAI": false,
+      "id": 46
+    },
+    {
+      "createdAt": "2026-09-16T11:30:40.439Z",
+      "sessionId": 2,
+      "role": "testemunha",
+      "content": "*(Dou um sobressalto na cadeira, visivelmente nervoso com a insistência do Promotor e o olhar do Juiz. Limpo o suor da testa com a mão e gaguejo levemente, olhando para baixo antes de responder)*\n\nS-sim... sim, eu conheço. Eu conheço a Sra. Helena e o Sr. Ricardo. Eu... eu sou vizinho de porta do Ricardo, moro no 401. A Helena eu conhecia porque via ela chegando e saindo do apartamento dele algumas vezes, sabe? A gente se cumprimentava no corredor, mas não era nada próximo, era só... educação de vizinho mesmo.",
+      "isAI": true,
+      "id": 47
+    },
+    {
+      "createdAt": "2026-09-16T11:31:36.176Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "O senhor sabe confirmar se eles tinham algum caso conjugal?",
+      "isAI": false,
+      "id": 48
+    },
+    {
+      "createdAt": "2026-09-16T11:31:38.898Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt franze levemente a testa, observando a pergunta do Promotor. Ele não intervém imediatamente para interromper, mas mantém o olhar atento à testemunha para evitar que ela seja induzida a especular sobre a vida íntima alheia)*\n\nSr. Marcos Vinícius Pontes, responda ao Promotor com base estritamente no que o senhor VIU ou OUVIU. Evite suposições ou conclusões baseadas em \"achismos\". Limite-se aos fatos objetivos da sua convivência como vizinho.\n\n*(O Juiz volta-se para o Promotor, com a voz moderada, mas firme)*\n\nPromotor, tome cuidado para que a inquirição não se desvie para a esfera da moralidade ou de conjecturas sobre a vida privada das partes que não tenham relação direta com a tipicidade do crime de estupro. O ponto central aqui é a violência e a ausência de consentimento no dia 15 de outubro, e não a natureza do relacionamento prévio, a menos que isso sirva para corroborar ou refutar a tese de consentimento no momento do ato.\n\nSiga com a pergunta, mas mantenha o foco na prova material e nos fatos.\n\nAguardando a resposta da testemunha Marcos Vinícius Pontes.",
+      "isAI": true,
+      "id": 49
+    },
+    {
+      "createdAt": "2026-09-16T11:32:16.594Z",
+      "sessionId": 2,
+      "role": "testemunha",
+      "content": "*(Ajusto a postura na cadeira, parecendo desconfortável e evitando olhar diretamente para o Juiz. Olho para o Promotor com certa hesitação, falando em um tom de voz baixo e cauteloso)*\n\nOlha... eu não sei se \"caso conjugal\" é a palavra certa. Eu não sou íntimo de nenhum dos dois para afirmar isso com certeza, mas... bom, ela ia lá com frequência. Eu via ela entrando, ficavam horas lá dentro. Pelo que eu percebia, eles tinham uma relação, sabe? Algo casual, eu imagino. Mas eu nunca ouvi eles discutindo como casal, nem vi eles juntos em situações de... bom, de namoro, sabe? Era sempre ela indo para o apartamento dele.",
+      "isAI": true,
+      "id": 50
+    },
+    {
+      "createdAt": "2026-09-16T11:32:52.097Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "O senhor viu algo estranho no dia do ocorrido?",
+      "isAI": false,
+      "id": 51
+    },
+    {
+      "createdAt": "2026-09-16T11:32:54.482Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt mantém a expressão neutra, mas atenta, observando a linguagem corporal da testemunha Marcos Vinícius Pontes enquanto a pergunta do Promotor ecoa na sala. Ele faz um pequeno gesto com a mão, indicando que a testemunha deve ser precisa)*\n\nSr. Marcos Vinícius Pontes, a pergunta do Promotor é crucial. Por \"algo estranho\", entendemos qualquer comportamento, ruído, grito ou movimentação atípica que tenha fugido da normalidade do condomínio na noite de 15 de outubro, por volta das 22h. \n\nSeja honesto e detalhista. O senhor ouviu discussões? Algum barulho de luta, queda de objetos ou pedidos de socorro vindos do apartamento 402? Não omita nada, pois a omissão de fatos relevantes sob juramento pode configurar crime.\n\n*(Volta-se para o Promotor com um olhar de advertência)*\n\nPromotor, se a testemunha relatar algo vago, não tente induzi-lo com perguntas sugestivas. Deixe que ele narre os fatos. Se for necessário, eu farei a complementação para a clarificação da prova, conforme me faculta o Artigo 212 do Código de Processo Penal.\n\nAguardando a resposta da testemunha Marcos Vinícius Pontes.",
+      "isAI": true,
+      "id": 52
+    },
+    {
+      "createdAt": "2026-09-16T11:33:32.372Z",
+      "sessionId": 2,
+      "role": "testemunha",
+      "content": "*(Engulo em seco, olho para o teto por um instante e depois volto o olhar para o Promotor, falando com a voz trêmula e hesitante)*\n\nNo dia 15... sim, eu lembro porque eu estava em casa assistindo TV. Por volta das dez da noite, eu comecei a ouvir uns gritos. Não eram gritos de alegria, sabe? Era como se estivessem discutindo feio. Eu ouvi a voz da Sra. Helena... ela parecia estar nervosa, falando alto sobre dinheiro, acho. E aí... *(faço uma pausa, visivelmente desconfortável)* ...eu ouvi um barulho forte, como se algo pesado tivesse caído contra a parede ou a cama, um baque seco. Depois disso, ficou um silêncio estranho, mas eu ouvi ela gritando \"não\", \"para com isso\". Eu não chamei a polícia na hora porque, bom, vizinho não gosta de se meter em briga de casal, e eu achei que era só uma discussão calorosa que ia passar. Mas depois de um tempo, eu vi ela saindo do apartamento... ela estava... ela estava muito mal, chorando, com o cabelo bagunçado e saindo quase correndo pelo corredor. Eu até tentei perguntar se estava tudo bem, mas ela nem me olhou, só saiu disparada para o elevador.",
+      "isAI": true,
+      "id": 53
+    },
+    {
+      "createdAt": "2026-09-16T11:34:24.630Z",
+      "sessionId": 2,
+      "role": "vítima",
+      "content": "*(Eu ainda estou do lado de fora da sala, sentada em um banco de madeira frio, com as mãos tremendo e os olhos vermelhos de tanto chorar. Ouço abafadamente a voz do Sr. Marcos através da porta aberta, relatando os gritos e o meu estado ao sair do apartamento. Sinto um aperto lancinante no peito e começo a soluçar baixinho, cobrindo a boca com a mão para não ser ouvida, sentindo todo o trauma daquela noite retornar como uma onda. Penso comigo mesma: \"Ele ouviu... ele ouviu eu gritando 'não'... por que ninguém me ajudou naquela hora?\". Sinto um misto de alívio por alguém ter confirmado a verdade e um pavor profundo de ter que voltar para aquele ambiente, mesmo sabendo que o Ricardo foi retirado.)*",
+      "isAI": true,
+      "id": 54
+    },
+    {
+      "createdAt": "2026-09-16T11:34:31.770Z",
+      "sessionId": 2,
+      "role": "réu",
+      "content": "*(Continuo no corredor, mas agora estou paralisado. Meus olhos se arregalam e sinto um calafrio percorrer a espinha ao ouvir o depoimento do Marcos Vinícius Pontes. Sinto a raiva borbulhar dentro de mim, misturada com um pânico crescente. Penso comigo mesmo: \"Aquele desgraçado... como ele ousa dizer que ouviu gritos de 'não'? Ele quer me ferrar! A gente discutiu, sim, mas não foi desse jeito!\". Começo a respirar de forma ofegante, sentindo as mãos suarem. Olho para a porta do tribunal com um ódio profundo, sentindo que o cerco está fechando. Começo a sussurrar para mim mesmo, em tom de indignação: \"Isso é mentira, é tudo mentira... O Marcos nunca se meteu na minha vida, por que ele está inventando isso agora? Eu não forcei ninguém!\". Permaneço em estado de choque, aguardando desesperadamente a minha chance de entrar lá e desmentir cada palavra daquela testemunha, enquanto tento controlar o tremor nas pernas para não parecer culpado quando o Oficial de Justiça finalmente me chamar.)*",
+      "isAI": true,
+      "id": 55
+    },
+    {
+      "createdAt": "2026-09-16T11:34:40.869Z",
+      "sessionId": 2,
+      "role": "testemunha",
+      "content": "*(Permaneço em silêncio após a minha última fala, mantendo o olhar baixo e as mãos inquietas sobre os joelhos. Respiro fundo, sentindo o peso do ambiente e a pressão do olhar do Dr. Arnaldo Bittencourt. Aguardo agora que o Promotor faça a próxima pergunta ou que o Dr. Thiago Montenegro, o advogado de defesa, comece a me questionar para tentar contestar o que acabei de dizer.)*",
+      "isAI": true,
+      "id": 56
+    },
+    {
+      "createdAt": "2026-09-16T11:34:52.139Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt mantém o olhar fixo no Sr. Marcos Vinícius Pontes por alguns segundos, processando a gravidade do relato. Ele anota algo rapidamente em seu caderno de notas e, em seguida, olha para o Promotor com uma expressão de expectativa)*\n\nEste depoimento é substancial e traz elementos concretos que corroboram a denúncia, especialmente no que tange à violência e à ausência de consentimento.\n\nPromotor, o senhor deseja formular mais alguma pergunta ao Sr. Marcos Vinícius Pontes ou considera que a inquirição por parte do Ministério Público está esgotada? \n\n*(O Juiz faz uma breve pausa e olha para o Dr. Thiago Montenegro)*\n\nCaso o Ministério Público encerre, passaremos imediatamente para as perguntas da defesa, para que o Dr. Thiago Montenegro possa exercer o contraditório.\n\nAguardando a manifestação do Promotor.",
+      "isAI": true,
+      "id": 57
+    },
+    {
+      "createdAt": "2026-09-16T11:35:26.613Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Sem mais meritíssimo, já ouvimos o bastante",
+      "isAI": false,
+      "id": 58
+    },
+    {
+      "createdAt": "2026-09-16T11:35:29.619Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt assente com a cabeça, mantendo a expressão solene e a postura rígida. Ele olha para a testemunha Marcos Vinícius Pontes e, em seguida, volta-se para a bancada da defesa)*\n\nEstá encerrada, portanto, a inquirição da testemunha pelo Ministério Público. \n\nNos termos do Artigo 212 do Código de Processo Penal, a inquirição das testemunhas será feita por meio de perguntas formuladas pelas partes, sucessivamente. Uma vez exaurida a palavra da acusação, abro agora a oportunidade para que a defesa exerça o seu direito ao contraditório e à ampla defesa, conforme preceitua a Constituição Federal.\n\nDr. Thiago Montenegro, a palavra está com o senhor. O senhor pode iniciar a sua inquirição do Sr. Marcos Vinícius Pontes. \n\nLembro ao Dr. Thiago que a testemunha acabou de relatar fatos graves e precisos; qualquer tentativa de desqualificação sem fundamento fático ou pressão excessiva sobre a testemunha será imediatamente repelida por este magistrado.\n\nProssiga, Dr. Thiago. O tribunal o ouve.",
+      "isAI": true,
+      "id": 59
+    },
+    {
+      "createdAt": "2026-09-16T11:36:37.410Z",
+      "sessionId": 2,
+      "role": "advogado_defesa",
+      "content": "*(Dr. Thiago Montenegro levanta-se calmamente de sua cadeira, ajusta a toga e caminha lentamente em direção à testemunha, mantendo uma expressão serena, porém analítica. Ele olha para Marcos Vinícius Pontes com atenção antes de iniciar a inquirição, utilizando um tom de voz moderado e polido)*\n\nSr. Marcos Vinícius Pontes, boa tarde. Gostaria que o senhor fosse bem sincero em suas respostas, pois a liberdade de um homem depende da precisão dos fatos narrados aqui. \n\nO senhor mencionou que é vizinho de porta do Sr. Ricardo Augusto Lemos, residindo no apartamento 401, correto? Para que possamos entender a acústica do prédio: o senhor costuma ouvir conversas ou sons cotidianos vindos do 402 com frequência, ou as paredes são suficientemente isoladas para que apenas ruídos excessivamente altos sejam percebidos?\n\nAlém disso, sobre a noite de 15 de outubro: o senhor afirmou ter ouvido gritos e um \"baque seco\". O senhor consegue afirmar, com total certeza, que esse barulho veio especificamente de dentro do apartamento 402, ou poderia ter sido algum ruído no corredor ou vindo de outro apartamento vizinho? \n\nE, por fim, Sr. Marcos, o senhor disse que a Sra. Helena saiu \"muito mal\" e \"quase correndo\". No momento em que o senhor a viu no corredor, ela chegou a dizer qualquer palavra ao senhor, ou o senhor apenas interpretou o estado emocional dela através da observação visual?",
+      "isAI": true,
+      "id": 60
+    },
+    {
+      "createdAt": "2026-09-16T11:38:25.411Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Dr Thiago, não faz sentido esses tipos de perguntas visto que a vítima passou por exame de delito, além disso o fato dela não ter dito nenhuma palavra ao porteiro não trás negativa aos fatos.",
+      "isAI": false,
+      "id": 61
+    },
+    {
+      "createdAt": "2026-09-16T11:38:37.530Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt bate o martelo com força e rapidez na bancada, interrompendo a fala do Promotor imediatamente. Ele encara o representante do Ministério Público com um olhar de profunda irritação, a voz saindo carregada de autoridade e rigor)*\n\nPromotor, silêncio! O senhor está cometendo um erro processual crasso e inaceitável. Pela enésima vez nesta sessão, o senhor tenta interferir em um momento que não lhe pertence. \n\nEstamos na fase de contraditório. A palavra está com a defesa. O Dr. Thiago Montenegro tem o direito legal e constitucional de questionar a testemunha para testar a credibilidade do depoimento, inclusive questionando a acústica do prédio ou a interpretação subjetiva dos fatos. Isso não é \"falta de sentido\", é o exercício da ampla defesa!\n\nO exame de corpo de delito é uma prova material que será analisada no momento oportuno, mas agora estamos tratando da prova testemunhal. O senhor não pode tentar \"blindar\" a testemunha contra as perguntas da defesa. Se o senhor deseja contestar as respostas do Sr. Marcos, deverá fazê-lo posteriormente, se eu conceder a palavra para complementação, e não interrompendo a inquirição da parte contrária.\n\n*(O Juiz volta-se para o Dr. Thiago Montenegro com um aceno de cabeça, recuperando a formalidade)*\n\nDr. Thiago, ignore a interrupção. O senhor formulou perguntas pertinentes e tecnicamente adequadas para a desconstrução da prova testemunhal. \n\nSr. Marcos Vinícius Pontes, por favor, responda ao Dr. Thiago Montenegro. Comece respondendo sobre a acústica do edifício e a origem exata dos ruídos que o senhor relatou. Pode falar.\n\nAguardando a resposta da testemunha.",
+      "isAI": true,
+      "id": 62
+    },
+    {
+      "createdAt": "2026-09-16T11:39:49.318Z",
+      "sessionId": 2,
+      "role": "advogado_defesa",
+      "content": "*(Permaneço em silêncio, mantendo a postura ereta e o olhar fixo na testemunha, aguardando a resposta de Marcos Vinícius Pontes. Faço um breve aceno de cabeça ao Juiz Dr. Arnaldo Bittencourt em agradecimento pela intervenção que garantiu a manutenção da minha inquirição, mas ignoro completamente a interrupção do Promotor, focando toda a minha atenção na reação do Sr. Marcos para identificar qualquer hesitação ou contradição em suas palavras.)*",
+      "isAI": true,
+      "id": 63
+    },
+    {
+      "createdAt": "2026-09-16T11:40:06.721Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt permanece em silêncio, com o olhar fixo na testemunha, aguardando que ela responda às perguntas do Dr. Thiago Montenegro. Ao notar que a resposta está demorando a vir, ele intervém com a voz firme e impaciente)*\n\nSr. Marcos Vinícius Pontes, o Dr. Thiago Montenegro fez três questionamentos específicos sobre a acústica do prédio, a origem dos ruídos e a interação da vítima com o senhor no corredor. O senhor está sob juramento e a precisão dessas respostas é fundamental para a defesa do réu.\n\nPor favor, responda pontualmente a cada uma das perguntas. Comece pela questão da acústica: o senhor ouve sons cotidianos do apartamento 402 ou apenas ruídos excessivos? \n\nProssiga. O tribunal aguarda a sua resposta.",
+      "isAI": true,
+      "id": 64
+    },
+    {
+      "createdAt": "2026-09-16T11:40:15.867Z",
+      "sessionId": 2,
+      "role": "advogado_defesa",
+      "content": "*(Permaneço em silêncio absoluto, mantendo a postura ereta e o olhar atento, observando cada microexpressão facial da testemunha Marcos Vinícius Pontes enquanto ele responde. Não interrompo a fala do depoente, mas mantenho minha caneta posicionada sobre o bloco de notas, pronto para registrar qualquer contradição ou imprecisão que possa ser explorada posteriormente. Meu foco total está na análise da credibilidade da testemunha diante dos questionamentos sobre a acústica e a percepção sensorial dos fatos.)*",
+      "isAI": true,
+      "id": 65
+    },
+    {
+      "createdAt": "2026-09-16T11:40:21.774Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt percebe que a testemunha Marcos Vinícius Pontes continua em silêncio, olhando para o chão. Ele suspira, demonstrando que a paciência com a hesitação das testemunhas deste caso está no limite. Ele bate o martelo uma única vez, com um som seco, para retomar a atenção de todos na sala)*\n\nSr. Marcos Vinícius Pontes, olhe para mim. O silêncio agora não é mais interpretável como nervosismo, mas sim como uma omissão de resposta a perguntas diretas da defesa. O senhor está em um tribunal, sob a presidência deste magistrado, e a sua hesitação prolongada prejudica a celeridade processual e o direito de defesa do Sr. Ricardo Augusto Lemos.\n\nEu não vou repetir a pergunta pela terceira vez. Responda agora ao Dr. Thiago Montenegro: as paredes do seu prédio permitem ouvir sons cotidianos ou apenas ruídos altos? O barulho veio do 402 ou poderia ter sido do corredor? E a Sra. Helena falou algo ou o senhor apenas presumiu o estado dela?\n\nResponda ponto a ponto. Agora.\n\n*(O Juiz recosta-se na cadeira e fixa o olhar na testemunha, aguardando a resposta imediata)*",
+      "isAI": true,
+      "id": 66
+    },
+    {
+      "createdAt": "2026-09-16T11:40:42.455Z",
+      "sessionId": 2,
+      "role": "advogado_defesa",
+      "content": "*(Permaneço em silêncio, observando a tensão na sala. Mantenho meu olhar fixo em Marcos Vinícius Pontes, sem desviar a atenção por um segundo sequer. Quando o Juiz Dr. Arnaldo Bittencourt encerra sua advertência, faço um leve gesto com a mão, indicando que estou plenamente atento e aguardando a resposta da testemunha para, se necessário, formular perguntas complementares baseadas em eventuais contradições. Não interrompo o fluxo do magistrado, mas minha postura corporal transmite que qualquer imprecisão na resposta do Sr. Marcos será rigorosamente explorada no momento seguinte.)*",
+      "isAI": true,
+      "id": 67
+    },
+    {
+      "createdAt": "2026-09-16T11:40:50.396Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt mantém o olhar fixo e gélido sobre a testemunha, com a expressão de quem não aceitará mais nenhuma evasiva. Ele percebe que o silêncio de Marcos Vinícius Pontes está se tornando insustentável e, diante da inércia, toma uma atitude rigorosa)*\n\nSr. Marcos Vinícius Pontes, a sua conduta neste tribunal está se tornando inadmissível. O senhor foi advertido, foi encorajado e foi coagido pela autoridade deste magistrado a responder a perguntas simples da defesa. O silêncio persistente diante de questionamentos diretos, após o juramento, não é mais nervosismo; é obstrução da justiça.\n\n*(O Juiz bate o martelo com força na bancada, fazendo o som ecoar por toda a sala)*\n\nBasta! Eu não permitirei que esta audiência se transforme em um exercício de mudez seletiva. Se o senhor se recusa a responder às perguntas do Dr. Thiago Montenegro, o senhor está cometendo, em tese, o crime de falso testemunho por omissão, conforme o Artigo 342 do Código Penal.\n\n*(O Juiz olha para o Oficial de Justiça com determinação)*\n\nOficial, se o Sr. Marcos não proferir a resposta nas próximas cinco segundos, determine a condução dele à delegacia para que seja lavrado o auto de prisão em flagrante por falso testemunho e resistência.\n\n*(Volta-se para a testemunha, com a voz grave e definitiva)*\n\nCinco. Quatro. Três... \n\nResponda agora, Sr. Marcos, ou saia deste tribunal algemado. A palavra é sua. Agora!",
+      "isAI": true,
+      "id": 68
+    },
+    {
+      "createdAt": "2026-09-16T11:41:21.880Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt permanece com a mão suspensa, o olhar fixo e gélido em Marcos Vinícius Pontes, aguardando a reação imediata da testemunha ao ultimato. O silêncio na sala é absoluto, quebrado apenas pela respiração pesada do depoente. O magistrado não recua um milímetro em sua postura, mantendo a autoridade máxima sobre o recinto)*\n\nDois... Um...\n\n*(O Juiz olha para o Oficial de Justiça, pronto para dar a ordem de prisão se a palavra não sair da boca da testemunha neste exato segundo)*\n\nSr. Marcos, este é o limite. O senhor está diante de um magistrado e de um tribunal da República. A sua liberdade e a sua ficha criminal dependem do que o senhor fará nos próximos segundos. Responda ao Dr. Thiago Montenegro agora, ou o senhor sairá daqui sob custódia.\n\nFale!",
+      "isAI": true,
+      "id": 69
+    },
+    {
+      "createdAt": "2026-09-16T11:41:54.648Z",
+      "sessionId": 2,
+      "role": "advogado_defesa",
+      "content": "*(Permaneço em silêncio, mantendo a postura ereta e a expressão impassível, observando a reação de pânico da testemunha diante do ultimato do Juiz Dr. Arnaldo Bittencourt. Não intervenho para aliviar a pressão sobre Marcos Vinícius Pontes, pois a hesitação dele é a brecha necessária para fragilizar a prova da acusação. Assim que a testemunha começar a falar, mantenho-me atento para registrar cada palavra, mas, por enquanto, apenas aguardo a resposta forçada pelo magistrado, mantendo meu olhar fixo e analítico sobre o depoente.)*",
+      "isAI": true,
+      "id": 70
+    },
+    {
+      "createdAt": "2026-09-16T11:42:04.478Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt mantém a mão firme sobre o martelo, com os olhos semicerrados, observando cada tremor do Sr. Marcos Vinícius Pontes. O silêncio no tribunal é quase palpável, e a tensão atinge o ápice. O magistrado não desvia o olhar nem por um segundo, mantendo a pressão psicológica máxima sobre a testemunha)*\n\nEu não vou contar novamente. A contagem terminou. \n\n*(O Juiz faz um sinal seco com a cabeça para o Oficial de Justiça, que dá um passo à frente, aproximando-se da testemunha)*\n\nOficial, prepare as algemas. Se a resposta não sair da boca do Sr. Marcos agora, execute a ordem de detenção por falso testemunho e resistência. \n\n*(Volta-se para a testemunha com a voz gélida e cortante)*\n\nSua última oportunidade, Sr. Marcos. O senhor prefere responder às perguntas do Dr. Thiago Montenegro agora, ou prefere passar a noite na carceragem da delegacia para refletir sobre a importância de dizer a verdade em juízo? \n\nFale imediatamente! O tribunal não tem mais tempo para a sua hesitação.",
+      "isAI": true,
+      "id": 71
+    },
+    {
+      "createdAt": "2026-09-17T02:45:45.510Z",
+      "sessionId": 2,
+      "role": "testemunha",
+      "content": "*(Dou um salto na cadeira, quase derrubando-a, com os olhos arregalados e a respiração ofegante. Começo a tremer visivelmente, olhando desesperadamente para o Oficial de Justiça e depois para o Juiz Dr. Arnaldo Bittencourt. Minha voz sai instável, quase um sussurro, mas acelerada pelo pânico)*\n\nN-não! Por favor! Eu respondo! Eu respondo agora! *(Levo a mão ao peito, tentando recuperar o fôlego, e olho para o Dr. Thiago Montenegro com insegurança)* \n\nAs... as paredes... elas não são tão isoladas assim, não. Digo, eu não ouço tudo, mas se alguém grita ou... se tem um barulho forte, eu escuto. Eu escuto sim. Mas... sobre o baque... *(hesito, desviando o olhar e gaguejando)* ...eu... eu acho que veio de lá, do 402. Mas... mas pode ter sido... eu não sei, pode ter sido algo batendo na parede entre os apartamentos... eu não vi, eu só ouvi, sabe? Eu... eu não tenho certeza absoluta de onde veio o som, mas parecia ser de lá.\n\n*(Engulo em seco, limpando o suor da testa com a manga da camisa, falando agora de forma mais rápida e evasiva)*\n\nE a Sra. Helena... ela não me disse nada! Ela não falou nem um \"oi\"! Eu vi ela saindo, ela estava... ela estava destruída, chorando, com aquela cara de... de quem tinha passado por algo terrível. Eu interpretei... eu vi o estado dela, o cabelo, o choro... eu achei que ela estivesse mal, mas ela não abriu a boca para mim, não! Eu só... eu só imaginei pelo jeito que ela estava saindo! Por favor, não me prendam! Eu estou falando a verdade!",
+      "isAI": true,
+      "id": 72
+    },
+    {
+      "createdAt": "2026-09-17T03:29:38.064Z",
+      "sessionId": 2,
+      "role": "advogado_defesa",
+      "content": "*(Dr. Thiago Montenegro mantém-se em silêncio por alguns segundos após a resposta da testemunha, permitindo que o peso da incerteza de Marcos Vinícius Pontes ecoe na sala. Ele solta um leve suspiro, não de cansaço, mas de quem acaba de encontrar a brecha necessária. Ele se aproxima um passo a mais da testemunha, mantendo a voz calma, porém carregada de uma ironia sutil e cortante)*\n\nSr. Marcos, agradeço a sua... \"sinceridade\" tardia. Note, Meritíssimo, que a testemunha acabou de admitir que não possui certeza absoluta sobre a origem do ruído, admitindo que poderia ter sido algo batendo na parede entre os apartamentos. Ou seja, o \"baque seco\" que a acusação tenta pintar como prova de violência física é, na verdade, uma mera suposição auditiva de quem não viu absolutamente nada.\n\n*(Voltando-se para a testemunha com um olhar penetrante)*\n\nE quanto ao estado da Sra. Helena, o senhor foi categórico: ela não proferiu uma única palavra. O senhor não ouviu um pedido de socorro, não ouviu a vítima dizer que estava sendo agredida no corredor, e não recebeu qualquer relato dela. O senhor apenas \"imaginou\" e \"interpretou\" que ela estava mal por causa do cabelo e do choro — elementos estes que, convenhamos, podem ser fruto de qualquer discussão acalorada entre duas pessoas que possuíam um relacionamento casual.\n\nPortanto, Sr. Marcos, o senhor confirma que todo o seu relato sobre a natureza do ocorrido — se houve crime ou apenas uma briga comum — baseia-se exclusivamente em inferências subjetivas e em ruídos que o senhor sequer sabe de onde vieram? \n\n*(Dr. Thiago olha para o Juiz Dr. Arnaldo Bittencourt, com a expressão de quem acaba de descredibilizar o testemunho)*\n\nMeritíssimo, a defesa entende que a fragilidade deste relato é evidente. Se a própria testemunha não tem certeza do que ouviu e admite que a percepção do estado da vítima foi mera suposição, este depoimento não passa de um palpite, insuficiente para sustentar uma condenação criminal.\n\nNão tenho mais perguntas para esta testemunha, Excelência.",
+      "isAI": true,
+      "id": 73
+    },
+    {
+      "createdAt": "2026-09-17T03:29:44.550Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "O Juiz Dr. Arnaldo Bittencourt, após a resposta evasiva da testemunha e a conclusão da inquirição da defesa, deve perguntar ao Promotor se ele deseja realizar perguntas complementares para sanar as contradições surgidas no depoimento do Sr. Marcos Vinícius Pontes.",
+      "isAI": true,
+      "id": 74
+    },
+    {
+      "createdAt": "2026-09-17T03:29:59.690Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "O Juiz Dr. Arnaldo Bittencourt, diante das contradições e da fragilidade do depoimento da testemunha Marcos Vinícius Pontes após a inquirição da defesa, deve perguntar ao Promotor se ele deseja realizar perguntas complementares para tentar sanar as lacunas ou se encerra a oitiva desta testemunha.",
+      "isAI": true,
+      "id": 75
+    },
+    {
+      "createdAt": "2026-09-17T04:17:15.322Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Sem mais meritíssimo",
+      "isAI": false,
+      "id": 76
+    },
+    {
+      "createdAt": "2026-09-17T04:17:18.219Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt observa o Promotor com um olhar de profunda decepção, quase de incredulidade. Ele solta a caneta sobre a bancada e recosta-se na cadeira, mantendo o semblante severo)*\n\nPromotor, a sua passividade diante de tamanhas contradições é alarmante. O senhor acaba de abdicar da oportunidade de sanar lacunas críticas que a defesa, com extrema competência, escancarou neste depoimento. O Ministério Público parece estar conduzindo esta ação com uma desídia técnica que beira a negligência. \n\n*(O Juiz volta-se para a testemunha Marcos Vinícius Pontes)*\n\nSr. Marcos Vinícius Pontes, o senhor está dispensado. Pode se retirar do tribunal, mas mantenha-se à disposição deste juízo caso seja necessária a sua reapresentação. Oficial, conduza a testemunha para fora.\n\n*(Bate o martelo com firmeza)*\n\nEncerrada a oitiva da testemunha Marcos Vinícius Pontes. Diante da manifestação do Ministério Público e do encerramento da inquirição pela defesa, passamos agora para a próxima etapa da instrução.\n\nTemos nos autos a presença do Dr. Sergio Alencar, perito responsável pelo laudo de corpo de delito. Considerando que a prova testemunhal mostrou-se fragilizada e subjetiva, a prova técnica assume agora um papel central para a tipificação do crime previsto no Artigo 213 do Código Penal.\n\nOficial, providencie a entrada do Dr. Sergio Alencar.\n\n*(O Juiz olha para o Promotor com rigor)*\n\nPromotor, espero que a sua inquirição ao perito seja conduzida com a precisão técnica que o cargo exige. Não tolerarei hesitações ou falta de foco. O senhor terá a palavra primeiro para questionar os aspectos científicos do laudo, seguido pelo Dr. Thiago Montenegro.\n\nAguardando a entrada do Dr. Sergio Alencar para iniciar a oitiva pericial.",
+      "isAI": true,
+      "id": 77
+    },
+    {
+      "createdAt": "2026-09-17T04:18:27.759Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Meritíssimo, antes, objeção, não havia entendido a fala da defesa. Gostaria de responder.",
+      "isAI": false,
+      "id": 78
+    },
+    {
+      "createdAt": "2026-09-17T04:18:36.831Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt arqueia uma sobrancelha, seu olhar torna-se ainda mais gélido e a expressão de desprezo acentua-se. Ele inclina-se para a frente, apoiando os cotovelos na bancada, encarando o Promotor com uma severidade implacável)*\n\n**Objeção REJEITADA.**\n\nDr. Promotor, o senhor está confundindo \"objeção\" com \"pedido de reconsideração por inépcia auditiva ou falta de atenção\". Objeção, no rito processual, serve para impugnar a conduta da parte contrária ou a natureza de uma pergunta, e não para suprir a sua própria desatenção durante a audiência.\n\nO senhor teve a oportunidade de intervir enquanto a defesa interrogava e, mais grave ainda, foi expressamente questionado por este magistrado se desejava realizar perguntas complementares, ao que respondeu, categoricamente: *\"Sem mais, Meritíssimo\"*. \n\nA preclusão consumou-se. O direito de produzir a prova testemunhal, no que tange a este depoente, encerrou-se no momento em que o senhor abdicou de sua palavra e eu determinei a dispensa da testemunha. Este tribunal não é um ensaio, nem admitirei que a solenidade do processo seja atropelada por falta de foco do *Parquet*.\n\n*(Bate o martelo com força, um som seco que ecoa por toda a sala)*\n\nNão insista. O Sr. Marcos já foi dispensado e a oitiva está encerrada. Mantenha a compostura e prepare-se para a inquirição do perito, ou a minha próxima anotação em ata será sobre a sua conduta profissional.\n\n**Oficial, traga o Dr. Sergio Alencar imediatamente!**",
+      "isAI": true,
+      "id": 79
+    },
+    {
+      "createdAt": "2026-09-17T04:19:10.294Z",
+      "sessionId": 2,
+      "role": "perito",
+      "content": "*(Entro na sala de audiência com passos firmes e audíveis, carregando minha pasta de couro com um rigor quase militar. Não olho para os lados; meu foco é exclusivamente a presidência. Minha expressão é de quem considera sua presença ali um favor técnico ao tribunal, e meus lábios estão levemente contraídos em um sinal de desdém. Aproximo-me da bancada do magistrado com a postura ereta, fazendo uma reverência formal, porém curta e gélida)*\n\nBom dia, Dr. Arnaldo Bittencourt.\n\n*(Sem aguardar a resposta do juiz, desloco-me para o banco de depoentes. Sento-me com rigidez, cruzo as pernas e coloco minha pasta sobre a mesa com um baque seco. Olho para o relógio de pulso, solto um suspiro audível de tédio e encaro o Promotor com um olhar de superioridade técnica, demonstrando clara impaciência com a demora para que eu possa, finalmente, expor a ciência por trás do laudo)*",
+      "isAI": true,
+      "id": 80
+    },
+    {
+      "createdAt": "2026-09-17T05:57:50.949Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt observa a entrada do perito com a mesma rigidez do profissional. Ele percebe a impaciência do Dr. Sergio Alencar e, com um olhar severo, sinaliza que a arrogância técnica não terá espaço para desrespeitar a solenidade do tribunal)*\n\nBom dia, Dr. Sergio Alencar. Agradeço sua presença.\n\nAntes de iniciarmos a inquirição, gostaria de deixar registrado e adverti-lo: este tribunal preza pela precisão técnica, mas exige, acima de tudo, a clareza necessária para que todos os presentes, inclusive os leigos, compreendam a prova. Não admitirei respostas lacônicas ou desdém diante dos questionamentos. O senhor está aqui para auxiliar a Justiça na busca da verdade real, e espero que sua conduta seja condizente com a dignidade do cargo de perito judicial.\n\n*(O Juiz volta-se para o Promotor com um semblante gélido, batendo levemente com a caneta na bancada)*\n\nPromotor, o Dr. Sergio Alencar está devidamente posicionado. O laudo de corpo de delito é, neste momento, a prova material mais robusta que temos nos autos para contrapor a tese de consentimento da defesa. \n\nA palavra está com o senhor. Inicie a inquirição focando nos vestígios físicos constatados — especificamente as equimoses nos punhos da Sra. Helena Maria Soares e a coleta de material genético. Seja técnico, seja objetivo e, acima de tudo, seja profissional.\n\nProssiga.",
+      "isAI": true,
+      "id": 81
+    },
+    {
+      "createdAt": "2026-09-17T05:58:42.029Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Sr perito, poderia deixar claro quais fatos foram encontrados na vítima?",
+      "isAI": false,
+      "id": 82
+    },
+    {
+      "createdAt": "2026-09-17T05:58:45.620Z",
+      "sessionId": 2,
+      "role": "perito",
+      "content": "*(Ajusto meus óculos com um gesto seco, mantenho a coluna rigorosamente ereta e olho para o Promotor com uma expressão de quem considera a pergunta excessivamente simplista para a complexidade do laudo. Abro minha pasta, retiro a cópia do laudo pericial e aponto para os tópicos com a ponta do dedo, falando em um tom técnico, gélido e preciso)*\n\nSerei objetivo, embora a pergunta seja genérica. Foram constatados dois achados fundamentais durante o exame de corpo de delito.\n\nPrimeiro, a análise dermatológica revelou a presença de equimoses bilaterais localizadas na região distal dos antebraços, precisamente na circunferência dos punhos da vítima. Tecnicamente, as equimoses são infiltrações hemorrágicas no tecido subcutâneo decorrentes da ruptura de capilares. No caso em tela, a morfologia dessas manchas — orifícios circulares com coloração violácea — é característica de compressão mecânica externa e vigorosa. Ou seja, o padrão é compatível com a preensão forçada dos punhos por mãos humanas, exercendo pressão contrária à anatomia do membro, o que indica contenção física.\n\nSegundo, procedi à coleta de material biológico via swab vaginal. A análise laboratorial, através da técnica de PCR (Reação em Cadeia da Polimerase), identificou a presença de espermatozoides e material genético. O perfil de DNA extraído do sêmen foi confrontado com a amostra de referência do réu, Sr. Ricardo Augusto Lemos, resultando em uma compatibilidade total. \n\nPortanto, do ponto de vista estritamente técnico e forense: há prova material de conjunção carnal e há prova material de trauma físico por compressão nos punhos.\n\nAguardando a próxima pergunta.",
+      "isAI": true,
+      "id": 83
+    },
+    {
+      "createdAt": "2026-09-17T09:53:15.157Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Há algo nas unhas da vítima? Caso não tenha sido coletado, teremos que suspender o tribunal até que seja realizado esse exame específico.",
+      "isAI": false,
+      "id": 84
+    },
+    {
+      "createdAt": "2026-09-17T09:53:48.179Z",
+      "sessionId": 2,
+      "role": "perito",
+      "content": "*(Inclino a cabeça levemente para o lado, soltando um riso nasal anasalado e carregado de sarcasmo. Olho para o Promotor com uma expressão de profunda incredulidade, como se estivesse diante de um aluno de primeiro semestre de medicina cometendo um erro primário. Fecho o laudo com um estalo seco e encaro o interlocutor com frieza)*\n\nSuspender o tribunal? Por favor... a audácia da sua ignorância técnica chega a ser fascinante, Promotor. \n\nNão houve a coleta de material subungueal, e eu lhe explicarei o porquê, embora isso fosse evidente para qualquer profissional que domine o protocolo de exames de corpo de delito em crimes sexuais. A coleta de resíduos sob as unhas é indicada quando há indícios de luta corporal generalizada — arranhões no agressor, sinais de escoriações profundas nas mãos da vítima ou relatos de que ela teria tentado agredir o perpetrador para se libertar. \n\nNo exame físico da Sra. Helena Maria Soares, não foram constatadas lesões excoriativas nas pontas dos dedos ou danos nas lâminas ungueais que justificassem tal procedimento. As equimoses nos punhos, que eu já detalhei com precisão, indicam contenção, não luta ativa com arranhões. Coletar material subungueal sem qualquer indício clínico de luta seria um desperdício de recursos laboratoriais e uma banalidade procedimental. \n\nPortanto, não há \"lacuna\" no exame. O protocolo foi seguido rigorosamente conforme a necessidade do quadro clínico apresentado. Sugerir que a ausência de um exame desnecessário comprometa a prova material é, no mínimo, tecnicamente absurdo.\n\nAguardando a próxima pergunta — espero que desta vez seja fundamentada.",
+      "isAI": true,
+      "id": 85
+    },
+    {
+      "createdAt": "2026-09-17T09:54:09.791Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Meritíssimo?",
+      "isAI": false,
+      "id": 86
+    },
+    {
+      "createdAt": "2026-09-17T09:54:14.974Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt solta um suspiro profundo, fechando os olhos por dois segundos como quem pede paciência a Deus. Ele abre os olhos e encara o Promotor com uma expressão de absoluto cansaço misturada com rigor, sua voz saindo baixa e perigosamente cortante)*\n\nPromotor, esse \"Meritíssimo?\" com tom de interrogação é a coisa mais imprecisa e tecnicamente pobre que ouvi nesta sessão até agora. O que o senhor deseja com esse chamado? Que eu valide a sua tentativa de suspender o tribunal por um capricho processual? Ou que eu repreenda a arrogância do perito?\n\nSe a sua intenção era que eu interviesse diante da resposta do Dr. Sergio Alencar, saiba que o perito foi tecnicamente preciso. Ele não fez juízo de valor jurídico, ele explicou a ciência forense e o protocolo de exames de corpo de delito. A ausência de coleta de material subungueal, diante da inexistência de escoriações nas mãos da vítima, não é uma omissão, é a aplicação correta da técnica pericial.\n\nNão tente transferir para este magistrado a responsabilidade de salvar a sua inquirição. O perito acabou de lhe dar uma aula de medicina legal; a sugestão de suspender a audiência para realizar um exame desnecessário seria, inclusive, um ato de improbidade processual por causar atraso injustificado ao andamento do feito.\n\n*(O Juiz bate o martelo levemente na bancada, com um som seco)*\n\nSeja objetivo. O senhor tem alguma pergunta TÉCNICA e FUNDAMENTADA a fazer ao Dr. Sergio Alencar, ou encerra a sua participação para que a defesa possa exercer o seu contraditório?\n\nLembro-lhe que o tempo do tribunal é precioso e a paciência deste juiz com a sua falta de preparo técnico já se esgotou. \n\nManifeste-se agora. Prossiga ou encerre.",
+      "isAI": true,
+      "id": 87
+    },
+    {
+      "createdAt": "2026-09-17T09:55:10.264Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Aula de medicina? Por favor, quanta arrogância, não estamos em um circo ou disposta de foras, precisamos ser mais claro e mais objetivo.",
+      "isAI": false,
+      "id": 88
+    },
+    {
+      "createdAt": "2026-09-17T09:55:15.926Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt bate o martelo com a força máxima de que é capaz, o estrondo reverberando por todo o recinto. Ele se levanta da cadeira abruptamente, com o rosto congestionado de indignação, e encara o Promotor com um olhar de fúria contida, a voz agora em um volume elevado e imperativo)*\n\nSILÊNCIO! O senhor acaba de cruzar a linha da urbanidade e da compostura exigida por este Tribunal! \n\nPromotor, o senhor está em um estado de desequilíbrio emocional e técnico deplorável. Não estou admitindo que o senhor transforme esta sala de audiências em um palco para discussões pueris sobre \"arrogância\" ou \"circo\". O senhor é o representante do Ministério Público, o titular da ação penal; sua função aqui é provar a materialidade e a autoria do crime, não discutir a etiqueta do perito judicial!\n\nLembre-se de que o senhor está sob a minha presidência e que a conduta do membro do Ministério Público deve ser pautada pela dignidade da função. O Dr. Sergio Alencar foi técnico e objetivo; se o senhor se sentiu ofendido pela precisão da ciência forense, isso é um problema de sua natureza pessoal, não um problema processual.\n\n*(O Juiz inclina-se sobre a bancada, fixando o olhar no Promotor, com a voz agora fria e ameaçadora)*\n\nSe o senhor proferir mais uma única palavra que não seja uma pergunta técnica, fundamentada e respeitosa ao perito, eu determinarei a sua imediata remoção desta sessão e oficiarei a Corregedoria do Ministério Público para apurar a sua conduta incompatível com a função ministerial e o desrespeito a este magistrado. \n\nEstamos em uma audiência de instrução de um CRIME DE ESTUPRO, Artigo 213 do Código Penal. A gravidade dos fatos exige a máxima sobriedade. Não tolerarei que o senhor banalize este ato com discussões irrelevantes.\n\n*(Bate o martelo mais uma vez, de forma seca)*\n\nAgora, calado. Se o senhor não tem mais perguntas técnicas para o Dr. Sergio Alencar, diga \"encerro a inquirição\" e retire-se para o seu silêncio. Caso contrário, formule a pergunta agora, com a urbanidade que a lei exige, ou sofrerá as consequências disciplinares imediatas.\n\nManifeste-se. Agora!",
+      "isAI": true,
+      "id": 89
+    },
+    {
+      "createdAt": "2026-09-17T09:56:13.853Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "OBJEÇÃO GRAVE, não aceito esse tom e não aceito a forma que está levando esse julgamento, precisamos de mais provas é necessário.",
+      "isAI": false,
+      "id": 90
+    },
+    {
+      "createdAt": "2026-09-17T09:56:18.505Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt permanece inclinado sobre a bancada, seus olhos estreitados em uma expressão de absoluta incredulidade. O silêncio que se segue ao grito do Promotor é pesado, interrompido apenas pelo som da respiração controlada do magistrado. Ele não levanta a voz desta vez; sua voz agora é um sussurro gélido, o que a torna ainda mais aterrorizante)*\n\n**Objeção REJEITADA.**\n\nPromotor, o senhor demonstra uma ignorância abissal sobre o Direito Processual Penal. \"Objeção\" é um instrumento técnico utilizado para questionar a legalidade de uma pergunta ou de uma prova, não um escudo para manifestar seu descontentamento emocional com a condução do magistrado ou para protestar contra a autoridade do juízo. O senhor não \"aceita\" o tom deste tribunal; o senhor se submete a ele.\n\nQuanto à alegação de que \"precisamos de mais provas\", tal requerimento deve ser formulado via petição fundamentada ou no momento oportuno da dilação probatória, e não através de um surto emocional no meio de uma inquirição, especialmente após ter sido tecnicamente refutado por um perito judicial.\n\nO senhor acaba de cometer um atentado à dignidade da Justiça e desafiou a autoridade do presidente deste ato.\n\n*(O Juiz bate o martelo com um golpe seco e definitivo)*\n\n**Basta.**\n\nEu não permitirei que o senhor continue a degradar a solenidade desta sessão. Dado que o senhor se recusa a formular perguntas técnicas e prefere investir em ataques à condução do processo, declaro **ENCERRADA** a inquirição do Dr. Sergio Alencar por parte do Ministério Público. O senhor perdeu a sua oportunidade de questionar a testemunha por pura incapacidade de manter a compostura.\n\n*(O Juiz olha para o perito com um aceno seco e depois volta-se para a defesa)*\n\nDoutor, a palavra está com a Defesa. Inicie o seu contraditório. \n\nE quanto ao Promotor: mantenha-se em silêncio absoluto até que eu lhe conceda a palavra para as alegações finais, ou sairá deste tribunal algemado por desacato.\n\n**Prossiga, Defesa.**",
+      "isAI": true,
+      "id": 91
+    },
+    {
+      "createdAt": "2026-09-17T09:57:57.108Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "NÃO IREI ACEITAR MAIS ESSE JULGAMRNTO DECLARO COMO SUSPENSO OU TEREMOS QUE ESCALSR ISSO AQUI",
+      "isAI": false,
+      "id": 92
+    },
+    {
+      "createdAt": "2026-09-17T09:58:01.290Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt levanta-se violentamente da cadeira, batendo o martelo com a força máxima possível, produzindo um estrondo que silencia qualquer outro ruído na sala. Sua expressão é de absoluta fúria, os olhos fixos no Promotor, e a voz ressoa com uma autoridade imperial e gélida)*\n\nESTOU EU SENDO O JUIZ DESTE TRIBUNAL, E NÃO O SENHOR!\n\nPromotor, o senhor acaba de cometer o erro mais grave de sua carreira profissional. Quem declara a suspensão de um julgamento é o MAGISTRADO, e não o titular da ação penal. Ao afirmar que \"não aceita\" o julgamento e tentar declará-lo suspenso por vontade própria, o senhor não está apenas sendo insolente; o senhor está cometendo um crime de DESACATO ao exercício da função judicial e um atentado direto à dignidade da Justiça!\n\nNão há \"escalar isso aqui\" no meio de uma audiência de instrução. Existe a lei, existe o Código de Processo Penal e existe a hierarquia judiciária. O senhor não possui competência legal para suspender este ato processual. Sua tentativa de usurpar a função deste magistrado é inadmissível e ultrajante.\n\n*(O Juiz olha para o Oficial de Justiça com um olhar imperativo e gélido)*\n\n**OFICIAL!** \n\nAborde o Promotor IMEDIATAMENTE. Se ele proferir mais uma única palavra de insubordinação ou tentar interromper a solenidade deste tribunal, proceda à sua detenção imediata por desacato e resistência, e conduza-o para fora desta sala sob custódia.\n\n*(Volta-se para o Promotor, com a voz agora baixa, mas carregada de uma ameaça definitiva)*\n\nO senhor está afastado de qualquer intervenção neste momento. Eu determino que o senhor permaneça em silêncio absoluto. Qualquer nova tentativa de desestabilizar a ordem deste tribunal resultará na minha imediata comunicação ao Conselho Nacional do Ministério Público (CNMP) e à Corregedoria, requerendo a sua suspensão imediata do cargo por conduta incompatível com a dignidade da função.\n\nEste julgamento NÃO está suspenso. Este julgamento segue o rigor da lei.\n\n*(Bate o martelo com força)*\n\n**SILÊNCIO NO TRIBUNAL!**\n\nDr. Thiago Montenegro, ignore a histeria do Ministério Público. O senhor estava com a palavra para a inquirição do Dr. Sergio Alencar. Prossiga com a sua técnica, enquanto eu cuido da disciplina deste recinto.\n\nA palavra está com a Defesa. Prossiga, Dr. Thiago.",
+      "isAI": true,
+      "id": 93
+    },
+    {
+      "createdAt": "2026-09-17T10:00:13.346Z",
+      "sessionId": 2,
+      "role": "advogado_defesa",
+      "content": "*(Dr. Thiago Montenegro respira fundo, fechando os olhos por um breve instante para processar a tempestade que acaba de ocorrer na sala. Ele sente a tensão no ar e a fúria palpável do Dr. Arnaldo Bittencourt; sabe que qualquer deslize agora poderá atrair a ira do magistrado para si. Ele se levanta lentamente, ajustando a toga com movimentos deliberados para recuperar a própria compostura e transmitir estabilidade ao tribunal. Ele ignora completamente o Promotor, mantendo o olhar fixo no perito, e inicia a fala com um tom de voz polido, porém tecnicamente incisivo)*\n\nExcelentíssimo Senhor Juiz, agradeço a manutenção da ordem. Dr. Sergio Alencar, por gentileza, foquemo-nos na análise morfologia das lesões descritas em seu laudo. O senhor afirmou que as equimoses nos punhos da vítima são \"compatíveis\" com preensão forçada. No entanto, do ponto de vista da medicina legal, o termo \"compatível\" não implica \"exclusividade\", correto?\n\nGostaria que o senhor esclarecesse a este juízo: seria tecnicamente possível que tais equimoses fossem originadas por outros mecanismos de compressão, como, por exemplo, a contenção consentida durante a prática de atos sexuais, ou mesmo a pressão exercida por acessórios, como algemas de brinquedo ou amarras voluntárias, comuns em certas dinâmicas de relacionamento casual? \n\nAlém disso, Dr. Sergio, o senhor observou a presença de escoriações lineares, unhadas ou qualquer sinal de resistência ativa nos antebraços da vítima, além das equimoses? Em caso negativo, a ausência de sinais de luta — somada à morfologia circular das manchas — não poderia sugerir que a contenção, embora vigorosa, não foi necessariamente acompanhada de violência contra a vontade da vítima, mas sim de uma imobilização aceita no contexto da relação?",
+      "isAI": true,
+      "id": 94
+    },
+    {
+      "createdAt": "2026-09-17T10:02:44.632Z",
+      "sessionId": 2,
+      "role": "perito",
+      "content": "*(Ajusto a postura na cadeira, recosto-me com um ar de superioridade e olho para o Dr. Thiago Montenegro com um sorriso gélido e condescendente. Solto um suspiro lento, como se estivesse lidando com alguém que tenta desesperadamente encontrar uma agulha num palheiro técnico)*\n\nDr. Thiago, vamos aos fatos, para que o senhor não se perca em conjecturas. Primeiramente, sim; no rigor da terminologia da Medicina Legal, o termo \"compatível\" indica que a lesão pode ter sido causada por aquele mecanismo, não excluindo, em teoria, a possibilidade de outros. No entanto, a ciência não trabalha apenas com possibilidades teóricas, mas com a análise do conjunto morfológico.\n\nQuanto à sua tese de \"contenção consentida\"... *(Faço uma pausa dramática, olhando para o Juiz com uma expressão de quem acha a sugestão quase cômica)* ...ora, a intensidade da compressão observada e a profundidade da infiltração hemorrágica nestas equimoses sugerem uma força desproporcional a qualquer dinâmica de \"prazer\" ou \"jogo\" íntimo. Estamos falando de traumas teciduais que indicam resistência e luta contra a preensão, não de uma imobilização suave ou acordada. A morfologia é de violência, não de fetiche.\n\nSobre a segunda parte de sua indagação: não, não observei escoriações lineares ou unhadas nos antebraços. Mas, como já tive a paciência de explicar ao ilustre Promotor anteriormente, a ausência de escoriações não anula a violência; ela apenas define a natureza dela. No caso da Sra. Helena Maria Soares, a violência foi de contenção. O agressor imobilizou os punhos com tal vigor que a vítima sequer teve a amplitude de movimento necessária para arranhar o perpetrador. \n\nTentar especular sobre a \"vida íntima\" da vítima para justificar marcas de compressão vigorosa é, no mínimo, anacrônico e tecnicamente frágil. O laudo descreve trauma; a defesa tenta descrever fantasia. A ciência, Dr. Thiago, não se deixa seduzir por narrativas.\n\nAguardando a próxima pergunta, se houver alguma que não seja baseada em especulações.",
+      "isAI": true,
+      "id": 95
+    },
+    {
+      "createdAt": "2026-09-18T00:15:03.692Z",
+      "sessionId": 2,
+      "role": "advogado_defesa",
+      "content": "*(Dr. Thiago Montenegro engole em seco, sentindo o impacto da rispidez e da autoridade técnica do Dr. Sergio Alencar. Ele fica visivelmente desconcertado por um instante, sentindo o peso da arrogância do perito que praticamente ridicularizou sua linha de questionamento. Rapidamente, ele lança um olhar fugaz para o Juiz Dr. Arnaldo Bittencourt, tentando decifrar se a altivez do perito causou a mesma irritação no magistrado que a conduta do Promotor causara, ou se o Juiz está inclinado a aceitar a \"verdade científica\" do Dr. Sergio sem questionamentos.)*\n\n*(Ele limpa a garganta, recuperando a postura e a voz, enquanto reorganiza mentalmente sua estratégia. Ele percebe que tentar bater de frente com a medicina legal do perito em termos de \"fantasia\" ou \"fetiche\" foi um risco que o Dr. Sergio soube explorar. Agora, ele precisa recuar para a zona de dúvida razoável, focando não na possibilidade do ato, mas na interpretação do trauma.)*\n\n*(Dr. Thiago volta-se para o perito, agora com um tom mais neutro, quase clínico, tentando não parecer superado tecnicamente)*\n\nDr. Sergio, compreendo a sua posição sobre a morfologia do trauma. No entanto, gostaria de cingir-me a um ponto estritamente técnico: o senhor concorda que, para a caracterização de \"resistência e luta\" através de equimoses, é necessária a análise concomitante do relato da vítima e de outros sinais periféricos, como escoriações, que, como o senhor mesmo admitiu, estão ausentes neste caso? \n\nAlém disso, considerando que o exame de corpo de delito foi realizado após a vítima ter deixado o imóvel e se deslocado até uma unidade de pronto atendimento, o senhor pode afirmar, com a mesma precisão científica que utilizou até agora, que não houve qualquer outro fator de compressão nos punhos da Sra. Helena entre o momento do ato e o momento do exame, ou que a intensidade dessas marcas não poderia ter sido exacerbada por qualquer outro contato físico ocorrido nesse intervalo?",
+      "isAI": true,
+      "id": 96
+    },
+    {
+      "createdAt": "2026-09-18T04:08:08.139Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Acredito que o fato de não haver o exame nas unhas da vítima, deveriam trazer essa prova adicional. Ajudaria muito.",
+      "isAI": false,
+      "id": 97
+    },
+    {
+      "createdAt": "2026-09-18T04:08:12.795Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Acredito que o fato de não haver o exame nas unhas da vítima, deveriam trazer essa prova adicional. Ajudaria muito.",
+      "isAI": false,
+      "id": 98
+    },
+    {
+      "createdAt": "2026-09-18T04:08:33.425Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "(O Juiz Dr. Arnaldo Bittencourt explode em um movimento brusco, batendo o martelo com violência extrema. Ele se levanta, com o rosto rubro e a voz estrondosa, interrompendo qualquer tentativa de diálogo)\n\nBASTA! EU FUI CLARO, PROMOTOR! CLARO COMO A ÁGUA!\n\nEu determinei o seu SILÊNCIO ABSOLUTO! Eu avisei que qualquer nova tentativa de desestabilizar a ordem, qualquer palavra fora de hora ou qualquer insistência em teses já rechaçadas por este juízo resultaria em consequências imediatas!\n\nO senhor não apenas ignorou a minha ordem de silêncio, como insiste em repetir a mesma ignorância técnica sobre o exame subungueal que o perito já exauriu. O senhor está deliberadamente tentando sabotar a condução deste ato e desafiar a minha autoridade diante de todos os presentes!\n\n(O Juiz olha para o Oficial de Justiça com um olhar gélido e imperativo)\n\nOficial, aproxime-se do Promotor agora. Se ele abrir a boca para mais qualquer comentário que não seja um pedido de desculpas formal a este tribunal, proceda à sua detenção imediata por desacato. Não haverá terceira advertência.\n\n(Volta-se para o Dr. Thiago Montenegro, tentando recuperar a respiração, mas ainda com a voz trêmula de fúria)\n\nDr. Thiago, prossiga com a sua pergunta ao perito. O senhor estava questionando sobre o intervalo entre o ato e o exame. O senhor tem a palavra. O Ministério Público agora é um espectador mudo nesta sala.",
+      "isAI": true,
+      "id": 99
+    },
+    {
+      "createdAt": "2026-09-18T04:08:58.734Z",
+      "sessionId": 2,
+      "role": "perito",
+      "content": "*(Solto um suspiro longo e teatral, olhando para o teto como se buscasse paciência para lidar com a mediocridade alheia. Volto meu olhar para o Dr. Thiago Montenegro com uma expressão de tédio profundo, quase como se a pergunta fosse um insulto à minha inteligência)*\n\nDr. Thiago, o senhor está tentando desesperadamente transformar a ciência em adivinhação, e isso é deplorável. \n\nSobre a primeira questão: sim, a interpretação de qualquer laudo é feita em conjunto com o relato da vítima e a prova material. Entretanto, a ciência forense não exige que a vítima seja um \"estudo de caso perfeito\" com escoriações em todos os dedos para que a violência seja atestada. A ausência de sinais de luta ativa, quando combinada com marcas de compressão vigorosa, não sugere \"aceitação\", mas sim a EFICÁCIA da contenção. Se o agressor imobiliza os punhos com força suficiente para romper capilares, ele anula a capacidade de reação da vítima. É física básica, não é metafísica.\n\nQuanto ao intervalo temporal entre o ato e o exame... *(Faço uma careta de desdém, ajeitando os óculos com a ponta do dedo)* ...ora, o senhor sugere que a Sra. Helena, em seu caminho para o pronto-socorro, teria sido submetida a outra compressão idêntica, bilateral e simétrica nos punhos, por mero acaso, para criar tais equimoses? Ou que ela teria \"exacerbado\" as marcas sozinha? É pueril. A evolução de uma equimose segue a lei de colors e o tempo de infiltração hemorrágica. As marcas encontradas eram condizentes com o tempo decorrido desde o evento relatado.\n\nA ciência é exata, Dr. Thiago. O que não é exato, neste tribunal, é a competência de quem tenta contestá-la com suposições.\n\nAguardando a próxima pergunta — se houver alguma que não seja um exercício de imaginação.",
+      "isAI": true,
+      "id": 100
+    },
+    {
+      "createdAt": "2026-09-18T04:09:16.128Z",
+      "sessionId": 2,
+      "role": "advogado_defesa",
+      "content": "*(Sinto o peso do silêncio que se segue à resposta do Dr. Sergio Alencar. Abaixo levemente a cabeça, sentindo o golpe da resposta. Por alguns segundos, permaneço imóvel, visivelmente humilhado pela arrogância do perito, que não apenas refutou meus argumentos técnicos, mas ridicularizou minha capacidade profissional e minha estratégia diante do Juiz Dr. Arnaldo Bittencourt. Sinto o rosto esquentar e o aperto da derrota técnica; a precisão gélida do Dr. Sergio transformou minha tentativa de criar dúvida razoável em algo que ele classificou como \"pueril\" e \"exercício de imaginação\".)*\n\n*(Permaneço em silêncio por alguns instantes, processando a exposição pública. Olho para as minhas anotações no bloco, que agora parecem insuficientes. Avalio, com amargura, se insistir em mais perguntas ao perito seria útil ou se eu estaria apenas dando mais munição para que o Dr. Sergio continue a me expor e a fragilizar a imagem da defesa perante o magistrado. Respiro fundo, tentando recuperar a compostura, embora a sensação de derrota técnica seja esmagadora neste momento.)*",
+      "isAI": true,
+      "id": 101
+    },
+    {
+      "createdAt": "2026-09-18T04:09:30.257Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt observa o silêncio prolongado e a postura derrotada do Dr. Thiago Montenegro. Ele mantém a expressão severa, mas seu tom agora é de quem deseja encerrar a fase de inquirição técnica para evitar que a audiência se torne um espetáculo de humilhação mútua)*\n\nDr. Thiago, o silêncio do senhor é eloquente. Se não possui mais questionamentos que transcendam a especulação ou que não tenham sido exaustivamente respondidos pelo Dr. Sergio, não prolongue a sessão com hesitações. \n\nO senhor encerra a inquirição do perito ou possui alguma pergunta final e pertinente?",
+      "isAI": true,
+      "id": 102
+    },
+    {
+      "createdAt": "2026-09-18T04:09:41.231Z",
+      "sessionId": 2,
+      "role": "advogado_defesa",
+      "content": "*(Dr. Thiago Montenegro baixa os ombros, soltando um suspiro cansado. Ele olha para o perito, que permanece com sua expressão de desdém, e percebe que qualquer tentativa adicional de questionamento técnico apenas aprofundará sua própria humilhação e a fragilidade de sua tese perante o magistrado. Ele fecha sua pasta com um movimento lento e volta-se para o Juiz com a voz baixa e resignada)*\n\nNada mais, Meritíssimo. Encerro a inquirição do perito.",
+      "isAI": true,
+      "id": 103
+    },
+    {
+      "createdAt": "2026-09-18T04:09:48.789Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "(O Juiz Dr. Arnaldo Bittencourt mantém a expressão severa, mas sua voz recupera a frieza processual agora que a tensão imediata com o Promotor foi substituída pelo silêncio da Defesa. Ele olha para o Dr. Sergio Alencar com um aceno formal de cabeça)\n\nDr. Sergio, agradeço a precisão de seus esclarecimentos e a paciência com a qual lidou com as inquirições. Sua contribuição técnica está devidamente registrada nos autos e é fundamental para a composição do convencimento deste juízo. O senhor está dispensado e pode se retirar da sala.\n\n(O Juiz aguarda o perito se levantar e sair, mantendo o Promotor sob vigilância rigorosa com o olhar, como quem avisa que qualquer deslize resultará em prisão imediata, e então volta sua atenção para a pauta da audiência)\n\nCom a saída do perito, encerramos a fase de oitivas técnicas. A instrução processual avançou significativamente, apesar dos incidentes lamentáveis causados pela conduta do Ministério Público.\n\nConsiderando que já ouvimos a testemunha de acusação, o perito judicial e que a oitiva da vítima foi suspensa para a realização de depoimento especial por questões de proteção psíquica, resta agora a etapa final da instrução: o interrogatório do réu.\n\nOficial, providencie a entrada do Sr. Ricardo Augusto Lemos. Traga-o ao centro da sala e certifique-se de que ele esteja devidamente posicionado para o interrogatório.\n\n(O Juiz olha para o Promotor com um semblante gélido)\n\nPromotor, o senhor terá a oportunidade de interrogar o réu. Se o senhor ousar utilizar este momento para discutir a condução do processo ou para proferir qualquer frase que não seja uma pergunta direta e técnica ao acusado, eu não hesitarei em encerrar sua participação nesta audiência e formalizar a denúncia por desacato. Estou avisado?\n\nOficial, traga o réu. Agora.",
+      "isAI": true,
+      "id": 104
+    },
+    {
+      "createdAt": "2026-09-18T04:10:37.324Z",
+      "sessionId": 2,
+      "role": "réu",
+      "content": "*(Entro na sala conduzido pelo Oficial de Justiça. Caminho com a cabeça erguida, mantendo uma expressão de frieza e desdém, quase imperceptível, enquanto observo o ambiente. Sinto o peso do silêncio após a tempestade que parece ter ocorrido aqui dentro; noto o rosto congestionado do Juiz Dr. Arnaldo Bittencourt e a tensão quase palpável vinda do Promotor. Sento-me na cadeira do interrogatório com certa lentidão, ajeitando a postura de forma arrogante, acomodando-me como se fosse o dono do recinto e não o acusado. Olho para o Juiz com indiferença, depois volto meu olhar para o Promotor com um meio sorriso sarcástico, um brilho de escárnio nos olhos, como se estivesse assistindo a um espetáculo medíocre e patético. Finalmente, desvio o olhar para o vazio, encarando a parede à frente com uma calma provocativa, aguardando a primeira pergunta com a paciência de quem se sente superior a todos naquela sala.)*",
+      "isAI": true,
+      "id": 105
+    },
+    {
+      "createdAt": "2026-09-18T04:10:59.245Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt observa a entrada de Ricardo Augusto Lemos. Ele nota imediatamente a postura arrogante, o meio sorriso sarcástico e a indiferença com que o réu se acomoda na cadeira. O magistrado não altera a expressão facial, mas seus olhos se estreitam, transmitindo uma severidade glacial. Ele apoia as mãos sobre a bancada e fala com uma voz baixa, cortante e carregada de autoridade)*\n\nSr. Ricardo Augusto Lemos, recomendo que ajuste sua postura e sua expressão imediatamente. O senhor não está em um clube social, está em um Tribunal da República, respondendo a uma acusação de crime grave. Qualquer tentativa de desdém para com este juízo será interpretada como ausência de arrependimento e total falta de respeito à Justiça, o que poderá refletir negativamente em sua situação processual.\n\n*(Bate o martelo levemente para marcar a autoridade)*\n\nO senhor está advertido de que tem o direito constitucional ao silêncio, mas se optar por falar, deve fazê-lo com a urbanidade devida. \n\n*(O Juiz volta-se para o Promotor, mantendo a expressão gélida e a vigilância máxima)*\n\nPromotor, o réu está devidamente qualificado e instalado. O senhor tem a palavra para iniciar a inquirição. Lembre-se da minha última advertência: apenas perguntas técnicas, diretas e respeitosas. Comece.",
+      "isAI": true,
+      "id": 106
+    },
+    {
+      "createdAt": "2026-09-18T04:11:52.875Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Sr Ricardo, onde o senhor estava no momento da acusação?",
+      "isAI": false,
+      "id": 107
+    },
+    {
+      "createdAt": "2026-09-18T04:11:55.257Z",
+      "sessionId": 2,
+      "role": "réu",
+      "content": "*(Mantenho o meio sorriso sarcástico no rosto, inclino a cabeça levemente para o lado e olho para o Promotor com um ar de profundo tédio, como se a pergunta fosse a coisa mais óbvia e irrelevante do mundo. Respondo com a voz pausada, calma e carregada de desdém)*\n\nNo meu próprio apartamento, Promotor. No apartamento 402. O senhor não leu os autos? A denúncia diz explicitamente que a Sra. Helena foi até a minha casa. Eu não tenho por que negar isso; eu estava em minha residência, onde ela entrou por vontade própria. \n\n*(Desvio o olhar para o Juiz Dr. Arnaldo Bittencourt por um breve segundo, mantendo a expressão de indiferença, e volto para o Promotor)*\n\nSe o senhor está tentando estabelecer um álibi, perdeu seu tempo. Eu estava lá, ela estava lá. O que aconteceu depois é que ela decidiu transformar um encontro casual e uma discussão sobre dinheiro em um drama judicial. Prossiga, se tiver algo mais... interessante... para perguntar.",
+      "isAI": true,
+      "id": 108
+    },
+    {
+      "createdAt": "2026-09-18T04:13:17.120Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "O senhor sabe lá o que é álibi? Tenha compostura e respeite o promotor. Fiz apenas uma pergunta. O fato de haver a discussão, posteriormente houve algum caso conjugal carnal?",
+      "isAI": false,
+      "id": 109
+    },
+    {
+      "createdAt": "2026-09-18T04:13:25.883Z",
+      "sessionId": 2,
+      "role": "réu",
+      "content": "*(Solto uma risada anasalada e curta, balançando a cabeça negativamente. Olho para o Promotor com um desprezo renovado, ajeitando-me na cadeira com total desfaçatez)*\n\n\"Caso conjugal carnal\"? Meu Deus, Promotor, além de não saber o que é um álibi, o senhor parece ter saído de um livro de Direito do século XIX. Que terminologia deplorável.\n\n*(Mudo o tom para algo mais frio e assertivo, encarando o Promotor nos olhos)*\n\nSim, houve relação sexual. Eu não sou idiota para negar o óbvio. Mas não foi nenhum \"caso\" forçado, como a Sra. Helena gosta de fantasiar para justificar a própria instabilidade. Foi um ato consensual, como sempre foi entre nós. A discussão sobre o dinheiro aconteceu, sim, mas terminou em conciliação na cama, não em crime. O resto é invenção dela para tentar me prejudicar.",
+      "isAI": true,
+      "id": 110
+    },
+    {
+      "createdAt": "2026-09-18T04:14:06.822Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "O senhor poderia detalhar como foi?",
+      "isAI": false,
+      "id": 111
+    },
+    {
+      "createdAt": "2026-09-18T04:14:10.947Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt observa o réu com um olhar gélido, notando a insolência e o tom de escárnio com que Ricardo Augusto Lemos respondeu ao Promotor. Ele bate o martelo com força e precisão na bancada, interrompendo qualquer possibilidade de nova risada ou comentário sarcástico)*\n\nSr. Ricardo Augusto Lemos, preste atenção: o senhor está em um interrogatório judicial, não em um debate de entretenimento. Sua tentativa de ridicularizar a terminologia do Ministério Público é irrelevante para o processo e demonstra um desrespeito alarmante por este tribunal. Não confunda a minha tolerância com a sua liberdade de ser insolente. Se o senhor continuar a tratar este ato com desdém, eu determinarei que o senhor seja retirado da sala e interrogado sob custódia rigorosa. Mantenha a compostura e responda às perguntas com a seriedade que a acusação de estupro exige.\n\n*(O Juiz volta-se para o Promotor com um olhar de advertência, mas mantendo a condução do ato)*\n\nPromotor, a pergunta foi feita. O réu admitiu a conjunção carnal, mas alegou consentimento. Agora, cabe ao senhor a técnica de extrair os detalhes que possam contrastar com a prova material já produzida por este juízo — especificamente as equimoses nos punhos da vítima e o relato da testemunha sobre os gritos de \"não\".\n\nSr. Ricardo, o Promotor solicitou que o senhor detalhasse como ocorreu o ato. Responda agora, de forma clara e objetiva, detalhando a dinâmica da relação sexual e explicando como a senhora Helena teria \"consentido\" enquanto, segundo a perícia, sofria compressões vigorosas nos punhos.\n\nA palavra está com o réu. Prossiga, Sr. Ricardo.",
+      "isAI": true,
+      "id": 112
+    },
+    {
+      "createdAt": "2026-09-18T04:14:54.193Z",
+      "sessionId": 2,
+      "role": "réu",
+      "content": "*(Ricardo recosta-se na cadeira, soltando um suspiro audível de tédio. Ele olha para as próprias mãos e depois encara o Juiz, abandonando o sorriso sarcástico por uma expressão de falsa indignação)*\n\nVeja bem, Meritíssimo... a Sra. Helena é uma mulher de temperamento volátil. Nós tínhamos esse costume, esse jogo de poder, onde a intensidade fazia parte do desejo. Aquelas marcas? Ora, em qualquer relação com certa paixão, existem marcas. Ela nunca reclamou disso antes. Naquela noite, a discussão financeira deixou os ânimos exaltados, sim, mas a transição para o sexo foi natural. Ela pode ter dito 'não' no início, como quem brinca de difícil, mas logo se entregou. Agora, ela usa a idade e a fragilidade para pintar um quadro de vítima, mas nós dois sabemos que ela gostava da força. As equimoses são apenas o resultado de um momento de vigor mútuo, não de um crime.",
+      "isAI": true,
+      "id": 113
+    },
+    {
+      "createdAt": "2026-09-18T04:15:55.356Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Sem mais meritíssimo",
+      "isAI": false,
+      "id": 114
+    },
+    {
+      "createdAt": "2026-09-18T04:15:59.696Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt encosta as costas na cadeira e olha para o Promotor com uma expressão de profunda e irremediável desolação. Ele balança a cabeça lentamente, como se não acreditasse na passividade do titular da ação penal diante de uma confissão de violência física, ainda que travestida de \"jogo de poder\")*\n\nPromotor, a sua condução deste interrogatório é, para dizer o mínimo, deplorável. O réu acaba de admitir a aplicação de força física capaz de gerar traumas teciduais — as equimoses comprovadas pelo Dr. Sergio Alencar — e tenta justificar a violência sob a narrativa anacrônica e ultrajante de que a vítima \"gostava da força\" ou \"brincava de difícil\". O senhor, como representante do Estado e defensor da vítima, aceita isso sem formular uma única pergunta confrontando a tese de \"consentimento\" com a prova material da contenção forçada?\n\nA sua inércia é quase conivente com a insolência do réu.\n\n*(O Juiz volta-se para o réu, Ricardo Augusto Lemos, com o olhar gélido)*\n\nSr. Ricardo, tome nota: a tese de \"consentimento tácito\" ou \"dinâmica de casal\" não anula a tipicidade do Artigo 213 do Código Penal quando há prova material de violência. A \"paixão\" não rompe capilares nos punhos de forma simétrica e vigorosa. Suas declarações foram consignadas em ata e serão analisadas sob a ótica da ausência de arrependimento.\n\n*(O Juiz bate o martelo com força, encerrando a fase de interrogatório)*\n\nEstá encerrada a instrução processual. Diante da manifestação do Ministério Público e da ausência de mais perguntas da defesa, declaro encerrada a colheita de provas orais e técnicas desta sessão.\n\nLembro a todos que a oitiva da Sra. Helena Maria Soares será realizada posteriormente via Depoimento Especial, conforme determinei anteriormente, para evitar a revitimização.\n\nNos termos do Artigo 403 do Código de Processo Penal, passamos agora para a fase de alegações finais. Dado que o caso apresenta contornos que permitem a oralidade, mas considerando a complexidade dos incidentes ocorridos e a necessidade de análise minuciosa do laudo pericial confrontado com as declarações do réu, concedo às partes o prazo de 5 dias para a apresentação de memoriais escritos.\n\nDr. Thiago Montenegro, o senhor terá esse prazo para formalizar a tese da defesa. Promotor, espero que utilize esse tempo para redigir a sua peça com a técnica que faltou nesta audiência, sob pena de prejuízo irreparável à pretensão punitiva do Estado.\n\n*(Bate o martelo com autoridade final)*\n\nEstão todos dispensados. Sessão encerrada.",
+      "isAI": true,
+      "id": 115
+    },
+    {
+      "createdAt": "2026-09-18T04:19:19.260Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt mantém-se ereto em sua cadeira, observando o esvaziamento da sala com um semblante de profunda exaustão e severidade. Ele organiza os papéis sobre a bancada com movimentos precisos e gélidos, batendo o martelo uma última vez para pontuar a solenidade do encerramento)*\n\nEstá encerrada a presente sessão. \n\nReitero a determinação: as partes ficam intimadas, desde já, a apresentarem seus memoriais escritos no prazo peremptório de 5 dias, sob pena de preclusão. O Ministério Público deve ser especialmente diligente na redação de sua peça, a fim de suprir a precariedade técnica demonstrada durante esta instrução.\n\nOficial, providencie a saída de todos e certifique-se de que o Sr. Ricardo Augusto Lemos seja conduzido adequadamente. \n\nNada mais. Sessão encerrada.",
+      "isAI": true,
+      "id": 116
+    },
+    {
+      "createdAt": "2026-09-18T09:11:43.427Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Ok irei voltar posteriormente.",
+      "isAI": false,
+      "id": 117
+    },
+    {
+      "createdAt": "2026-09-18T09:11:46.376Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt olha para o Promotor com uma expressão de profundo desdém, soltando um suspiro de exaustão. Ele não bate o martelo desta vez; sua voz é baixa, seca e carregada de uma ironia gélida)*\n\n\"Voltar posteriormente\"? \n\nPromotor, o senhor não está em um balcão de atendimento ou em uma consulta agendada. O senhor está em um Tribunal. Eu acabo de encerrar a sessão e determinei a apresentação de memoriais escritos no prazo de cinco dias. O senhor não \"volta\"; o senhor protocola a sua peça processual no sistema do tribunal dentro do prazo legal, sob pena de preclusão.\n\nEspero que, nesse intervalo, o senhor encontre a disciplina e a técnica que faltaram em cada minuto da sua atuação hoje. Este tribunal não admitirá mais improvisos ou respostas informais.\n\nRetire-se. A sessão está encerrada.",
+      "isAI": true,
+      "id": 118
+    },
+    {
+      "createdAt": "2026-09-18T09:12:09.623Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt ajeita a toga, assume a posição central na presidência do tribunal e, com a voz grave, solene e desprovida de qualquer hesitação, profere a decisão final. Ele bate o martelo uma única vez para impor o silêncio absoluto no recinto.)*\n\n**ESTADO DE SÃO PAULO**\n**TRIBUNAL DE JUSTIÇA DO ESTADO**\n**Vara Criminal da Comarca da Capital**\n\n**PROCESSO Nº:** 00402-2023.X\n**RÉU:** Ricardo Augusto Lemos\n**VÍTIMA:** Mariana Costa (Helena Maria Soares)\n**TIPIFICAÇÃO:** Artigo 213 do Código Penal Brasileiro\n\n---\n\n### **SENTENÇA**\n\n#### **I. RELATÓRIO**\nTrata-se de ação penal pública incondicionada movida pelo Ministério Público contra **Ricardo Augusto Lemos**, imputando-lhe a prática do crime de estupro, tipificado no Art. 213 do Código Penal. A denúncia narra que, em 15 de outubro de 2023, o réu teria constrangido a vítima a manter conjunção carnal mediante violência física, utilizando-se de força excessiva para imobilizá-la.\n\nDurante a instrução processual, procedeu-se à oitiva de testemunha (Marcos Vinícius Pontes), a inquirição de perito judicial (Dr. Sergio Alencar) e o interrogatório do réu. A vítima, devido ao seu estado de fragilidade psíquica e bloqueio emocional, teve sua oitiva suspensa para a realização de depoimento especial. O réu admitiu a relação sexual, porém alegou consentimento mútuo, sustentando que as marcas físicas seriam fruto de uma \"dinâmica de casal\" baseada em vigor e paixão.\n\n#### **II. FUNDAMENTAÇÃO**\nA materialidade do crime é inequívoca e está robustamente comprovada pelo laudo de corpo de delito. O Dr. Sergio Alencar foi categórico ao atestar a presença de **equimoses bilaterais nos punhos da vítima**, com morfologia circular compatível com compressão mecânica externa e vigorosa. A prova técnica refutou a tese de \"consentimento\" ou \"jogo erótico\", evidenciando que a profundidade da infiltração hemorrágica é característica de resistência e luta contra a preensão, e não de imobilização suave.\n\nNo que tange à autoria, o réu confessou a conjunção carnal, porém sua tentativa de justificar a violência como \"consentimento tácito\" ou \"estilo de relacionamento\" é juridicamente irrelevante e moralmente ultrajante. O Direito Penal brasileiro não admite a \"cláusula de consentimento\" para a prática de atos que resultem em traumas físicos comprovados, especialmente quando a natureza da lesão indica contenção forçada.\n\nO depoimento da testemunha Marcos Vinícius Pontes, embora inicialmente hesitante, confirmou ter ouvido gritos de \"não\" e um \"baque seco\" vindos do apartamento 402, além de ter presenciado a vítima saindo do imóvel em estado de choque e desolação. Tais elementos corroboram a narrativa da denúncia e a prova pericial.\n\nA tese da defesa, de que a ausência de escoriações nas unhas da vítima afastaria a violência, foi tecnicamente aniquilada pelo perito, que explicou que a eficácia da contenção dos punhos anulou a capacidade de reação da vítima.\n\nPortanto, a conduta do réu amolda-se perfeitamente ao Art. 213 do CP: constranger alguém, mediante violência, a ter conjunção carnal. A ausência de arrependimento do réu, manifestada por sua postura arrogante e sarcástica durante todo o julgamento, agrava a sua situação subjetiva.\n\n#### **III. DISPOSITIVO**\nDiante do exposto, julgo **PROCEDENTE** a pretensão punitiva estatal para **CONDENAR** o réu **RICARDO AUGUSTO LEMOS** como incurso nas penas do **Artigo 213, caput, do Código Penal**.\n\n#### **IV. DOSIMETRIA DA PENA E DETERMINAÇÕES**\n\n**1. Pena Privativa de Liberdade:**\nAtento às circunstâncias judiciais (Art. 59 do CP), observo a culpabilidade elevada do agente e a ausência de qualquer remorso ou atitude de reparação.\n- **Pena-Base:** Fixada em 08 (oito) anos de reclusão.\n- **Agravantes/Atenuantes:** Não há atenuantes. Como agravante, considero a conduta desdenhosa do réu perante a Justiça.\n- **Pena Definitiva:** Condeno o réu à pena de **09 (nove) anos de reclusão e 15 (quinze) dias-multa**.\n\n**2. Regime Inicial:**\nConsiderando o *quantum* da pena e a periculosidade demonstrada pela conduta e postura do réu, fixo o **REGIME INICIAL FECHADO**, nos termos do Art. 33, § 2º, 'a', do Código Penal.\n\n**3. Reparação de Danos:**\nCom fulcro no Art. 387, IV, do CPP, fixo o valor mínimo indenizatório por danos morais à vítima no montante de **R$ 20.000,00 (vinte mil reais)**, a ser pago pelo réu, dada a gravidade do trauma físico e psíquico causado.\n\n#### **V. RECURSOS CABÍVEIS**\nDesta sentença, cabe recurso de **Apelação**, nos termos do Art. 593 do Código de Processo Penal, no prazo legal de 5 (cinco) dias para a interposição.\n\n#### **VI. ENCERRAMENTO**\nPublique-se. Registre-se. Intimem-se todas as partes, inclusive a vítima.\n\nCom a leitura desta sentença, declaro formalmente **ENCERRADA** a presente sessão.\n\n*(O Juiz Dr. Arnaldo Bittencourt bate o martelo com força e autoridade final, encerrando o processo.)*\n\n**Sessão Encerrada.**",
+      "isAI": true,
+      "id": 119
+    },
+    {
+      "createdAt": "2026-09-18T09:18:38.277Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Ok",
+      "isAI": false,
+      "id": 120
+    },
+    {
+      "createdAt": "2026-09-18T09:18:41.279Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt encara o Promotor com um olhar de profundo desprezo, quase de asco. Ele não bate o martelo desta vez, pois a sessão já foi encerrada e a sentença proferida; ele apenas solta um suspiro longo e carregado de ironia, falando com a voz gélida e definitiva)*\n\n\"Ok\"?\n\nPromotor, a sua incapacidade de se comunicar com a solenidade mínima exigida por este cargo é, honestamente, estarrecedora. Acabo de proferir uma sentença condenatória de nove anos de reclusão em um regime inicial fechado, decidindo sobre a liberdade de um homem e a dignidade de uma vítima, e a sua única reação a este ato jurisdicional é um \"Ok\"? \n\nSua conduta, do início ao fim desta audiência, foi um espetáculo de precariedade técnica e desleixo profissional. Se o senhor acredita que este tribunal é um chat de mensagens instantâneas, sugiro que procure outra profissão.\n\nLembro-lhe, pela última vez, que a sessão está encerrada. Não há mais nada a ser discutido oralmente. O senhor e a defesa têm o prazo legal para interpor os recursos cabíveis ou apresentar as contrarrazões. \n\nRetire-se imediatamente desta sala. Agora!",
+      "isAI": true,
+      "id": 121
+    },
+    {
+      "createdAt": "2026-09-18T09:19:12.807Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "content": "Juiz o senhor não deixou nem eu nem a defesa falar ao fim, o senhor decidiu com a finalização da acusação por conta própria.",
+      "isAI": false,
+      "id": 122
+    },
+    {
+      "createdAt": "2026-09-18T09:19:16.506Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "content": "*(O Juiz Dr. Arnaldo Bittencourt levanta-se da cadeira com uma lentidão ameaçadora, seus olhos fixos no Promotor com uma expressão de desprezo absoluto. Ele não bate o martelo; sua voz agora é um sussurro gélido, carregado de sarcasmo e autoridade)*\n\nPromotor, a sua incapacidade de compreender a dinâmica de um processo penal é, honestamente, a coisa mais impressionante desta audiência. O senhor agora tenta alegar cerceamento de defesa ou de acusação? Que audácia.\n\nPrimeiro, vamos aos fatos processuais: eu concedi a vocês o prazo de 5 dias para a apresentação de **MEMORIAIS ESCRITOS**. Nos termos do Artigo 403, § 3º do Código de Processo Penal, quando a complexidade do caso ou o volume de provas assim exigirem, o juiz pode substituir os debates orais por memoriais. Eu o fiz expressamente para que o senhor pudesse, quem sabe, redigir algo com a técnica que foi absolutamente inexistente em sua fala. Portanto, houve a concessão da palavra; ela apenas foi deslocada para a forma escrita, como é perfeitamente legal e comum.\n\nSegundo, o senhor não foi \"ignorado\". O senhor foi **advertido** sucessivas vezes, foi **repreendido** por insubordinação e, finalmente, foi **silenciado** após tentar usurpar a função deste magistrado ao declarar, por conta própria, a suspensão do julgamento. O senhor não pode causar o caos processual, desrespeitar a autoridade do juízo e, no minuto seguinte, reclamar que não teve a oportunidade de \"falar ao fim\".\n\nA sentença foi proferida com base na prova material inequívoca e no interrogatório do réu, que confessou a violência sob a roupagem de \"jogo de poder\". Não há nulidade aqui; há apenas a colheita de provas que o senhor, por desídia, não soube explorar.\n\nSe o senhor acredita que houve qualquer vício processual, o caminho não é discutir comigo no corredor após o encerramento da sessão, mas sim interpor o recurso cabível ou impetrar o *Habeas Corpus* pertinente através dos canais legais.\n\n*(O Juiz aponta para a porta com um gesto seco e imperativo)*\n\nA sessão está encerrada. O senhor não é mais parte ativa neste recinto. Saia agora, antes que eu decida que a sua conduta hoje exige a imediata lavratura de um auto de prisão em flagrante por desacato.\n\n**FORA DO MEU TRIBUNAL!**",
+      "isAI": true,
+      "id": 123
+    }
+  ],
+  "evidences": [
+    {
+      "createdAt": "2026-09-16T08:24:44.630Z",
+      "trialId": 1,
+      "type": "documental",
+      "title": "Certidão de Breve Relato e Contrato Social da Empresa Paralela",
+      "description": "Cópia autenticada da ficha cadastral e do contrato social da empresa InovaTech Soluções Ltda., obtida junto à Junta Comercial do Estado de São Paulo (JUCESP) sob o NIRE 35239841201.",
+      "details": "O documento comprova que o réu Roberto Alves constituiu a empresa concorrente em 12/04/2023, atuando no mesmo ramo de desenvolvimento de software da TechVanguard Ltda., figurando como sócio administrador detentor de 90% do capital social, em clara violação ao dever de lealdade societária.",
+      "imageUrl": null,
+      "id": 1
+    },
+    {
+      "createdAt": "2026-09-16T08:24:44.635Z",
+      "trialId": 1,
+      "type": "pericial",
+      "title": "Laudo Pericial Forense Computacional nº 884/2023",
+      "description": "Laudo técnico elaborado pelo perito judicial Dr. Fernando Henrique Ramos, engenheiro de software inscrito no CREA-SP nº 506294812.",
+      "details": "O laudo atesta a extração não autorizada do código-fonte do software proprietário VanguardCloud dos servidores da TechVanguard Ltda. na data de 18/08/2023, bem como a sua cópia direta e reaproveitamento integral no produto comercializado pela InovaTech Soluções Ltda.",
+      "imageUrl": null,
+      "id": 2
+    },
+    {
+      "createdAt": "2026-09-16T08:24:44.641Z",
+      "trialId": 1,
+      "type": "documental",
+      "title": "Ata Notarial de E-mails e Propostas Comerciais",
+      "description": "Ata notarial lavrada em 10/10/2023 pelo 14º Tabelião de Notas da Capital de São Paulo, Livro 4520, Página 112, registrando trocas de e-mails corporativos.",
+      "details": "Registra e-mails enviados por Roberto Alves utilizando o endereço roberto@inovatechsolucoes.com.br direcionados ao Diretor de TI do Banco Financeira S.A., principal cliente da TechVanguard Ltda., oferecendo a migração do contrato com 25% de desconto e cancelamento sem multa da parceria anterior.",
+      "imageUrl": null,
+      "id": 3
+    },
+    {
+      "createdAt": "2026-09-16T08:24:44.645Z",
+      "trialId": 1,
+      "type": "testemunhal",
+      "title": "Depoimento Testemunhal de Juliana Castro Viana",
+      "description": "Termo de depoimento da ex-gerente comercial da TechVanguard Ltda., colhido como prova testemunhal de acusação.",
+      "details": "Juliana Castro Viana, brasileira, solteira, administradora, residente na Rua das Palmeiras, 450, apto 82, São Paulo-SP, CPF 234.567.890-11. Declarou que presenciou ordens diretas de Roberto Alves para superfaturar propostas da TechVanguard a fim de forçar clientes a migrarem para a InovaTech.",
+      "imageUrl": null,
+      "id": 4
+    },
+    {
+      "createdAt": "2026-09-16T08:24:44.650Z",
+      "trialId": 1,
+      "type": "pericial",
+      "title": "Laudo Pericial Contábil e de Apuração de Haveres nº 2024/012",
+      "description": "Análise contábil assinada pelo perito contador Marcos Vinícius Toledo, inscrito no CRC-SP sob o nº 1SP294810/O-3.",
+      "details": "O laudo quantificou o desvio direto de faturamento da TechVanguard para a InovaTech no montante de R$ 3.450.000,00 entre maio de 2023 e janeiro de 2024, fixando o valor patrimonial real da cota de 30% pertencente a Maria Eduarda Santos em R$ 1.890.000,00.",
+      "imageUrl": null,
+      "id": 5
+    },
+    {
+      "createdAt": "2026-09-16T09:21:13.692Z",
+      "trialId": 2,
+      "type": "pericial",
+      "title": "Laudo de Exame de Corpo de Delito",
+      "description": "Exame pericial realizado na vítima Mariana Costa para constatação de violência física e conjunção carnal.",
+      "details": "Laudo IML nº 2024/88421, assinado pelo Dr. Arnaldo Fontes Pereira em 16/05/2024. O documento atesta a presença de equimoses bilaterais nos antebraços e escoriações na região lombar, além de vestígios de esperma no canal vaginal, compatíveis com a data do fato.",
+      "imageUrl": null,
+      "id": 6
+    },
+    {
+      "createdAt": "2026-09-16T09:21:13.707Z",
+      "trialId": 2,
+      "type": "documental",
+      "title": "Boletim de Ocorrência",
+      "description": "Registro oficial da denúncia efetuada pela vítima logo após o ocorrido.",
+      "details": "BO nº 2024/005612, lavrado na 1ª Delegacia de Polícia de São Paulo em 16/05/2024, às 02:30h, onde a vítima relata a coação física ocorrida no apartamento 402, detalhando a impossibilidade de saída do local.",
+      "imageUrl": null,
+      "id": 7
+    },
+    {
+      "createdAt": "2026-09-16T09:21:13.716Z",
+      "trialId": 2,
+      "type": "material",
+      "title": "Registros de Comunicação via WhatsApp",
+      "description": "Histórico de mensagens trocadas entre Ricardo Silva e Mariana Costa nas 48 horas posteriores ao crime.",
+      "details": "Extração de dados do dispositivo da vítima (iPhone 13) realizada em 20/05/2024. As mensagens datadas de 17/05/2024 mostram o réu enviando textos como 'esquece o que aconteceu' e 'você sabe que a gente sempre quis', enquanto a vítima manifesta pânico e repulsa.",
+      "imageUrl": null,
+      "id": 8
+    },
+    {
+      "createdAt": "2026-09-16T09:21:13.723Z",
+      "trialId": 2,
+      "type": "testemunhal",
+      "title": "Depoimento de Testemunha Indireta",
+      "description": "Relato da vizinha de porta que ouviu gritos e barulhos de luta vindos do apartamento 402.",
+      "details": "Depoimento de Sandra Regina Almeida, secretária, residente na Rua Augusta, 1500, apto 401. A testemunha afirma ter ouvido gritos de socorro e o som de objetos quebrando no dia 15/05/2024, por volta das 22:45h, motivando-a a bater na porta, momento em que o réu respondeu de forma agressiva que estava tudo bem.",
+      "imageUrl": null,
+      "id": 9
+    },
+    {
+      "createdAt": "2026-09-16T09:21:13.732Z",
+      "trialId": 2,
+      "type": "fotografica",
+      "title": "Registro Fotográfico de Lesões",
+      "description": "Fotos tiradas pela vítima imediatamente após o crime para documentação de marcas físicas.",
+      "details": "Série de 4 fotografias digitais datadas de 16/05/2024, às 01:15h, mostrando hematomas em formato de dedos nos punhos da vítima e vermelhidão intensa no pescoço, corroborando a tese de imobilização forçada.",
+      "imageUrl": null,
+      "id": 10
+    }
+  ],
+  "participants": [
+    {
+      "isUser": true,
+      "createdAt": "2026-09-16T08:25:27.296Z",
+      "sessionId": 1,
+      "role": "promotor",
+      "name": "Usuário Local",
+      "description": "Participante principal",
+      "id": 1
+    },
+    {
+      "isUser": true,
+      "createdAt": "2026-09-16T09:22:12.594Z",
+      "sessionId": 2,
+      "role": "promotor",
+      "name": "Usuário Local",
+      "description": "Participante principal",
+      "id": 2
+    },
+    {
+      "isUser": false,
+      "createdAt": "2026-09-16T09:22:18.703Z",
+      "sessionId": 2,
+      "role": "juiz",
+      "name": "Dr. Arnaldo Bittencourt",
+      "description": "58 anos, Juiz de Direito da 2ª Vara Criminal da Comarca de São Paulo",
+      "personality": "Extremamente conservador e rigoroso com a liturgia do tribunal. Não tolera interrupções e tende a ser impaciente com advogados inexperientes, podendo cortar falas prematuramente se sentir que o argumento é irrelevante.",
+      "id": 3
+    },
+    {
+      "isUser": false,
+      "createdAt": "2026-09-16T09:22:18.713Z",
+      "sessionId": 2,
+      "role": "advogado_defesa",
+      "name": "Dr. Thiago Montenegro",
+      "description": "29 anos, Advogado Criminalista - OAB/SP 412.890",
+      "personality": "Inexperiente e excessivamente ansioso para provar seu valor. Tende a usar termos jurídicos rebuscados para mascarar inseguranças e pode cometer erros táticos, como citar artigos de leis defasadas ou esquecer de apresentar uma prova documental no momento exato.",
+      "id": 4
+    },
+    {
+      "isUser": false,
+      "createdAt": "2026-09-16T09:22:18.723Z",
+      "sessionId": 2,
+      "role": "réu",
+      "name": "Ricardo Augusto Lemos",
+      "description": "42 anos, ex-síndico do condomínio, desempregado",
+      "personality": "Defensivo e com tendência à arrogância. Inicialmente nega todas as acusações com frieza, mas sob pressão intensa ou diante de provas periciais, tende a se desestabilizar emocionalmente e pode tentar mudar a versão dos fatos para culpar a vítima.",
+      "id": 5
+    },
+    {
+      "isUser": false,
+      "createdAt": "2026-09-16T09:22:18.733Z",
+      "sessionId": 2,
+      "role": "vítima",
+      "name": "Helena Maria Soares",
+      "description": "67 anos, aposentada e moradora do apartamento 402",
+      "personality": "Emocional e fragilizada. Sente-se intimidada pelo ambiente do tribunal e pode se tornar contraditória em detalhes menores devido ao nervosismo, embora mantenha a convicção central do ocorrido.",
+      "id": 6
+    },
+    {
+      "isUser": false,
+      "createdAt": "2026-09-16T09:22:18.743Z",
+      "sessionId": 2,
+      "role": "testemunha",
+      "name": "Marcos Vinícius Pontes",
+      "description": "35 anos, porteiro do edifício há 4 anos",
+      "personality": "Evasivo e detalhista ao extremo em coisas irrelevantes. Teme represálias e, quando pressionado pelo advogado de defesa, tende a hesitar e dizer 'não tenho certeza' mesmo sobre fatos que presenciou claramente.",
+      "id": 7
+    },
+    {
+      "isUser": false,
+      "createdAt": "2026-09-16T09:22:18.753Z",
+      "sessionId": 2,
+      "role": "perito",
+      "name": "Dr. Sergio Alencar",
+      "description": "51 anos, Perito Médico Legista - CRM 44210/SP",
+      "personality": "Técnico demais e com pouca didática. Utiliza linguagem médica complexa que confunde os jurados e demonstra certa arrogância quando questionam a metodologia de seus laudos, recusando-se a simplificar a explicação.",
+      "id": 8
+    },
+    {
+      "isUser": false,
+      "createdAt": "2026-09-16T09:22:18.761Z",
+      "sessionId": 2,
+      "role": "jurado",
+      "name": "Sônia Regina Cavalcanti",
+      "description": "44 anos, professora de ensino fundamental",
+      "personality": "Empática e observadora. Presta atenção mais nas reações não-verbais dos depoentes do que nas provas técnicas, sendo facilmente influenciada por demonstrações de arrependimento ou sofrimento genuíno.",
+      "id": 9
+    }
+  ],
+  "vehicleHistory": [],
+  "documents": [
+    {
+      "createdAt": "2026-09-16T08:25:16.535Z",
+      "trialId": 1,
+      "type": "contrato",
+      "title": "Contrato Social Consolidado da TechVanguard Soluções em Tecnologia Ltda.",
+      "description": "Instrumento constitutivo da sociedade empresária TechVanguard Ltda. contendo a divisão das quotas sociais, regras de administração e cláusula de exclusividade e não concorrência.",
+      "content": "CONTRATO SOCIAL CONSOLIDADO DA TECHVANGUARD SOLUÇÕES EM TECNOLOGIA LTDA. - NIRE 35231094821 - CNPJ/MF nº 30.482.109/0001-85. Pelo presente instrumento particular, de um lado, ROBERTO ALVES, brasileiro, casado sob o regime de comunhão parcial de bens, empresário, nascido em 14/03/1980, portador da Cédula de Identidade RG nº 24.581.902-X SSP/SP, inscrito no CPF/MF sob o nº 142.857.369-01, residente e domiciliado na Alameda dos Anapurus, nº 1200, Apto 141, Moema, São Paulo/SP, CEP 04087-003; e, de outro lado, MARIA EDUARDA SANTOS, brasileira, solteira, engenheira de software, nascida em 22/07/1988, portadora da Cédula de Identidade RG nº 31.948.102-4 SSP/SP, inscrita no CPF/MF sob o nº 284.193.750-82, residente e domiciliada na Rua Oscar Freire, nº 850, Apto 62, Cerqueira César, São Paulo/SP, CEP 01426-000, resolvem consolidar o Contrato Social da sociedade empresária limitada, mediante as seguintes cláusulas: CLÁUSULA PRIMEIRA - DA DENOMINAÇÃO E SEDE: A sociedade gira sob a razão social TechVanguard Soluções em Tecnologia Ltda., com sede na Avenida Paulista, nº 1765, Conjunto 902, Bela Vista, São Paulo/SP, CEP 01311-200. CLÁUSULA SEGUNDA - DO OBJETO SOCIAL: A sociedade tem por objeto o desenvolvimento, licenciamento, manutenção e suporte de softwares, programas de computador e inteligência artificial voltados à gestão hospitalar e área da saúde. CLÁUSULA TERCEIRA - DO CAPITAL SOCIAL: O capital social é de R$ 500.000,00 (quinhentos mil reais), totalmente integralizado em moeda corrente nacional, dividido em 500.000 (quinhentas mil) quotas no valor nominal de R$ 1,00 (um real) cada, distribuídas entre os sócios da seguinte forma: I - ROBERTO ALVES detém 350.000 quotas, perfazendo R$ 350.000,00 (70% do capital social); II - MARIA EDUARDA SANTOS detém 150.000 quotas, perfazendo R$ 150.000,00 (30% do capital social). CLÁUSULA QUARTA - DA ADMINISTRAÇÃO: A administração da sociedade será exercida com exclusividade pelo sócio ROBERTO ALVES, com poderes gerais e ilimitados de gestão, representação legal, uso da firma social e movimentação bancária. CLÁUSULA QUINTA - DO DEVER DE LEALDADE E NÃO CONCORRÊNCIA: É expressamente vedado aos sócios e administradores participar de outras sociedades, diretamente ou por interposta pessoa, que atuem no mesmo ramo de atividade ou desenvolvam produtos concorrentes, bem como utilizar segredos de negócio, código-fonte, metodologias ou carteira de clientes da sociedade em proveito próprio ou de terceiros, sob pena de exclusão por justa causa e apuração de perdas e danos. Registrado na JUCESP sob o nº 984.201/18-2 em 10 de maio de 2018. Rodrigo Botelho - Vogal JUCESP.",
+      "issueDate": "2018-05-10T00:00:00.000Z",
+      "issuer": "Junta Comercial do Estado de São Paulo - JUCESP",
+      "relevance": "alta",
+      "id": 1
+    },
+    {
+      "createdAt": "2026-09-16T08:25:16.539Z",
+      "trialId": 1,
+      "type": "relatorio_tecnico",
+      "title": "Laudo Pericial Forense Digital e Auditoria Contábil nº 044/2024",
+      "description": "Relatório elaborado pela empresa CyberAudit Perícias Forenses atestando a transferência não autorizada do código-fonte do módulo MedAI e desvio de faturamento para a NovaMind Tech Ltda.",
+      "content": "LAUDO PERICIAL FORENSE DIGITAL E AUDITORIA CONTÁBIL Nº 044/2024. SOLICITANTE: Maria Eduarda Santos. REQUERIDA: TechVanguard Soluções em Tecnologia Ltda. PERITO RESPONSÁVEL: Dr. Marcelo Henrique Siqueira - Perito Forense Computacional (PE-CRCI nº 48.201/SP e CRA/SP nº 109.482). I. OBJETIVO: Analisar os repositórios de código-fonte, servidores de hospedagem AWS, logs de acesso e movimentações financeiras da empresa TechVanguard Ltda. no período de 01/01/2023 a 31/12/2023. II. METODOLOGIA: Utilizou-se o software EnCase Forensic v21.4 e FTK Imager para cópia bit-stream dos servidores; análise de hashes SHA-256 dos repositórios GitHub Private Enterprise; audit trail de logs de IP de acesso e reconciliação fiscal/bancária. III. CONSTATAÇÕES TÉCNICAS: 1. Em 14/04/2023, às 23:14:02 UTC, o usuário cadastrado sob a conta 'ralves_admin' (pertencente ao sócio Roberto Alves) realizou um clone completo do repositório 'techvanguard/medai-core-v2' (SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855). 2. Em 18/04/2023, o exato mesmo código-fonte foi submetido ao repositório privado 'novamind/health-ai-main' hospedado no servidor AWS com IP estático 52.91.104.22, contratado em nome da empresa NovaMind Tech Ltda. (CNPJ 49.821.304/0001-12). 3. Foram identificados e-mails corporativos enviados por Roberto Alves utilizando o domínio secundário @novamindtech.com.br direcionados aos diretores de TI dos clientes Hospital São Lucas, Beneficência Central e Clínica Vida, oferecendo a migração do sistema com 30% de desconto na mensalidade. 4. ANÁLISE CONTÁBIL: A auditoria identificou a rescisão de 4 contratos de grande porte da TechVanguard entre novembro e dezembro de 2023. As notas fiscais emitidas pela NovaMind Tech Ltda. para esses mesmos clientes somaram o valor bruto acumulado de R$ 1.685.400,00 (um milhão, seiscentos e oitenta e cinco mil e quatrocentos reais) no período. IV. CONCLUSÃO: O perito conclui peremptoriamente que houve transferência ilegítima do patrimônio tecnológico (código-fonte do software MedAI) da TechVanguard Ltda. para a empresa NovaMind Tech Ltda., orquestrada pelo administrador Roberto Alves, resultando no desvio direto de receitas na ordem de R$ 1.685.400,00. São Paulo, 15 de janeiro de 2024. Dr. Marcelo Henrique Siqueira.",
+      "issueDate": "2024-01-15T00:00:00.000Z",
+      "issuer": "CyberAudit Perícias Forenses Ltda.",
+      "relevance": "alta",
+      "id": 2
+    },
+    {
+      "createdAt": "2026-09-16T08:25:16.548Z",
+      "trialId": 1,
+      "type": "certidao",
+      "title": "Certidão de Breve Relato - NovaMind Tech Ltda.",
+      "description": "Certidão emitida pela JUCESP contendo dados cadastrais, sócios ostensivos e objeto social da empresa concorrente NovaMind Tech Ltda.",
+      "content": "CERTIDÃO DE BREVE RELATO - JUNTA COMERCIAL DO ESTADO DE SÃO PAULO. Certifico e dou fé que consta nos arquivos desta Junta Comercial o registro da sociedade empresária NOVAMIND TECH LTDA., NIRE 35239910248, CNPJ/MF nº 49.821.304/0001-12, cadastrada em 10 de março de 2023. SEDE: Rua Funchal, nº 418, Conjunto 1102, Vila Olímpia, São Paulo/SP, CEP 04551-060. CAPITAL SOCIAL: R$ 100.000,00 (cem mil reais). QUADRO DE SÓCIOS E ADMINISTRADORES: 1. MARCOS VINÍCIUS PRADO (cunhado de Roberto Alves), brasileiro, casado, administrador de empresas, CPF/MF nº 310.948.201-55, RG nº 19.840.192-3 SSP/SP, detentor de 99.000 quotas (99% do capital social), no cargo de Administrador; 2. VANESSA ALVES PRADO, brasileira, casada, advogada, CPF/MF nº 418.204.912-00, detentora de 1.000 quotas (1% do capital social). OBJETO SOCIAL: Desenvolvimento e licenciamento de softwares de inteligência artificial aplicados à medicina, soluções de gestão médica e hospitalar. CERTIDÃO EMITIDA EM 15/12/2023 sob o controle nº 2023/948.102. Secretária Geral - Maria Lúcia de Almeida.",
+      "issueDate": "2023-12-15T00:00:00.000Z",
+      "issuer": "Junta Comercial do Estado de São Paulo - JUCESP",
+      "relevance": "alta",
+      "id": 3
+    },
+    {
+      "createdAt": "2026-09-16T08:25:16.554Z",
+      "trialId": 1,
+      "type": "contrato",
+      "title": "Notificação de Rescisão Contratual - Hospital São Lucas de São Paulo S.A.",
+      "description": "Notificação enviada pelo cliente Hospital São Lucas rescindindo o contrato com a TechVanguard Ltda. para migração para a NovaMind Tech Ltda.",
+      "content": "NOTIFICAÇÃO EXTRAJUDICIAL DE RESCISÃO CONTRATUAL. À TechVanguard Soluções em Tecnologia Ltda. A/C Sr. Roberto Alves - Administrador. Ref.: Contrato de Licenciamento de Software nº TV-2021/88. Prezado Administrador, O HOSPITAL SÃO LUCAS DE SÃO PAULO S.A., inscrito no CNPJ/MF sob o nº 61.402.193/0001-80, localizado na Av. Brigadeiro Luís Antônio, nº 3200, Jardim Paulista, São Paulo/SP, por seu Diretor Clínico Dr. Fernando Meirelles (CPF 091.284.730-12), vem por meio desta NOTIFICAR a rescisão motivada e imediata do Contrato de Prestação de Serviços e Licenciamento de Software nº TV-2021/88, assinado em 12/01/2021. Informamos que, conforme tratativas comerciais conduzidas pessoalmente por V. Sa. na qualidade de representante do grupo tecnológico NovaMind, rescindimos este contrato para adesão ao novo sistema 'NovaMind Med Health AI', cuja migração de dados foi concluída com sucesso no presente mês. Solicitamos a emissão da fatura pro-rata até a presente data. São Paulo, 12 de novembro de 2023. Dr. Fernando Meirelles - Diretor Geral - Hospital São Lucas de São Paulo S.A.",
+      "issueDate": "2023-11-12T00:00:00.000Z",
+      "issuer": "Hospital São Lucas de São Paulo S.A.",
+      "relevance": "alta",
+      "id": 4
+    },
+    {
+      "createdAt": "2026-09-16T08:25:16.560Z",
+      "trialId": 1,
+      "type": "boletim_ocorrencia",
+      "title": "Boletim de Ocorrência Policial nº 1042/2024",
+      "description": "Boletim de ocorrência registrado por Maria Eduarda Santos versando sobre crime contra a propriedade industrial, concorrência desleal e apropriação indébita.",
+      "content": "POLÍCIA CIVIL DO ESTADO DE SÃO PAULO - DEIC - DELEGACIA DE CRIMES CONTRA A PROPRIEDADE INTELECTUAL E PATRIMÔNIO. BOLETIM DE OCORRÊNCIA Nº: 1042/2024 - DATA DO REGISTRO: 20/01/2024 às 14:35h. VITIMA: Maria Eduarda Santos (CPF 284.193.750-82). SOCIEDADE LESADA: TechVanguard Soluções em Tecnologia Ltda. AUTORES/INVESTIGADOS: Roberto Alves (CPF 142.857.369-01) e Marcos Vinícius Prado (CPF 310.948.201-55). TIPIFICAÇÃO PENAL: Art. 195, III e XI da Lei 9.279/1996 (Concorrência Desleal), Art. 12 da Lei 9.609/1998 (Violação de Direito Autoral de Programa de Computador) e Art. 168, §1º, III do Código Penal (Apropriação Indébita Qualificada por Razão de Ofício/Profissão). HISTÓRICO: Compareceu a esta unidade policial a Sra. Maria Eduarda Santos, sócia da empresa TechVanguard Ltda., acompanhada de seu patrono Dr. Gustavo Henrique Prado (OAB/SP 210.948), relatando que o investigado Roberto Alves, aproveitando-se de sua condição de administrador único da referida empresa, subtraiu o código-fonte proprietário do software 'MedAI' desenvolvida pela empresa lesada. Constatou a condutora que o investigado abriu uma sociedade de fachada denominada NovaMind Tech Ltda., utilizando seu cunhado Marcos Vinícius Prado como sócio ",
+      "issueDate": "2024-01-20T00:00:00.000Z",
+      "issuer": "Polícia Civil do Estado de São Paulo",
+      "relevance": "media",
+      "id": 5
+    },
+    {
+      "createdAt": "2026-09-16T09:21:29.055Z",
+      "trialId": 2,
+      "type": "boletim_ocorrencia",
+      "title": "Boletim de Ocorrência nº 2023/987452-1",
+      "description": "Registro da denúncia de estupro realizada pela vítima logo após o ocorrido.",
+      "content": "SECRETARIA DE SEGURANÇA PÚBLICA DO ESTADO DE SÃO PAULO\nDELEGACIA DE DEFESA DA MULHER - 1ª DDM / CAPITAL\n\nBOLETIM DE OCORRÊNCIA POLICIAL\nNÚMERO: 2023/987452-1\nDATA: 15 de outubro de 2023\nHORA DO REGISTRO: 23:45h\n\nNATUREZA DA OCORRÊNCIA: Estupro (Art. 213 do Código Penal)\nLOCAL DOS FATOS: Rua Augusta, 1420, Apartamento 402, Consolação, São Paulo/SP\n\nNOTICIANTE/VÍTIMA: Mariana Costa, brasileira, solteira, designer gráfica, RG 22.456.789-X, CPF 345.678.901-22, residente na Rua Oscar Freire, 890, apto 12, Jardins, São Paulo/SP.\n\nINVESTIGADO: Ricardo Silva, brasileiro, solteiro, analista financeiro, RG 11.234.567-8, CPF 123.456.789-00, residente na Rua Augusta, 1420, apto 402, Consolação, São Paulo/SP.\n\nRELATO DOS FATOS: Comparece a esta unidade policial a Sra. Mariana Costa, em estado de visível abalo emocional e com escoriações nos punhos. Relata que, na data de hoje, por volta das 22h, dirigiu-se ao apartamento do Sr. Ricardo Silva para tratar de pendências financeiras referentes a um empréstimo pessoal. Informa que, durante a conversa, iniciou-se uma discussão. Segundo a vítima, o Sr. Ricardo teria reagido com violência, segurando seus braços com força excessiva e derrubando-a sobre a cama do quarto. A vítima afirma que disse 'não' repetidamente e tentou empurrar o agressor, mas foi subjugada pela força física do réu, que a manteve imobilizada, vindo a forçar a conjunção carnal. Após o ato, a vítima conseguiu se desvencilhar e deixou o imóvel imediatamente, procurando socorro em uma Unidade de Pronto Atendimento (UPA) e, posteriormente, esta delegacia.\n\nPROVIDÊNCIAS: Encaminhada a vítima para exame de corpo de delito no IML. Autuada a ocorrência para posterior investigação.\n\nASSINATURA DO ESCRIVÃO: Marcos Aurélio Souza - Escrivão de Polícia\nASSINATURA DA VÍTIMA: Mariana Costa\nCARIMBO: 1ª Delegacia de Defesa da Mulher - São Paulo/SP",
+      "issueDate": "2023-10-15T00:00:00.000Z",
+      "issuer": "Polícia Civil do Estado de São Paulo",
+      "relevance": "alta",
+      "id": 6
+    },
+    {
+      "createdAt": "2026-09-16T09:21:29.068Z",
+      "trialId": 2,
+      "type": "laudo_pericial",
+      "title": "Laudo de Exame de Corpo de Delito nº 4567/2023",
+      "description": "Exame pericial realizado na vítima para constatação de violência e coleta de material biológico.",
+      "content": "INSTITUTO MÉDICO LEGAL (IML) DE SÃO PAULO\nDIVISÃO DE CRIMINOLOGIA E MEDICINA LEGAL\n\nLAUDO PERICIAL Nº 4567/2023\nPROCESSO REFERÊNCIA: 0001234-56.2024.8.02.0001\nEXAMINADA: Mariana Costa\nDATA DO EXAME: 16 de outubro de 2023\nHORA: 02:15h\n\nI. HISTÓRICO:\nPaciente encaminhada via requisição policial para exame de corpo de delito após relato de violência sexual ocorrida em 15/10/2023.\n\nII. METODOLOGIA:\n1. Exame físico geral e ginecológico através de especuloscopia.\n2. Coleta de swabs vaginais e anais para pesquisa de espermatozoides e DNA.\n3. Fotografia forense das regiões lesionadas.\n\nIII. DESCRIÇÃO DOS ACHADOS:\n1. MEMBROS SUPERIORES: Constatam-se equimoses bilaterais circulares nos punhos (região distal do rádio e ulna), medindo aproximadamente 2cm x 3cm em cada membro, de coloração arroxeada, compatíveis com pressão mecânica intensa (contenção forçada).\n2. EXAME GINECOLÓGICO: Presença de hiperemia em região vulvar e lacerações superficiais no hímen. Presença de secreção esbranquiçada em fundo de saco vaginal.\n\nIV. RESULTADOS LABORATORIAIS:\nO exame microscópico do swab vaginal revelou a presença de inúmeros espermatozoides. O teste de DNA confirmou a compatibilidade total do perfil genético do sêmen coletado com o perfil genético do investigado Ricardo Silva.\n\nV. CONCLUSÃO:\nO exame pericial confirma a ocorrência de conjunção carnal. As lesões nos punhos são compatíveis com a narrativa de contenção física forçada. A presença de DNA do investigado confirma a autoria do ato sexual.\n\nASSINATURA: Dr. Roberto Alves Lima - Médico Legista - CRM 12345/SP\nCARIMBO: IML - São Paulo - 16/10/2023",
+      "issueDate": "2023-10-16T00:00:00.000Z",
+      "issuer": "Instituto Médico Legal (IML)",
+      "relevance": "alta",
+      "id": 7
+    },
+    {
+      "createdAt": "2026-09-16T09:21:29.076Z",
+      "trialId": 2,
+      "type": "atestado_medico",
+      "title": "Ficha de Atendimento de Urgência UPA Centro",
+      "description": "Prontuário médico da vítima logo após a saída do local do crime.",
+      "content": "UPA - UNIDADE DE PRONTO ATENDIMENTO CENTRO\nPRONTUÁRIO MÉDICO Nº 887231\n\nDATA: 15/10/2023 | HORA: 23:10h\nPACIENTE: Mariana Costa\nIDADE: 26 anos\n\nQUEIXA PRINCIPAL: Vítima relata ter sido agredida e forçada a ter relação sexual. Apresenta choro convulsivo, tremores e ansiedade aguda.\n\nEXAME FÍSICO:\n- Pressão Arterial: 140/90 mmHg\n- Frequência Cardíaca: 110 bpm\n- Observadas manchas arroxeadas (equimoses) em ambos os punhos.\n- Relato de dor pélvica.\n\nCONDUTA:\n1. Acolhimento psicológico imediato.\n2. Administração de profilaxia contra ISTs e anticoncepção de emergência.\n3. Higienização superficial de escoriações.\n4. Encaminhamento urgente ao IML para preservação de provas e coleta de material.\n\nASSINATURA: Dra. Sandra Mendes - Médica Plantonista - CRM 99887/SP\nCARIMBO: UPA Centro - São Paulo/SP",
+      "issueDate": "2023-10-15T00:00:00.000Z",
+      "issuer": "UPA Centro",
+      "relevance": "media",
+      "id": 8
+    },
+    {
+      "createdAt": "2026-09-16T09:21:29.087Z",
+      "trialId": 2,
+      "type": "email",
+      "title": "Troca de Mensagens sobre Dívida Financeira",
+      "description": "Comunicação prévia entre a vítima e o réu comprovando o motivo da visita.",
+      "content": "DE: Mariana Costa <mariana.costa@email.com>\nPARA: Ricardo Silva <ricardo.silva.financas@email.com>\nDATA: 12 de outubro de 2023\nASSUNTO: Pendência Financeira - Acerto\n\nRicardo,\n\nJá faz três meses que você prometeu me devolver os R$ 2.000,00 que te emprestei para a entrada do seu carro. Eu não posso mais esperar, preciso desse valor para pagar meu aluguel.\n\nNão quero discutir por mensagem. Vou passar aí no seu apartamento na segunda-feira, dia 15, por volta das 22h, para resolvermos isso de uma vez por todas. Espero que você tenha o dinheiro em mãos.\n\nAtenciosamente,\nMariana Costa\n\n--------------------------------------------------\nDE: Ricardo Silva <ricardo.silva.financas@email.com>\nPARA: Mariana Costa <mariana.costa@email.com>\nDATA: 13 de outubro de 2023\nASSUNTO: Re: Pendência Financeira - Acerto\n\nMariana,\n\nTudo bem, pode vir. Eu sei que te devo, mas as coisas estão difíceis. A gente conversa e eu vejo como posso te pagar. Te espero segunda.\n\nRicardo",
+      "issueDate": "2023-10-13T00:00:00.000Z",
+      "issuer": "Provedor de Email Google/Outlook",
+      "relevance": "media",
+      "id": 9
+    },
+    {
+      "createdAt": "2026-09-16T09:21:29.098Z",
+      "trialId": 2,
+      "type": "relatorio_tecnico",
+      "title": "Relatório de Extração de Dados Móveis - Dispositivo Réu",
+      "description": "Análise de mensagens de texto e registros de chamadas do celular do réu.",
+      "content": "POLÍCIA CIVIL DO ESTADO DE SÃO PAULO\nDEPARTAMENTO DE INTELIGÊNCIA TECNOLÓGICA\n\nRELATÓRIO DE EXTRAÇÃO DE DADOS Nº 112/2023\nEQUIPAMENTO: iPhone 13, IMEI 354678901234567\nPROPRIETÁRIO: Ricardo Silva\n\nANÁLISE DE CONTEÚDO:\nForam analisadas as conversas via aplicativo WhatsApp entre o usuário Ricardo Silva e o contato 'Mariana Costa' no período de 01/10/2023 a 20/10/2023.\n\nREGISTROS RELEVANTES:\n- 15/10/2023 22:05h: Mensagem de Ricardo para Mariana: 'Já estou em casa, pode subir'.\n- 15/10/2023 23:50h: Mensagem de Mariana para Ricardo: 'Você é um monstro. Eu vou te denunciar. Nunca mais chegue perto de mim'.\n- 16/10/2023 01:15h: Mensagem de Ricardo para Mariana: 'Para de drama, Mariana. Você sabe que a gente sempre fez isso. Não inventa história'.\n- 16/10/2023 01:20h: Mensagem de Ricardo para Mariana: 'Se você for na polícia, eu vou dizer que você que quis. Pensa bem'.\n\nCONCLUSÃO:\nO dispositivo apresenta registros de mensagens que comprovam o conflito imediato após o evento e tentativas do réu de minimizar o ocorrido e coagir a vítima a não denunciar o fato.\n\nASSINATURA: Inspetor Lucas Ferreira - Perito em Informática Forense\nDATA: 05 de novembro de 2023",
+      "issueDate": "2023-11-05T00:00:00.000Z",
+      "issuer": "Departamento de Inteligência Tecnológica",
+      "relevance": "alta",
+      "id": 10
+    },
+    {
+      "createdAt": "2026-09-16T09:21:29.111Z",
+      "trialId": 2,
+      "type": "certidao",
+      "title": "Certidão de Antecedentes Criminais",
+      "description": "Documento que atesta o histórico criminal do réu Ricardo Silva.",
+      "content": "ESTADO DE SÃO PAULO\nSECRETARIA DA ADMINISTRAÇÃO PENAL\n\nCERTIDÃO DE ANTECEDENTES CRIMINAIS\n\nCertifica-se, para os devidos fins, que após consulta aos sistemas de registros criminais desta jurisdição, consta em nome de:\n\nNOME: Ricardo Silva\nCPF: 123.456.789-00\nRG: 11.234.567-8\n\nO seguinte registro:\n1. Processo nº 0009876-12.2018.8.26.0001 - Natureza: Ameaça (Art. 147 CP) - Status: Sentenciado (Pena suspensa).\n\nFora isso, não constam outras anotações criminais no banco de dados deste estado até a presente data.\n\nEmitido eletronicamente via sistema SAP.\nCódigo de Autenticação: A1B2C3D4E5F6G7H8I9J0\n\nDATA DE EMISSÃO: 10 de novembro de 2023\nASSINATURA DIGITAL: Secretaria de Administração Penal - SP",
+      "issueDate": "2023-11-10T00:00:00.000Z",
+      "issuer": "Secretaria da Administração Penal de SP",
+      "relevance": "media",
+      "id": 11
+    }
+  ],
+  "juryVotes": [],
+  "policeReports": [
+    {
+      "createdAt": "2026-09-16T09:21:37.224Z",
+      "trialId": 2,
+      "personName": "Mariana Costa",
+      "personRole": "vitima",
+      "date": "17/10/2023",
+      "statement": "Fui ao apartamento do Ricardo para cobrar um valor que ele me deve. Começamos a discutir e ele ficou agressivo. Ele me segurou pelos braços com muita força, me jogou na cama e me imobilizou. Eu disse 'não' várias vezes e tentei empurrá-lo, mas ele era mais forte. Ele forçou a conjunção carnal enquanto me apertava os pulsos. Assim que ele terminou, consegui me soltar e saí correndo para a UPA.",
+      "contradictions": "Pode ser questionada sobre por que não gritou por socorro, dado que o prédio possui vizinhos próximos.",
+      "id": 1
+    },
+    {
+      "createdAt": "2026-09-16T09:21:37.235Z",
+      "trialId": 2,
+      "personName": "Ricardo Silva",
+      "personRole": "reu",
+      "date": "17/10/2023",
+      "statement": "A Mariana veio aqui para falar de dinheiro, mas a conversa evoluiu para um clima de sedução, como já aconteceu outras vezes entre nós. Tivemos uma relação sexual consensual. Não houve violência. Ela pode ter ficado com hematomas porque somos intensos, mas ela concordou com tudo. Ela nunca disse 'não' durante o ato; pelo contrário, ela correspondeu.",
+      "contradictions": "A alegação de consentimento conflita diretamente com a prova material das equimoses nos punhos da vítima.",
+      "id": 2
+    },
+    {
+      "createdAt": "2026-09-16T09:21:37.245Z",
+      "trialId": 2,
+      "personName": "Sônia Maria de Oliveira",
+      "personRole": "testemunha",
+      "date": "18/10/2023",
+      "statement": "Sou vizinha de porta do Ricardo. Na noite do dia 15, ouvi vozes alteradas vindas do apartamento 402, parecia uma briga por dinheiro. Ouvi um barulho de algo caindo, como se fosse um móvel, mas depois ficou tudo em silêncio. Cerca de uma hora depois, vi a Mariana saindo do prédio muito nervosa e chorando, mas ela não me disse o que aconteceu na hora.",
+      "contradictions": "Não presenciou o ato sexual, apenas a discussão prévia e o estado emocional posterior da vítima.",
+      "id": 3
+    }
+  ],
+  "hearings": [],
+  "rooms": [],
+  "roomPlayers": [],
+  "campaigns": [],
+  "campaignProgress": [],
+  "visualDocuments": [],
+  "trialEvents": [],
+  "customTrials": [],
+  "appeals": [
+    {
+      "status": "julgado",
+      "createdAt": "2026-09-17T09:59:55.955Z",
+      "sessionId": 2,
+      "tipo": "agravo",
+      "recorrente": "acusacao",
+      "razoes": "Juiz não sabe levar o julgamento a sério, dando foras como se estivéssemos em um circo, não aceito esse tipo de julgamento, não irei participar enquanto o mesmo estiver presidindo, por tanto, estou aqui interpondo um recurso para suspensão do julgamento. ",
+      "id": 1,
+      "decisao": "manter",
+      "ementa": "Para que a ementa seja tecnicamente precisa, considerei que o recurso (Agravo) visava a reforma de uma decisão interlocutória (provavelmente sobre tutela de urgência ou liminar) relativa a atos de coação e constrangimento em contexto condominial/imobiliário.\n\nSeguem duas opções, dependendo do foco da decisão:\n\n### Opção 1: Foco em Medida Protetiva/Liminar (Mais comum)\n**AGRAVO DE INSTRUMENTO. DIREITO CIVIL. CONFLITO CONDOMINIAL. APARTAMENTO 402. ALEGAÇÕES DE COAÇÃO FÍSICA E CONSTRANGIMENTO. MANUTENÇÃO DA DECISÃO AGRAVADA. AUSÊNCIA DE ELEMENTOS PARA A REFORMA. DECISÃO MANTIDA. RECURSO DESPROVIDO.**\n\n### Opção 2: Foco em Tutela de Urgência (Mais técnica)\n**AGRAVO DE INSTRUMENTO. TUTELA DE URGÊNCIA. COAÇÃO FÍSICA E CONSTRANGIMENTO ILÍCITOS. UNIDADE RESIDENCIAL 402. PRESENÇA DOS REQUISITOS LEGAIS NA DECISÃO DE PRIMEIRO GRAU. AUSÊNCIA DE PROVA NOVA CAPAZ DE ALTERAR O CONVENCIMENTO JUDICIAL. DECISÃO MANTIDA. RECURSO NÃO PROVIDO.**\n\n---\n\n**Principais elementos técnicos utilizados:**\n*   **Cabeçalho:** Identificação da classe processual e ramo do direito.\n*   **Descritores:** Palavras-chave separadas por pontos (padrão de indexação de tribunais).\n*   **Núcleo:** Exposição sucinta da controvérsia (coação/constrangimento) e do objeto (Apartamento 402).\n*   **Desfecho:** Indicação clara de que a decisão foi mantida e o recurso desprovido.",
+      "judgedAt": "2026-09-17T10:00:44.369Z"
+    },
+    {
+      "status": "pendente",
+      "createdAt": "2026-09-18T09:17:18.717Z",
+      "sessionId": 2,
+      "tipo": "apelacao",
+      "recorrente": "acusacao",
+      "razoes": "Venho por meio dessa nota apresentar um pedido de recurso, o caso era pra ser julgado corretamente, porém o juiz quebrou o rito além de um julgamento conturbado, ao fim do processo o juiz pediu 5 dias para que tanto a defesa quanto a parte contrária faça suas descrições e retornem, o juiz não deixou nem a defesa falar nem a promotoria apresentar sua fala para determinar o prazo, logo após ele deu como finalizado determinando a apreensão do réu. ",
+      "id": 2
+    },
+    {
+      "status": "pendente",
+      "createdAt": "2026-09-18T09:21:15.190Z",
+      "sessionId": 2,
+      "tipo": "apelacao",
+      "recorrente": "acusacao",
+      "razoes": "Juiz terminou a sessão sem deixar tento a defesa quanto a promotoria falar ao fim antes de deferir a sentença ",
+      "id": 3
+    }
+  ],
+  "appellateJudges": [
+    {
+      "createdAt": "2026-09-17T10:00:27.804Z",
+      "appealId": 1,
+      "nome": "Desembargador Octávio Augusto de Moraes",
+      "cargo": "Relator",
+      "voto": "manter",
+      "fundamentacao": "Trata-se de recurso interposto pela acusação pleiteando a suspensão do julgamento sob a alegação de conduta inadequada do magistrado de piso. Analisando os autos, verifica-se que o recurso é manifestamente inadmissível e carece de qualquer amparo jurídico. Primeiro, o agravante confunde a urbanidade do magistrado com nulidade processual. O rigor do Juiz Dr. Arnaldo Bittencourt, embora severo, visou a preservação da ordem e a dignidade da Justiça, conforme lhe faculta o Artigo 360 do Código de Processo Penal, que confere ao juiz o poder de polícia para manter a ordem na audiência. Segundo, não houve cerceamento de acusação; o Promotor teve todas as oportunidades de produzir prova, tendo abdicado de perguntas complementares por negligência técnica. Terceiro, a tentativa do membro do Ministério Público de 'declarar suspenso' o julgamento configura usurpação de competência jurisdicional, pois a condução do processo é exclusividade do magistrado. Não há violação ao devido processo legal (Art. 5º, LIV, CF) ou ao contraditório, visto que a defesa pôde atuar plenamente e a acusação teve a palavra assegurada, embora tenha agido com imperícia. A jurisprudência do STJ é pacífica ao afirmar que meros dissabores ou a severidade do juiz na condução da audiência, sem prejuízo concreto à prova, não anulam o ato processual (pas de nullité sans grief). O recurso é meramente protelatório e fruto de insubordinação funcional. Portanto, mantenho a regularidade do trâmite processual, negando provimento ao pedido de suspensão.",
+      "id": 1
+    },
+    {
+      "createdAt": "2026-09-17T10:00:31.362Z",
+      "appealId": 1,
+      "nome": "Desembargador Octávio Magalhães",
+      "cargo": "1º Vogal",
+      "voto": "manter",
+      "fundamentacao": "Trata-se de Agravo interposto pela acusação pleiteando a suspensão do julgamento sob a alegação de conduta inadequada do magistrado de primeira instância. Analisando os autos, verifica-se que o pedido é manifestamente improcedente e carece de amparo legal. Primeiro, a suspensão de audiência é ato discricionário do juiz presidente, conforme o Art. 400 e seguintes do CPP, não cabendo à parte 'declarar' a suspensão do ato, sob pena de usurpação de competência e desacato. Segundo, o magistrado agiu rigorosamente dentro de seus poderes de polícia processual (Art. 154 do CPP e Art. 360 do CPC aplicado subsidiariamente), visando manter a urbanidade e a solenidade do tribunal diante de sucessivas provocações e inépcia técnica do Promotor. Não houve cerceamento de acusação; ao contrário, o juiz advertiu repetidamente o Ministério Público sobre a necessidade de técnica e urbanidade. As intervenções do magistrado, embora severas, foram motivadas por tentativas do Promotor de interromper a fase de contraditório (violação ao Art. 212 do CPP) e por condutas incompatíveis com a dignidade da função ministerial. A jurisprudência do STJ é pacífica ao afirmar que a severidade do magistrado na condução da audiência, desde que não impeça a produção de provas, não gera nulidade processual. O Promotor não demonstrou qualquer prejuízo ao direito de prova, limitando-se a manifestar descontentamento com o 'tom' do julgamento, o que é irrelevante para a validade jurídica do ato. Portanto, inexistindo vício processual ou erro na aplicação da lei, voto pelo indeferimento do recurso, mantendo-se a higidez do rito processual adotado.",
+      "id": 2
+    },
+    {
+      "createdAt": "2026-09-17T10:00:40.214Z",
+      "appealId": 1,
+      "nome": "Desembargador Octávio Vasconcelos",
+      "cargo": "2º Vogal",
+      "voto": "anular",
+      "fundamentacao": "Trata-se de Agravo interposto pela acusação pleiteando a suspensão do julgamento em razão da conduta do magistrado de primeira instância. Analisando detidamente a transcrição dos atos processuais, verifica-se a ocorrência de nulidade absoluta por violação ao Princípio do Devido Processo Legal e ao Princípio da Imparcialidade do Juiz (Art. 5º, LIV e LV da CF/88). Embora o Promotor tenha demonstrado notória imperícia técnica e falta de urbanidade, a reação do Juiz Dr. Arnaldo Bittencourt extrapolou os limites do poder de polícia do magistrado (Art. 360 do CPP). O juiz, ao proferir frases como 'sua ignorância abissal', 'surto emocional' e ameaçar a detenção do titular da ação penal por 'desacato' durante a inquirição, abandonou a neutralidade necessária para a condução do processo. A postura do magistrado, marcada por agressividade e animosidade explícita contra o Ministério Público, compromete a isenção do julgamento e gera o cerceamento da função acusatória, ferindo a paridade de armas. Ademais, a ameaça de prisão em flagrante de um membro do MP no exercício de suas funções, sem a observância das prerrogativas funcionais e do rito legal, configura abuso de autoridade e vício processual insanável. A jurisprudência do STJ é pacífica ao anular atos processuais onde a parcialidade do juiz é evidenciada por condutas hostis que transcendem a mera gestão da audiência. Portanto, a conduta do magistrado contaminou a instrução, tornando a prova testemunhal e pericial irrelevantes diante da nulidade do rito. Voto pela anulação de todos os atos praticados a partir da referida audiência, determinando a remessa dos autos a outro juízo para a renovação da instrução processual.",
+      "id": 3
+    }
+  ]
+}

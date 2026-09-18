@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1764027191229,
+      "tag": "0000_sweet_thundra",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1764027313651,
+      "tag": "0001_jittery_speed",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1764034707145,
+      "tag": "0002_dry_wildside",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1764107603624,
+      "tag": "0003_tricky_raza",
+      "breakpoints": true
+    }
+  ]
+}
