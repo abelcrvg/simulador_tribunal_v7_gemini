@@ -1,0 +1,44 @@
+name: Aplicar melhorias do simulador v2
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Aplicar melhorias
+        run: node scripts/run-tribunal-improvements-v2.mjs
+
+      - name: Verificar TypeScript
+        run: npm run check
+
+      - name: Verificar alterações
+        run: git status --short
+
+      - name: Commitar alterações
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add drizzle/schema.ts server/db.ts server/feedback.ts server/routers.ts client/src/pages/Trial.tsx .gitignore
+            git commit -m "Aplicar melhorias do simulador"
+            git push
+          else
+            echo "Nenhuma alteração para commitar."
+          fi
