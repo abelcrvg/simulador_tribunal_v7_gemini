@@ -3,11 +3,18 @@ import fs from 'node:fs';
 const scriptPath = 'scripts/apply-tribunal-improvements.mjs';
 let source = fs.readFileSync(scriptPath, 'utf8');
 
-// O script contem template literals que geram codigo. Estas interpolacoes
-// precisam permanecer literais durante a primeira avaliacao do script.
-source = source.replace(/\$\{appeal/g, '\\${appeal');
-source = source.replace(/\$\{session\./g, '\\${session.');
-source = source.replace(/\$\{reasons/g, '\\${reasons');
+// O script contém template literals que geram código-fonte. As interpolações
+// destinadas ao código gerado precisam permanecer literais durante a primeira
+// avaliação do script de melhorias.
+// Usamos uma função de replacement para impedir que String.replace interprete
+// os marcadores $ das substituições.
+const escapeInterpolation = (pattern) => {
+  source = source.replace(pattern, (match) => `\\${match}`);
+};
+
+escapeInterpolation(/\$\{appeal/g);
+escapeInterpolation(/\$\{session\./g);
+escapeInterpolation(/\$\{reasons/g);
 
 const needle = "if(!routers.includes(oldConclusion)) throw new Error('Regra antiga de conclusão não encontrada');";
 
