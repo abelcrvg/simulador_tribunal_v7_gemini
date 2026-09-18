@@ -3,6 +3,12 @@ import fs from 'node:fs';
 const scriptPath = 'scripts/apply-tribunal-improvements.mjs';
 let source = fs.readFileSync(scriptPath, 'utf8');
 
+// O script contem template literals que geram codigo. Estas interpolacoes
+// precisam permanecer literais durante a primeira avaliacao do script.
+source = source.replace(/\$\{appeal/g, '\\${appeal');
+source = source.replace(/\$\{session\./g, '\\${session.');
+source = source.replace(/\$\{reasons/g, '\\${reasons');
+
 const needle = "if(!routers.includes(oldConclusion)) throw new Error('Regra antiga de conclusão não encontrada');";
 
 if (!source.includes(needle)) {
