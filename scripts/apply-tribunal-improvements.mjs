@@ -2,27 +2,37 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-function read(file){return fs.readFileSync(path.join(root,file),'utf8');}
-function write(file,content){fs.writeFileSync(path.join(root,file),content,'utf8');}
+function read(file){ return fs.readFileSync(path.join(root,file),'utf8'); }
+function write(file,content){ fs.writeFileSync(path.join(root,file),content,'utf8'); }
+function replaceIfPresent(source, oldText, newText, label){
+  if(source.includes(newText)) return source;
+  if(!source.includes(oldText)) throw new Error(`${label} não encontrado e a alteração também não está presente.`);
+  return source.replace(oldText,newText);
+}
 
-// 1) Schema: habeas corpus + issue key.
+// 1) Schema: habeas corpus + questão processual.
 let schema=read('drizzle/schema.ts');
-schema=schema.replace(
+schema=replaceIfPresent(
+  schema,
   'tipo: mysqlEnum("tipo", ["apelacao", "agravo", "embargos"]).notNull(),',
-  'tipo: mysqlEnum("tipo", ["apelacao", "agravo", "embargos", "habeas_corpus"]).notNull(),\n  questao: varchar("questao", { length: 500 }).notNull().default("questao não especificada"),'
+  'tipo: mysqlEnum("tipo", ["apelacao", "agravo", "embargos", "habeas_corpus"]).notNull(),\n  questao: varchar("questao", { length: 500 }).notNull().default("questao não especificada"),',
+  'Schema de recursos'
 );
 write('drizzle/schema.ts',schema);
 
-// 2) Local DB: keep compatibility with the old single-appeal lookup and add a multi-appeal lookup.
+// 2) Local DB: compatibilidade + múltiplos recursos.
 let db=read('server/db.ts');
-db=db.replace(
-  'export async function getAppealBySessionId(sessionId:number){const s=await dbStore();return s.appeals.find(x=>Number(x.sessionId)===sessionId)||null;}\n',
-  'export async function getAppealBySessionId(sessionId:number){const s=await dbStore();return s.appeals.find(x=>Number(x.sessionId)===sessionId)||null;}\nexport async function getAppealsBySessionId(sessionId:number){const s=await dbStore();return sortDesc(filter(s.appeals,"sessionId",sessionId),"createdAt");}\n'
-);
+const oldAppealLookup='export async function getAppealBySessionId(sessionId:number){const s=await dbStore();return s.appeals.find(x=>Number(x.sessionId)===sessionId)||null;}\n';
+const newAppealLookup=oldAppealLookup+'export async function getAppealsBySessionId(sessionId:number){const s=await dbStore();return sortDesc(filter(s.appeals,"sessionId",sessionId),"createdAt");}\n';
+if(!db.includes('getAppealsBySessionId')) {
+  if(!db.includes(oldAppealLookup)) throw new Error('Lookup de recursos não encontrado');
+  db=db.replace(oldAppealLookup,newAppealLookup);
+}
 write('server/db.ts',db);
 
-// 3) Feedback is generated once when the final judgment closes the session and cached locally.
-write('server/feedback.ts', `import { mkdir, readFile, writeFile } from "node:fs/promises";
+// 3) Feedback calculado no encerramento e armazenado localmente.
+if(!fs.existsSync(path.join(root,'server/feedback.ts'))) {
+  write('server/feedback.ts', `import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import * as db from "./db";
 
@@ -81,13 +91,16 @@ export async function generateFeedbackForSession(sessionId: number, invokeLLM: (
   return store[String(sessionId)];
 }
 `);
+}
 
-// 4) Routers: feedback helper.
+// 4) Routers.
 let routers=read('server/routers.ts');
-routers=routers.replace(
-  'import {\n  buildHearingDirectorPrompt,\n  parseHearingDirectorDecision,\n} from "./ai/hearing-director";\n',
-  'import {\n  buildHearingDirectorPrompt,\n  parseHearingDirectorDecision,\n} from "./ai/hearing-director";\nimport { generateFeedbackForSession, getCachedFeedback } from "./feedback";\n'
-);
+const oldImport='import {\n  buildHearingDirectorPrompt,\n  parseHearingDirectorDecision,\n} from "./ai/hearing-director";\n';
+const newImport=oldImport+'import { generateFeedbackForSession, getCachedFeedback } from "./feedback";\n';
+if(!routers.includes('from "./feedback"')) {
+  if(!routers.includes(oldImport)) throw new Error('Import do diretor não encontrado');
+  routers=routers.replace(oldImport,newImport);
+}
 
 const feedbackPattern=/    \/\/ Gerar feedback detalhado sobre a performance do usuário[\s\S]*?    \/\/ Buscar sessão por ID \(alias para getById\)/;
 const feedbackReplacement=`    // Gerar/obter feedback detalhado sobre a performance do usuário
@@ -106,8 +119,7 @@ const feedbackReplacement=`    // Gerar/obter feedback detalhado sobre a perform
       }),
 
     // Buscar sessão por ID (alias para getById)`;
-if(!feedbackPattern.test(routers)) throw new Error('Bloco getFeedback não encontrado');
-routers=routers.replace(feedbackPattern,feedbackReplacement);
+if(feedbackPattern.test(routers)) routers=routers.replace(feedbackPattern,feedbackReplacement);
 
 const oldConclusion=`        const shouldConclude = session.status === 'concluido' ||
                               realMessages.length > 15 && // Pelo menos 15 mensagens trocadas
@@ -131,8 +143,8 @@ const newConclusion=`        const directorRequestsConclusion =
             /encerrar|concluir|sentença|sentenca|veredicto|decisão final|decisao final/i.test(
               lastMessage.content
             ));`;
-if(!routers.includes(oldConclusion)) throw new Error('Regra antiga de conclusão não encontrada');
-routers=routers.replace(oldConclusion,newConclusion);
+if(routers.includes(oldConclusion)) routers=routers.replace(oldConclusion,newConclusion);
+else if(!routers.includes('const directorRequestsConclusion')) throw new Error('Regra de conclusão não encontrada');
 
 const oldUpdate=`        if (shouldConclude && nextRole === 'juiz') {
           await db.updateSessionStatus(input.sessionId, 'concluido', aiContent);
@@ -145,8 +157,8 @@ const newUpdate=`        if (shouldConclude && nextRole === 'juiz') {
             console.error("[Feedback automático] Falha ao calcular feedback:", feedbackError);
           }
         }`;
-if(!routers.includes(oldUpdate)) throw new Error('Atualização de conclusão não encontrada');
-routers=routers.replace(oldUpdate,newUpdate);
+if(routers.includes(oldUpdate)) routers=routers.replace(oldUpdate,newUpdate);
+else if(!routers.includes('generateFeedbackForSession(input.sessionId')) throw new Error('Atualização de conclusão não encontrada');
 
 const oldInput=`        tipo: z.enum(["apelacao", "agravo", "embargos"]),
         recorrente: z.string(), // "defesa" ou "acusacao"
@@ -155,8 +167,8 @@ const newInput=`        tipo: z.enum(["apelacao", "agravo", "embargos", "habeas_
         recorrente: z.string(), // "defesa" ou "acusacao"
         questao: z.string().min(5).max(500), // Questão processual específica
         razoes: z.string().min(10), // Argumentação do recurso`;
-if(!routers.includes(oldInput)) throw new Error('Input de recurso não encontrado');
-routers=routers.replace(oldInput,newInput);
+if(routers.includes(oldInput)) routers=routers.replace(oldInput,newInput);
+else if(!routers.includes('habeas_corpus')) throw new Error('Input de recurso não encontrado');
 
 const oldCreate=`      .mutation(async ({ input, ctx }) => {
         const appealId = await db.createAppeal({
@@ -210,8 +222,8 @@ const newCreate=`      .mutation(async ({ input, ctx }) => {
       }),
 
     // Buscar recurso por sessionId`;
-if(!routers.includes(oldCreate)) throw new Error('Criação de recurso não encontrada');
-routers=routers.replace(oldCreate,newCreate);
+if(routers.includes(oldCreate)) routers=routers.replace(oldCreate,newCreate);
+else if(!routers.includes('getAppealsBySessionId(input.sessionId)')) throw new Error('Criação de recurso não encontrada');
 
 const oldPrompt=`TIPO: ${appeal.tipo.toUpperCase()}
 RECORRENTE: ${appeal.recorrente}
@@ -224,36 +236,41 @@ RAZÕES DO RECURSO:
 ${appeal.razoes}
 
 ${appeal.tipo === "habeas_corpus" ? "HABEAS CORPUS: analise especificamente eventual violência ou coação ilegal à liberdade de locomoção, inclusive as hipóteses dos arts. 647 e 648 do CPP. Neste simulador, MANTER representa denegar o HC, REFORMAR representa conceder o HC e ANULAR representa considerar o pedido prejudicado conforme a fundamentação." : "Analise o recurso conforme sua natureza."}`;
-if(!routers.includes(oldPrompt)) throw new Error('Prompt de recurso não encontrado');
-routers=routers.replace(oldPrompt,newPrompt);
+if(routers.includes(oldPrompt)) routers=routers.replace(oldPrompt,newPrompt);
+else if(!routers.includes('QUESTÃO PROCESSUAL: ${appeal.questao')) throw new Error('Prompt de recurso não encontrado');
 write('server/routers.ts',routers);
 
-// 5) Client: HC + multiple-resource UI.
+// 5) Client: HC + múltiplos recursos. Cada transformação é idempotente.
 let trial=read('client/src/pages/Trial.tsx');
-trial=trial.replace(
+trial=replaceIfPresent(trial,
   'const [tipo, setTipo] = useState<"apelacao" | "agravo" | "embargos">("apelacao");',
-  'const [tipo, setTipo] = useState<"apelacao" | "agravo" | "embargos" | "habeas_corpus">("apelacao");'
+  'const [tipo, setTipo] = useState<"apelacao" | "agravo" | "embargos" | "habeas_corpus">("apelacao");',
+  'Tipo do recurso'
 );
-trial=trial.replace(
+trial=replaceIfPresent(trial,
   'const [recorrente, setRecorrente] = useState("");\n  \n  const interporRecurso',
-  'const [recorrente, setRecorrente] = useState("");\n  const [questao, setQuestao] = useState("");\n  \n  const interporRecurso'
+  'const [recorrente, setRecorrente] = useState("");\n  const [questao, setQuestao] = useState("");\n  \n  const interporRecurso',
+  'Questão do recurso'
 );
-trial=trial.replace(
+trial=replaceIfPresent(trial,
   '    if (!recorrente) {\n      alert("Por favor, identifique quem está recorrendo (defesa ou acusação).");\n      return;\n    }\n    interporRecurso.mutate({ sessionId, tipo, recorrente, razoes });',
-  '    if (!recorrente) {\n      alert("Por favor, identifique quem está recorrendo (defesa ou acusação).");\n      return;\n    }\n    if (!questao.trim()) {\n      alert("Informe qual questão processual está sendo impugnada. Um novo recurso precisa tratar de uma questão diferente dos anteriores.");\n      return;\n    }\n    interporRecurso.mutate({ sessionId, tipo, recorrente, questao: questao.trim(), razoes });'
+  '    if (!recorrente) {\n      alert("Por favor, identifique quem está recorrendo (defesa ou acusação).");\n      return;\n    }\n    if (!questao.trim()) {\n      alert("Informe qual questão processual está sendo impugnada. Um novo recurso precisa tratar de uma questão diferente dos anteriores.");\n      return;\n    }\n    interporRecurso.mutate({ sessionId, tipo, recorrente, questao: questao.trim(), razoes });',
+  'Envio do recurso'
 );
-trial=trial.replace(
+trial=replaceIfPresent(trial,
   '          <option value="embargos">Embargos</option>\n        </select>',
-  '          <option value="embargos">Embargos</option>\n          <option value="habeas_corpus">Habeas Corpus</option>\n        </select>'
+  '          <option value="embargos">Embargos</option>\n          <option value="habeas_corpus">Habeas Corpus</option>\n        </select>',
+  'Opção de Habeas Corpus'
 );
-trial=trial.replace(
+trial=replaceIfPresent(trial,
   '          {tipo === "embargos" && "Recurso para esclarecer contradições ou omissões"}\n        </p>',
-  '          {tipo === "embargos" && "Recurso para esclarecer contradições ou omissões"}\n          {tipo === "habeas_corpus" && "Remédio constitucional para proteger a liberdade de locomoção diante de ilegalidade ou abuso de poder"}\n        </p>'
+  '          {tipo === "embargos" && "Recurso para esclarecer contradições ou omissões"}\n          {tipo === "habeas_corpus" && "Remédio constitucional para proteger a liberdade de locomoção diante de ilegalidade ou abuso de poder"}\n        </p>',
+  'Descrição do Habeas Corpus'
 );
 const reasonsMarker=`      <div>\n        <label className="block text-sm font-semibold mb-2">\n          Razões do Recurso (Argumentação Jurídica)\n        </label>`;
 const reasonsReplacement=`      <div>\n        <label className="block text-sm font-semibold mb-2">Questão processual impugnada</label>\n        <Textarea\n          value={questao}\n          onChange={(e) => setQuestao(e.target.value)}\n          placeholder="Ex.: nulidade por cerceamento de defesa; prisão cautelar sem fundamentação; omissão na sentença..."\n          className="min-h-[90px]"\n          required\n        />\n        <p className="text-xs text-muted-foreground mt-1">\n          O sistema não permitirá outro recurso sobre a mesma questão. Recursos diferentes podem ser interpostos na mesma sessão.\n        </p>\n      </div>\n\n${reasonsMarker}`;
-if(!trial.includes(reasonsMarker)) throw new Error('Campo de razões não encontrado');
-trial=trial.replace(reasonsMarker,reasonsReplacement);
+if(trial.includes(reasonsMarker)) trial=trial.replace(reasonsMarker,reasonsReplacement);
+else if(!trial.includes('Questão processual impugnada')) throw new Error('Campo de razões não encontrado');
 
 const insertionPoint='// Componente para galeria de documentos visuais';
 const recursosComponent=`function RecursoItem({ appeal }: { appeal: any }) {
@@ -301,27 +318,27 @@ function RecursosView({ sessionId }: { sessionId: number }) {
 }
 
 `;
-if(!trial.includes(insertionPoint)) throw new Error('Ponto de inserção de RecursosView não encontrado');
-trial=trial.replace(insertionPoint,recursoComponent);
+if(trial.includes(insertionPoint)) trial=trial.replace(insertionPoint,recursosComponent+insertionPoint);
+else if(!trial.includes('function RecursosView')) throw new Error('Ponto de inserção de RecursosView não encontrado');
 trial=trial.replace('<AcordaoView sessionId={sessionId} />','<RecursosView sessionId={sessionId} />');
 trial=trial.replace('⚖️ Acórdão - Tribunal de Justiça','⚖️ Recursos e Acórdãos');
 trial=trial.replace('Decisão colegiada dos desembargadores sobre o recurso interposto','Acompanhe todos os recursos desta sessão, incluindo Habeas Corpus, e seus respectivos julgamentos');
 
-trial=trial.replace(
-  '              <p className="text-xs sm:text-sm text-muted-foreground">\n                Você é: <span className="font-semibold text-foreground">{roleLabels[session.userRole]}</span>\n              </p>',
-  `              <p className="text-xs sm:text-sm text-muted-foreground">
+const statusOld='              <p className="text-xs sm:text-sm text-muted-foreground">\n                Você é: <span className="font-semibold text-foreground">{roleLabels[session.userRole]}</span>\n              </p>';
+const statusNew=`              <p className="text-xs sm:text-sm text-muted-foreground">
                 Você é: <span className="font-semibold text-foreground">{roleLabels[session.userRole]}</span>
               </p>
               <div className="mt-1">
                 <span className={\`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold \${session.status === "concluido" ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100" : session.status === "abandonado" ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100" : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"}\`}>
                   {session.status === "concluido" ? "✓ Sentença proferida · Sessão encerrada" : session.status === "abandonado" ? "Sessão abandonada" : "Aguardando sentença do juiz"}
                 </span>
-              </div>`
-);
-trial=trial.replace(
-  '<span className="hidden sm:inline">Solicitar Feedback</span><span className="sm:hidden">Feedback</span>',
-  '<span className="hidden sm:inline">{session.status === "concluido" ? "Ver Feedback" : "Feedback"}</span><span className="sm:hidden">Feedback</span>'
-);
+              </div>`;
+if(trial.includes(statusOld)) trial=trial.replace(statusOld,statusNew);
+else if(!trial.includes('Sessão encerrada')) throw new Error('Status da sessão não encontrado');
+
+const feedbackOld='<span className="hidden sm:inline">Solicitar Feedback</span><span className="sm:hidden">Feedback</span>';
+const feedbackNew='<span className="hidden sm:inline">{session.status === "concluido" ? "Ver Feedback" : "Feedback"}</span><span className="sm:hidden">Feedback</span>';
+if(trial.includes(feedbackOld)) trial=trial.replace(feedbackOld,feedbackNew);
 write('client/src/pages/Trial.tsx',trial);
 
 let gi=read('.gitignore');
