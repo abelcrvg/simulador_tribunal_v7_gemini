@@ -51,7 +51,19 @@ beforeAll(async () => {
     title: "Caso com verdade objetiva",
     area: "penal",
     description: "Teste de vazamento",
-    facts: { publicNarrative: "Versão pública", objectiveTruth: "SEGREDO" } as any,
+    facts: {
+      publicNarrative: "Versão pública",
+      objectiveTruth: "SEGREDO",
+      knownFacts: [
+        {
+          role: "réu",
+          person: "",
+          facts: "SEGREDO VIVIDO",
+          interest: "SEGREDO INTERESSE",
+          fear: "SEGREDO MEDO",
+        },
+      ],
+    } as any,
     legalBasis: "Art. 156 do CP",
     admiteJuri: false,
   });
@@ -109,6 +121,7 @@ describe("Controle de posse", () => {
 
     expect(result.trial.facts.publicNarrative).toBe("Versão pública");
     expect(result.trial.facts.objectiveTruth).toBeUndefined();
+    expect(result.trial.facts.knownFacts).toBeUndefined();
     expect(JSON.stringify(result)).not.toContain("SEGREDO");
   });
 });

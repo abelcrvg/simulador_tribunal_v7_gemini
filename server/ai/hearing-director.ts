@@ -184,6 +184,10 @@ Você NÃO é um personagem.
 Você NÃO deve interpretar juiz, promotor, advogado, testemunha, perito,
 réu ou usuário.
 
+Você NÃO tem acesso à verdade objetiva do caso e NÃO deve presumi-la.
+Trate apenas a narrativa pública/denúncia, as provas e tudo que foi
+debatido nesta audiência como material disponível.
+
 Sua função é observar o que aconteceu e decidir qual é o
 ACONTECIMENTO MAIS PLAUSÍVEL para fazer a audiência avançar.
 ${isSTFSession ? `
@@ -323,7 +327,11 @@ CASO:
 Título: ${normalizeText(trial?.title)}
 Área: ${normalizeText(trial?.area)}
 Descrição: ${normalizeText(trial?.description)}
-Fatos: ${normalizeText(trial?.facts)}
+Fatos: ${normalizeText(
+    trial?.facts && typeof trial.facts === 'object' && typeof trial.facts.publicNarrative === 'string'
+      ? trial.facts.publicNarrative
+      : (typeof trial?.facts === 'string' ? trial.facts : "")
+  )}
 
 PARTICIPANTES:
 ${buildParticipantsContext(participants, userRole)}

@@ -107,9 +107,9 @@ data/
 # TypeScript Check:
 npm run check -> Exit code 0 (0 errors)
 
-# Vitest Suite (após realismo, tempo real e higiene):
-Test Files  18 passed (18)
-     Tests  114 passed (114)
+# Vitest Suite (após conhecimento privado fragmentado):
+Test Files  19 passed (19)
+     Tests  120 passed (120)
   Duration  ~4s
 ```
 
@@ -119,7 +119,9 @@ Test Files  18 passed (18)
 > ℹ️ `opencode.test.ts`: **7/7 passando** — descoberta de modelo gratuito, agente dedicado, rotação em falha, intercalação Nvidia/`opencode`, rejeição de fala com outro alfabeto e extração de JSON. Validação real: `OK` via `nvidia/google/gemma-4-31b-it`.
 > ℹ️ `speech-sanitizer.test.ts`: **11/11 passando** — fala preservada, remoção de metadados em português e inglês, rótulo de personagem repetido, fallback neutro, tags de contexto, múltiplos personagens e higienização de CJK/caracteres estrangeiros.
 > ℹ️ `persona-evals.test.ts`: **11/11 passando** — avaliações determinísticas para juiz, promotor, defesa, ministro e testemunha: primeira pessoa, português, ausência de metadados e remoção de caracteres estrangeiros.
-> ℹ️ `hearing-director.freedom.test.ts` (**2**), `stf.structured.test.ts` (**5**) e o novo teste de confronto em `tribunal_integration.test.ts` (**6/6 no arquivo**) cobrem as melhorias de realismo desta sessão.
+> ℹ️ `hearing-director.freedom.test.ts` (**3/3**) cobre liberdade cênica e confirma que o Diretor recebe só a narrativa pública, nunca `objectiveTruth`/`knownFacts`.
+> ℹ️ `knowledge.test.ts` (**5/5**) cobre o vazamento de verdade: fragmento por pessoa/papel, interesses/medos, ausência de obsolescência e compatibilidade com casos legados sem `knownFacts`.
+> ℹ️ `stf.structured.test.ts` (**5**) e `tribunal_integration.test.ts` (**6/6 no arquivo**) cobrem as melhorias de realismo; o teste de integração também confirma que `trial.getById` omita `objectiveTruth` e `knownFacts`.
 > ⚠️ Numa execução anterior apareceram 7 `EPERM: rename` em `server/db.ts` (Windows),
 > com 2 `.tmp` deixados em `data/`; não foram removidos.
 
@@ -178,12 +180,13 @@ JWT_SECRET=...
 | 2026-11-20 (correções gerais) | OpenCode (Big Pickle) | **`campaign.advanceCase`/`complete`**: passaram a buscar o progresso pelo `progressId` real e a validar posse (antes usavam `getCampaignProgress(0,0)`). **`server/db.ts`**: `persist()` não envenena mais a `saveQueue` após uma falha de escrita. **IDOR**: novo `server/access-control.ts` com `requireOwnedSession`, `requireTrialAccess` e `requireOwnedAppeal`, aplicados a sessões, provas/documentos/históricos, recursos e eventos/docs visuais; `customTrial.getById` deixou de devolver `objectiveTruth`. **UI**: botão "Ver Decisão Final" abre o diálogo do `FinalDecisionView`. **Testes**: `LOCAL_DB_PATH` isolado por worker (`server/test-setup.ts`), então `npm test` não altera mais `data/tribunal-local.json`. Novos testes: `campaign.test.ts`, `db.persistence.test.ts`, `ownership.test.ts`. Multiplayer **não** foi tocado (fora de escopo). 90/90 testes passando, TypeScript limpo. |
 | 2026-11-20 (validação funcional) | OpenCode (Big Pickle) | Antes do push, os fluxos reais foram exercitados via `appRouter.createCaller` com IA mockada: **5/5** no novo `tribunal_integration.test.ts` (1ª instância completa, inclusive sentença) e **8/8** no `stf_integration.test.ts` (plenário, falas, maioria e acórdão). Os mocks do STF foram ajustados para as chaves reais retornadas pelo backend e para não confundir o prompt de fala com o do Diretor de Audiência. Suíte final: **95/95 testes**, `npm run check` limpo, `data/tribunal-local.json` intacto. |
 | 2026-11-20 (realismo e tempo real) | OpenCode (Big Pickle) | **Realismo sem rigidez**: o Diretor de Audiência passou a aceitar `aparte`, `repreensao` e `revelacao` — personagens podem falar fora da vez, quem conduz pode chamar à ordem (não automaticamente) e fatos concretos podem desviar a atenção; prompt e enum do json_schema atualizados. **STF estruturado**: votos com cargo/tese/vista/divergência extraídos da fala e persistidos, apuração mesclada com os votos salvos e acórdão com `teseVencedora` e votação nominal na UI. **Sentença estruturada**: `relatorio`, `fundamentacao`, `dispositivo` e `dosimetria` no prompt/schema e em `FinalDecisionView`. **Provas**: origem, data de coleta e custódia geradas/persistidas; nova mutation `evidence.confrontar`, confronto exibido nos autos, no prompt da sentença e no contexto do Diretor. **Tempo real**: `getIO()` e `join-session`/`leave-session` validados em `_core/socket.ts`, `broadcastSessionMessage` em `_core/message-events.ts`, `createBroadcastMessage` no router principal e no de voz; `Trial.tsx` escuta `new-message` via Socket.IO e atualiza o cache tRPC, eliminando os `setTimeout` de refetch. **Higiene**: semente versionada em `data/seed.local.json`, banco ativo em `data/tribunal-runtime.json` (migração única do legado), script `npm run db:seed`, `.env.example` sem MySQL, `.gitignore` ajustado e 11 evals de persona. Multiplayer não foi alterado. **114/114 testes**, `npm run check` limpo. |
+| 2026-11-20 (conhecimento privado) | OpenCode (Big Pickle) | **Verdade como conhecimento vivido, não como prova lacrada**: a IA de criação passou a gerar `facts.knownFacts` com fragmentos por `role`/`person`, `facts`, `interest` e `fear`, derivados de `objectiveTruth`, que continua existindo apenas no servidor como semente. Novo módulo `server/ai/knowledge.ts` distribui ao personagem apenas a narrativa pública da denúncia + o fragmento de quem viveu o fato e reforça a regra de que saber não obriga confessar. Juiz e Diretor de Audiência passaram a ser explicitamente cegos à verdade objetiva: o Diretor usa só `publicNarrative`, provas, autos e o que foi debatido; a sentença trata o que não foi demonstrado como não provado. `trial.getById` e `publicTrials` removem `objectiveTruth` e `knownFacts` da resposta; mocks foram atualizados e novos testes cobrem vazamento, fragmentos e casos legados. **120/120 testes**, `npm run check` limpo. |
 
 ---
 
 ## 📌 Próximos Passos Sugeridos
 
-1. Testar na interface web: aparte/repreensão/revelação, votação nominal do STF, sentença com dosimetria, confronto de provas e atualização das falas sem recarregar (criar caso **novo** — sessões antigas têm nomes genéricos salvos).
-2. Se o OpenCode ficar indisponível de forma persistente, o usuário pode fornecer chaves individuais das IAs gratuitas; a cadeia OpenRouter e os fallbacks já cobrem esse cenário.
+1. Testar na interface web com um caso **novo**: réu/vítima/testemunhas recebendo só o que viveram, juiz decidindo apenas com denúncia/provas/autos, aparte/repreensão/revelação, votação nominal do STF, sentença com dosimetria, confronto de provas e falas sem recarregar.
+2. Observar na prática se os fragmentos privados geram contradições interessantes sem travar a audiência; se necessário, ajustar os exemplos de `interest`/`fear` no prompt de criação de caso.
 3. Opcional: unificar Diretor + fala do personagem em uma única chamada (hoje `message.continuar` ainda faz duas; a abertura do STF já é determinística).
-4. Revisar `git status`/`git diff` desta sessão e decidir o commit das melhorias (o push anterior, com os testes de fluxo, já está no remoto).
+4. Se o OpenCode ficar indisponível de forma persistente, o usuário pode fornecer chaves individuais das IAs gratuitas; a cadeia OpenRouter e os fallbacks já cobrem esse cenário.

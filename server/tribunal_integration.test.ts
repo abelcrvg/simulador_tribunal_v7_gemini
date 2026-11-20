@@ -62,6 +62,22 @@ vi.mock("./_core/llm", () => {
           facts: {
             publicNarrative: "O réu teria discutido com a vítima antes dos fatos.",
             objectiveTruth: "A vítima iniciou a agressão, mas o réu reagiu com uso excessivo de força.",
+            knownFacts: [
+              {
+                role: "réu",
+                person: "Ricardo",
+                facts: "Eu fui empurrado antes de reagir.",
+                interest: "Quero que a legítima defesa seja aceita.",
+                fear: "Que digam que usei força demais.",
+              },
+              {
+                role: "testemunha",
+                person: "",
+                facts: "Vi a vítima avançar, mas não vi o golpe final.",
+                interest: "Dizer o que vi sem me envolver.",
+                fear: "Ser ameaçado pelo réu.",
+              },
+            ],
           },
           legalBasis: "Art. 121 do Código Penal",
           jurisprudence: "STJ - REsp 1.000.000",
@@ -149,6 +165,11 @@ describe("⚖️ Fluxo Tribunal — Integração Completa via tRPC", () => {
     expect(trialId).toBeGreaterThan(0);
     expect(trial.area).toBe("penal");
     expect(trial.admiteJuri).toBe(true);
+    expect((trial.facts as any).knownFacts).toHaveLength(2);
+
+    const publicTrial: any = await caller.trial.getById({ id: trialId });
+    expect(publicTrial.facts.knownFacts).toBeUndefined();
+    expect(publicTrial.facts.objectiveTruth).toBeUndefined();
 
     const result: any = await caller.session.create({
       trialId,

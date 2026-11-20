@@ -39,4 +39,35 @@ describe("liberdade cênica do Diretor de Audiência", () => {
     expect(flat).toContain('"revelacao"');
     expect(flat).toContain('"aparte"');
   });
+
+  it("não entrega a verdade objetiva nem conhecimentos privados ao Diretor", () => {
+    const prompt = buildHearingDirectorPrompt({
+      trial: {
+        title: "Caso",
+        area: "penal",
+        facts: {
+          publicNarrative: "Versão pública dos fatos.",
+          objectiveTruth: "SEGREDO ABSOLUTO",
+          knownFacts: [
+            {
+              role: "réu",
+              person: "Ricardo",
+              facts: "SEGREDO VIVIDO",
+              interest: "SEGREDO INTERESSE",
+              fear: "SEGREDO MEDO",
+            },
+          ],
+        },
+      },
+      participants: [],
+      messages: [],
+      evidences: [],
+      userRole: "juiz",
+      userName: "Dr. João",
+    });
+
+    expect(prompt).toContain("Versão pública dos fatos.");
+    expect(prompt).not.toContain("SEGREDO");
+    expect(prompt.replace(/\s+/g, " ")).toContain("NÃO tem acesso à verdade objetiva");
+  });
 });

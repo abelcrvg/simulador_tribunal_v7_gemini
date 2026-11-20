@@ -120,6 +120,7 @@ Retorne um JSON estruturado.`;
         : { ...trial, facts: { publicNarrative: trial.facts } };
       if (trialData.facts && typeof trialData.facts === 'object') {
         delete (trialData.facts as any).objectiveTruth;
+        delete (trialData.facts as any).knownFacts;
       }
 
       return { ...customTrial, trial: trialData };

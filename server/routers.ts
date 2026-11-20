@@ -14,6 +14,7 @@ import { z } from "zod";
 import * as db from "./db";
 import { requireOwnedAppeal, requireOwnedSession, requireTrialAccess } from "./access-control";
 import { generateImage } from "./_core/imageGeneration";
+import { filterKnowledge } from "./ai/knowledge";
 import {
   buildHearingDirectorPrompt,
   parseHearingDirectorDecision,
@@ -912,7 +913,16 @@ FORMATO DE RESPOSTA (JSON):
   "description": "Resumo executivo do caso em 2-3 parágrafos",
   "facts": {
     "publicNarrative": "Versão dos fatos que é de conhecimento público ou aceita pelas partes inicialmente",
-    "objectiveTruth": "A VERDADE ABSOLUTA e OCULTA dos fatos. Detalhe exatamente o que aconteceu, quem mentiu, quem é culpado, a intenção real e detalhes que NÃO estão na narrativa pública. Esta seção é secreta e serve apenas para guiar a IA no comportamento dos personagens."
+    "objectiveTruth": "A VERDADE ABSOLUTA e OCULTA dos fatos. Detalhe exatamente o que aconteceu, quem mentiu, quem é culpado, a intenção real e detalhes que NÃO estão na narrativa pública. Esta seção NUNCA é enviada aos prompts: serve apenas para você distribuir conhecimentos parciais em knownFacts.",
+    "knownFacts": [
+      {
+        "role": "papel de quem viveu o fato (ex.: reu, vitima, testemunha, perito)",
+        "person": "nome curto do personagem ou string vazia se valer para todas as pessoas desse papel",
+        "facts": "Somente o que ESSA pessoa presenciou ou viveu. Não escreva a verdade inteira.",
+        "interest": "O que essa pessoa quer com o processo (ex.: se safar, proteger alguém, ser acreditada)",
+        "fear": "O que essa pessoa teme que seja descoberto ou dito em audiência"
+      }
+    ]
   },
   "legalBasis": "Fundamentacao legal completa",
   "jurisprudence": "Jurisprudencia relevante",
@@ -941,8 +951,24 @@ FORMATO DE RESPOSTA (JSON):
               properties: {
                 publicNarrative: { type: "string", description: "Narrativa pública dos fatos" },
                 objectiveTruth: { type: "string", description: "Verdade objetiva e oculta" },
+                knownFacts: {
+                  type: "array",
+                  description: "Conhecimento parcial de cada pessoa que viveu os fatos",
+                  items: {
+                    type: "object",
+                    properties: {
+                      role: { type: "string", description: "Papel de quem viveu o fato" },
+                      person: { type: "string", description: "Nome do personagem ou string vazia" },
+                      facts: { type: "string", description: "Somente o que essa pessoa presenciou" },
+                      interest: { type: "string", description: "Interesse dessa pessoa no processo" },
+                      fear: { type: "string", description: "Medo dessa pessoa" },
+                    },
+                    required: ["role", "person", "facts", "interest", "fear"],
+                    additionalProperties: false,
+                  },
+                },
               },
-              required: ["publicNarrative", "objectiveTruth"],
+              required: ["publicNarrative", "objectiveTruth", "knownFacts"],
               additionalProperties: false,
             },
             legalBasis: { type: "string", description: "Fundamentação legal" },
@@ -965,7 +991,7 @@ FORMATO DE RESPOSTA (JSON):
     title: caseData.title,
     area: caseData.area,
     description: caseData.description,
-    facts: typeof caseData.facts === 'string' ? { publicNarrative: caseData.facts, objectiveTruth: caseData.facts } : caseData.facts,
+    facts: typeof caseData.facts === 'string' ? { publicNarrative: caseData.facts, objectiveTruth: caseData.facts, knownFacts: [] } : caseData.facts,
     legalBasis: caseData.legalBasis,
     jurisprudence: caseData.jurisprudence,
     admiteJuri: isSTF ? false : Boolean(caseData.admiteJuri),
@@ -1117,28 +1143,6 @@ function normalizeParticipantText(value: unknown): string {
   return String(value ?? "").trim();
 }
 
-function filterKnowledge(participant: any, trialFacts: any): string {
-  if (!trialFacts) return "Fatos não disponíveis.";
-
-  const role = normalizeParticipantText(participant?.role);
-  const publicNarrative = typeof trialFacts.publicNarrative === 'string'
-    ? trialFacts.publicNarrative
-    : (typeof trialFacts === 'string' ? trialFacts : "");
-
-  const objectiveTruth = typeof trialFacts.objectiveTruth === 'string'
-    ? trialFacts.objectiveTruth
-    : (typeof trialFacts === 'string' ? trialFacts : "");
-
-  // O Juiz, Promotor e Advogado de Defesa NÃO têm acesso automático à verdade objetiva.
-  const knowsTruth = !["juiz", "promotor", "advogado_defesa", "defensor_publico", "assistente_acusacao"].includes(role);
-
-  if (knowsTruth) {
-    return `[VERDADE OBJETIVA - Conhecimento do Personagem]: ${objectiveTruth}\n\n[NARRATIVA PÚBLICA]: ${publicNarrative}`;
-  }
-
-  return `[NARRATIVA PÚBLICA]: ${publicNarrative}`;
-}
-
 function buildParticipantBehaviorContext(
   participant: any,
   messageHistory: any[],
@@ -1165,7 +1169,7 @@ function buildParticipantBehaviorContext(
   // declarações dos demais personagens com aquilo que ele próprio disse.
 
   const trialFacts = typeof trial?.facts === 'string'
-    ? { publicNarrative: trial.facts, objectiveTruth: trial.facts }
+    ? { publicNarrative: trial.facts, objectiveTruth: trial.facts, knownFacts: [] }
     : trial?.facts;
 
   const factsContext = filterKnowledge(participant, trialFacts);
@@ -1373,11 +1377,12 @@ export const appRouter = router({
         // Removemos a verdade objetiva antes de enviar para o cliente para evitar vazamento de conhecimento
         const trialData = typeof trial.facts === 'object'
           ? { ...trial, facts: { ...trial.facts } }
-          : { ...trial, facts: { publicNarrative: trial.facts, objectiveTruth: trial.facts } };
+          : { ...trial, facts: { publicNarrative: trial.facts, objectiveTruth: trial.facts, knownFacts: [] } };
 
         const publicTrialData = { ...trialData };
         if (typeof publicTrialData.facts === 'object') {
           delete (publicTrialData.facts as any).objectiveTruth;
+          delete (publicTrialData.facts as any).knownFacts;
         }
 
         return publicTrialData as any;
@@ -1658,6 +1663,9 @@ Responda APENAS com o JSON, sem texto adicional:`;
         const juryVotesList = juryVotes.map(v => `- ${v.jurorName}: ${v.vote} - ${v.opinion}`).join("\n\n");
 
         const decisionPrompt = `Você é o JUIZ responsável por este julgamento. Baseado em TODO O HISTÓRICO do julgamento, gere uma DECISÃO FINAL completa e fundamentada.
+
+Você NÃO tem acesso à verdade objetiva e NÃO deve presumir fatos fora destes autos.
+Considere apenas a narrativa pública/denúncia, as provas e tudo que foi debatido nesta audiência. O que não foi aqui demonstrado deve ser tratado como não provado.
 
 === INFORMAÇÕES DO CASO ===
 Título: ${trial.title}

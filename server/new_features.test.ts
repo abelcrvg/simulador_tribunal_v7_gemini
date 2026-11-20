@@ -87,6 +87,15 @@ vi.mock("./_core/llm", () => ({
               facts: {
                 publicNarrative: "Disparos efetuados em via pública na madrugada.",
                 objectiveTruth: "Houve legítima defesa após agressão física injusta.",
+                knownFacts: [
+                  {
+                    role: "réu",
+                    person: "",
+                    facts: "Eu reagi porque fui agredido primeiro.",
+                    interest: "Quero alegar legítima defesa.",
+                    fear: "Que a acusação prove intenção homicida.",
+                  },
+                ],
               },
               legalBasis: "Art. 121, § 2º, incisos II e IV do Código Penal",
               jurisprudence: "STF - HC 123.456",
