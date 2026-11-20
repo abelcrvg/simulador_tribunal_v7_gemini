@@ -41,6 +41,39 @@ describe("sanitizeAIResponse", () => {
     expect(result).not.toMatch(/PASSOS|RESUMO|PRÓXIMO PROMPT/i);
   });
 
+  it("corta metadados de agente em inglês", () => {
+    const text = [
+      "Dra. Sandra Battistella [Procurador-Geral da República (PGR)](IA)",
+      "MAXIMUM STEPS LIMIT REACHED -",
+    ].join("\n");
+
+    const result = sanitizeAIResponse(text, "promotor", "Dr. Paulo Souza");
+    expect(result).toMatch(/Peço vênia/);
+    expect(result).not.toMatch(/MAXIMUM|STEPS|LIMIT|REACHED/i);
+  });
+
+  it("remove o rótulo do personagem repetido dentro da fala", () => {
+    const text = [
+      "Ministra Cármen Lúcia [Ministro do STF](IA)",
+      "Peço vênia, Excelência, para prosseguir.",
+    ].join("\n");
+
+    expect(sanitizeAIResponse(text, ROLE, NAME)).toBe(
+      "Peço vênia, Excelência, para prosseguir.",
+    );
+  });
+
+  it("preserva a fala antes de um marcador inglês", () => {
+    const text = [
+      "Excelência, a Procuradoria-Geral da República requer a improcedência.",
+      "MAX STEPS LIMIT REACHED",
+    ].join("\n");
+
+    expect(sanitizeAIResponse(text, ROLE, NAME)).toBe(
+      "Excelência, a Procuradoria-Geral da República requer a improcedência.",
+    );
+  });
+
   it("remove checkpoint e tags de pensamento", () => {
     const text = "<think>vou responder</think><conversation-checkpoint>\nresumo interno\n</conversation-checkpoint>\nVoto pela procedência.";
     const result = sanitizeAIResponse(text, ROLE, NAME);

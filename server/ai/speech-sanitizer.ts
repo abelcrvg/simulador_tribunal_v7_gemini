@@ -10,6 +10,7 @@
 
 export const ANTI_META_INSTRUCTION = [
   "NUNCA escreva resumos, status de execução, checkpoints, metadados, 'próximos passos', 'tarefas concluídas', 'ferramentas desabilitadas', 'working directory', 'próximo prompt do usuário' ou qualquer texto fora da fala do personagem.",
+  "Também são proibidos os equivalentes em inglês: 'maximum steps limit reached', 'max steps', 'step limit', 'tool calls disabled', 'next user prompt', 'system status' e 'conversation checkpoint'.",
   "Não mencione IA, agente, sistema, prompt, ferramentas ou instruções recebidas.",
   "Sua resposta deve conter APENAS a fala, em primeira pessoa, como em uma sessão real.",
 ].join(" ");
@@ -37,6 +38,10 @@ export function stripForeignScript(text: string): string {
     .trim();
 }
 
+// Alguns modelos repetem o rótulo do personagem dentro do próprio texto
+// ("Ministra Fulana [Ministro do STF](IA)"). A interface já mostra quem fala.
+const ROLE_LABEL_PATTERN = /^\s*[^:\n]+\[[^\]]+\]\s*\(IA\)\s*$/i;
+
 const META_BLOCK_PATTERN = new RegExp(
   [
     "<conversation-checkpoint",
@@ -44,6 +49,14 @@ const META_BLOCK_PATTERN = new RegExp(
     "FERRAMENTAS\\s+DESABILITADAS",
     "FERRAMENTAS\\s+DESATIVADAS",
     "TOOLS?\\s+DISABLED",
+    "TOOL\\s+CALLS?\\s+DISABLED",
+    "MAXIMUM\\s+STEPS?\\s+LIMIT\\s+REACHED",
+    "MAX\\s+STEPS?\\s+LIMIT\\s+REACHED",
+    "STEPS?\\s+LIMIT\\s+REACHED",
+    "MAXIMUM\\s+STEPS?\\b",
+    "CONVERSATION[\\s-]+CHECKPOINT",
+    "NEXT\\s+USER\\s+PROMPT",
+    "SYSTEM\\s+STATUS",
     "PR[ÓO]XIMO\\s+PROMPT\\s+DO\\s+USU[ÁA]RIO",
     "PR[ÓO]XIMA\\s+ENTRADA\\s+DO\\s+USU[ÁA]RIO",
     "PR[ÓO]XIMA\\s+A[ÇC][ÃA]O\\s+DO\\s+USU[ÁA]RIO",
@@ -78,6 +91,16 @@ export function sanitizeAIResponse(
   if (hasForeignScript(content)) {
     console.log("[AVISO] IA misturou caracteres de outro alfabeto; removendo.");
     content = stripForeignScript(content);
+  }
+
+  const labelLines = content.split("\n").filter(line => ROLE_LABEL_PATTERN.test(line));
+  if (labelLines.length) {
+    console.log("[AVISO] IA repetiu o rótulo do personagem; removendo.");
+    content = content
+      .split("\n")
+      .filter(line => !ROLE_LABEL_PATTERN.test(line))
+      .join("\n")
+      .trim();
   }
 
   const multipleRolesPattern =
