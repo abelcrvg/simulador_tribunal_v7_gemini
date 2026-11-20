@@ -34,6 +34,9 @@ export type GenerateImageResponse = {
 export async function generateImage(
   options: GenerateImageOptions
 ): Promise<GenerateImageResponse> {
+  if (!ENV.imageGenerationEnabled) {
+    throw new Error("Geração de imagens desativada (IMAGE_GENERATION_ENABLED)");
+  }
   if (!ENV.forgeApiUrl) {
     throw new Error("BUILT_IN_FORGE_API_URL is not configured");
   }

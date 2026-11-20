@@ -2,6 +2,7 @@ import { z } from "zod";
 import { protectedProcedure, router } from "./_core/trpc";
 import { invokeLLM } from "./_core/llm";
 import { generateImage } from "./_core/imageGeneration";
+import { ENV } from "./_core/env";
 import * as db from "./db";
 
 /**
@@ -135,6 +136,10 @@ Retorne um JSON com:
         })
       )
       .mutation(async ({ input }) => {
+        if (!ENV.imageGenerationEnabled) {
+          throw new Error("Geração de imagens desativada (IMAGE_GENERATION_ENABLED)");
+        }
+
         const trial = await db.getTrialById(input.trialId);
         if (!trial) throw new Error("Caso não encontrado");
 

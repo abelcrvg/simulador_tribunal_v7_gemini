@@ -37,6 +37,11 @@ import {
 // Função auxiliar para higienizar respostas da IA (cortar múltiplos papéis e menções ao usuário)
 // Função para gerar documentos visuais em background (não bloqueia)
 async function generateVisualDocumentsInBackground(trialId: number, trial: any) {
+  if (!ENV.imageGenerationEnabled) {
+    console.log("[Background] Geração de imagens desativada; pulando documentos visuais.");
+    return;
+  }
+
   console.log(`[Background] Iniciando geração de documentos visuais para trial ${trialId}`);
   
   const categories: Array<"cena_crime" | "planta_baixa" | "laudo_pericial" | "foto_prova"> = 

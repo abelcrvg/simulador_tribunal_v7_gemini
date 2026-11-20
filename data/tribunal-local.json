@@ -1,21 +1,21 @@
 {
   "counters": {
-    "trials": 149,
-    "evidences": 210,
-    "documents": 195,
-    "sessions": 75,
-    "messages": 698,
-    "participants": 315,
+    "trials": 155,
+    "evidences": 215,
+    "documents": 200,
+    "sessions": 77,
+    "messages": 700,
+    "participants": 317,
     "policeReports": 48,
     "appeals": 7,
     "appellateJudges": 15,
     "hearings": 57,
-    "campaigns": 24,
-    "customTrials": 24,
+    "campaigns": 25,
+    "customTrials": 25,
     "rooms": 25,
     "roomPlayers": 34,
-    "visualDocuments": 154,
-    "trialEvents": 22
+    "visualDocuments": 155,
+    "trialEvents": 23
   },
   "users": [],
   "trials": [
@@ -2269,6 +2269,98 @@
       "difficulty": "medio",
       "id": 149,
       "timeline": "{}"
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.166Z",
+      "title": "Atropelamento na Faixa de Pedestre",
+      "area": "penal",
+      "description": "Motorista em alta velocidade e ao celular atropelou vítima na faixa de pedestres.",
+      "facts": "O acusado trafegava em via urbana desrespeitando a sinalização semafórica.",
+      "legalBasis": "Art. 302 da Lei nº 9.503/1997 (Código de Trânsito Brasileiro)",
+      "jurisprudence": "STJ - REsp 1.845.221/SP",
+      "admiteJuri": false,
+      "timeline": "15/03/2024: Ocorrência do sinistro",
+      "id": 150
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.209Z",
+      "title": "Homicídio Qualificado",
+      "area": "penal",
+      "description": "Homicídio ocorrido na região central após desavença.",
+      "facts": {
+        "publicNarrative": "Disparos efetuados em via pública na madrugada.",
+        "objectiveTruth": "Houve legítima defesa após agressão física injusta."
+      },
+      "legalBasis": "Art. 121, § 2º, incisos II e IV do Código Penal",
+      "jurisprudence": "STF - HC 123.456",
+      "admiteJuri": true,
+      "difficulty": "medio",
+      "id": 151,
+      "timeline": "{}"
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.434Z",
+      "title": "Homicídio Qualificado",
+      "area": "penal",
+      "description": "Homicídio ocorrido na região central após desavença.",
+      "facts": {
+        "publicNarrative": "Disparos efetuados em via pública na madrugada.",
+        "objectiveTruth": "Houve legítima defesa após agressão física injusta."
+      },
+      "legalBasis": "Art. 121, § 2º, incisos II e IV do Código Penal",
+      "jurisprudence": "STF - HC 123.456",
+      "admiteJuri": true,
+      "difficulty": "medio",
+      "id": 152,
+      "timeline": "{}"
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.590Z",
+      "title": "Homicídio Qualificado",
+      "area": "penal",
+      "description": "Homicídio ocorrido na região central após desavença.",
+      "facts": {
+        "publicNarrative": "Disparos efetuados em via pública na madrugada.",
+        "objectiveTruth": "Houve legítima defesa após agressão física injusta."
+      },
+      "legalBasis": "Art. 121, § 2º, incisos II e IV do Código Penal",
+      "jurisprudence": "STF - HC 123.456",
+      "admiteJuri": true,
+      "difficulty": "medio",
+      "id": 153,
+      "timeline": "{}"
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.670Z",
+      "title": "Homicídio Qualificado",
+      "area": "penal",
+      "description": "Homicídio ocorrido na região central após desavença.",
+      "facts": {
+        "publicNarrative": "Disparos efetuados em via pública na madrugada.",
+        "objectiveTruth": "Houve legítima defesa após agressão física injusta."
+      },
+      "legalBasis": "Art. 121, § 2º, incisos II e IV do Código Penal",
+      "jurisprudence": "STF - HC 123.456",
+      "admiteJuri": true,
+      "difficulty": "medio",
+      "id": 154,
+      "timeline": "{}"
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.759Z",
+      "title": "Homicídio Qualificado",
+      "area": "penal",
+      "description": "Homicídio ocorrido na região central após desavença.",
+      "facts": {
+        "publicNarrative": "Disparos efetuados em via pública na madrugada.",
+        "objectiveTruth": "Houve legítima defesa após agressão física injusta."
+      },
+      "legalBasis": "Art. 121, § 2º, incisos II e IV do Código Penal",
+      "jurisprudence": "STF - HC 123.456",
+      "admiteJuri": true,
+      "difficulty": "medio",
+      "id": 155,
+      "timeline": "{}"
     }
   ],
   "sessions": [
@@ -3188,6 +3280,30 @@
       "trialId": 147,
       "userRole": "juiz",
       "id": 75
+    },
+    {
+      "status": "em_andamento",
+      "juriVotou": false,
+      "instancia": "primeira",
+      "isMultiplayer": false,
+      "createdAt": "2026-11-20T07:01:00.329Z",
+      "updatedAt": "2026-11-20T07:01:00.329Z",
+      "userId": 1,
+      "trialId": 151,
+      "userRole": "juiz",
+      "id": 76
+    },
+    {
+      "status": "em_andamento",
+      "juriVotou": false,
+      "instancia": "primeira",
+      "isMultiplayer": false,
+      "createdAt": "2026-11-20T07:01:00.522Z",
+      "updatedAt": "2026-11-20T07:01:00.522Z",
+      "userId": 1,
+      "trialId": 152,
+      "userRole": "juiz",
+      "id": 77
     }
   ],
   "messages": [
@@ -8901,6 +9017,24 @@
       "isAI": true,
       "senderName": "Dra. Sandra Battistella",
       "id": 698
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.353Z",
+      "sessionId": 76,
+      "role": "sistema",
+      "senderName": "Tribunal",
+      "content": "Bem-vindo ao julgamento! Você foi designado como **Test User** (juiz). O julgamento começará em breve.",
+      "isAI": true,
+      "id": 699
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.538Z",
+      "sessionId": 77,
+      "role": "sistema",
+      "senderName": "Tribunal",
+      "content": "Bem-vindo ao julgamento! Você foi designado como **Test User** (juiz). O julgamento começará em breve.",
+      "isAI": true,
+      "id": 700
     }
   ],
   "evidences": [
@@ -11003,6 +11137,56 @@
       "details": "Disparo único no tórax",
       "imageUrl": null,
       "id": 210
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.234Z",
+      "trialId": 151,
+      "type": "pericial",
+      "title": "Laudo Necroscópico",
+      "description": "Exame cadavérico do IML",
+      "details": "Disparo único no tórax",
+      "imageUrl": null,
+      "id": 211
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.454Z",
+      "trialId": 152,
+      "type": "pericial",
+      "title": "Laudo Necroscópico",
+      "description": "Exame cadavérico do IML",
+      "details": "Disparo único no tórax",
+      "imageUrl": null,
+      "id": 212
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.605Z",
+      "trialId": 153,
+      "type": "pericial",
+      "title": "Laudo Necroscópico",
+      "description": "Exame cadavérico do IML",
+      "details": "Disparo único no tórax",
+      "imageUrl": null,
+      "id": 213
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.684Z",
+      "trialId": 154,
+      "type": "pericial",
+      "title": "Laudo Necroscópico",
+      "description": "Exame cadavérico do IML",
+      "details": "Disparo único no tórax",
+      "imageUrl": null,
+      "id": 214
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.774Z",
+      "trialId": 155,
+      "type": "pericial",
+      "title": "Laudo Necroscópico",
+      "description": "Exame cadavérico do IML",
+      "details": "Disparo único no tórax",
+      "imageUrl": null,
+      "id": 215
     }
   ],
   "participants": [
@@ -14084,6 +14268,24 @@
       "name": "Test User",
       "description": "Participante principal",
       "id": 315
+    },
+    {
+      "isUser": true,
+      "createdAt": "2026-11-20T07:01:00.372Z",
+      "sessionId": 76,
+      "role": "juiz",
+      "name": "Test User",
+      "description": "Participante principal",
+      "id": 316
+    },
+    {
+      "isUser": true,
+      "createdAt": "2026-11-20T07:01:00.554Z",
+      "sessionId": 77,
+      "role": "juiz",
+      "name": "Test User",
+      "description": "Participante principal",
+      "id": 317
     }
   ],
   "vehicleHistory": [],
@@ -16427,6 +16629,66 @@
       "issuer": "1ª Delegacia de Polícia",
       "relevance": "alta",
       "id": 195
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.258Z",
+      "trialId": 151,
+      "type": "boletim_ocorrencia",
+      "title": "BO nº 1234/2024",
+      "description": "Registro da Polícia Civil",
+      "content": "Registro formal da ocorrência na 1ª Delegacia de Polícia.",
+      "issueDate": "2024-01-15T00:00:00.000Z",
+      "issuer": "1ª Delegacia de Polícia",
+      "relevance": "alta",
+      "id": 196
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.470Z",
+      "trialId": 152,
+      "type": "boletim_ocorrencia",
+      "title": "BO nº 1234/2024",
+      "description": "Registro da Polícia Civil",
+      "content": "Registro formal da ocorrência na 1ª Delegacia de Polícia.",
+      "issueDate": "2024-01-15T00:00:00.000Z",
+      "issuer": "1ª Delegacia de Polícia",
+      "relevance": "alta",
+      "id": 197
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.620Z",
+      "trialId": 153,
+      "type": "boletim_ocorrencia",
+      "title": "BO nº 1234/2024",
+      "description": "Registro da Polícia Civil",
+      "content": "Registro formal da ocorrência na 1ª Delegacia de Polícia.",
+      "issueDate": "2024-01-15T00:00:00.000Z",
+      "issuer": "1ª Delegacia de Polícia",
+      "relevance": "alta",
+      "id": 198
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.699Z",
+      "trialId": 154,
+      "type": "boletim_ocorrencia",
+      "title": "BO nº 1234/2024",
+      "description": "Registro da Polícia Civil",
+      "content": "Registro formal da ocorrência na 1ª Delegacia de Polícia.",
+      "issueDate": "2024-01-15T00:00:00.000Z",
+      "issuer": "1ª Delegacia de Polícia",
+      "relevance": "alta",
+      "id": 199
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.788Z",
+      "trialId": 155,
+      "type": "boletim_ocorrencia",
+      "title": "BO nº 1234/2024",
+      "description": "Registro da Polícia Civil",
+      "content": "Registro formal da ocorrência na 1ª Delegacia de Polícia.",
+      "issueDate": "2024-01-15T00:00:00.000Z",
+      "issuer": "1ª Delegacia de Polícia",
+      "relevance": "alta",
+      "id": 200
     }
   ],
   "juryVotes": [],
@@ -18329,6 +18591,17 @@
       "isPublic": true,
       "createdBy": 1,
       "id": 24
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.139Z",
+      "title": "Crimes contra o Patrimônio",
+      "description": "Série de casos sobre furto, roubo e estelionato",
+      "difficulty": "medio",
+      "totalCases": 3,
+      "storyline": "{\"mainStory\":\"Conspiração Corporativa e Fraude Tributária\",\"cases\":[{\"caseNumber\":1,\"title\":\"Fraude Fiscal Inicial\",\"description\":\"Sonegação\",\"connection\":\"Início\",\"consequences\":\"Investigação deflagrada\"},{\"caseNumber\":2,\"title\":\"Lavagem de Capitais\",\"description\":\"Ocultação\",\"connection\":\"Meio\",\"consequences\":\"Bloqueio de bens\"},{\"caseNumber\":3,\"title\":\"Corrupção no Judiciário\",\"description\":\"Suborno\",\"connection\":\"Fim\",\"consequences\":\"Sentença condenatória\"}]}",
+      "isPublic": true,
+      "createdBy": 1,
+      "id": 25
     }
   ],
   "campaignProgress": [],
@@ -20180,6 +20453,18 @@
       "thumbnailUrl": "https://example.com/mock-evidence-image.png",
       "metadata": "{\"generatedAt\":\"2026-11-20T06:51:59.116Z\",\"prompt\":\"Crie uma imagem realista da cena do crime para o caso: Homicídio Qualificado. Fatos: [object Object]. Estilo: fotografia forense, evidências marcadas, iluminação profissional.\"}",
       "id": 154
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.744Z",
+      "trialId": 154,
+      "type": "image",
+      "category": "cena_crime",
+      "title": "Foto da Cena do Crime",
+      "description": "Documento visual gerado por IA para Homicídio Qualificado",
+      "fileUrl": "https://example.com/mock-evidence-image.png",
+      "thumbnailUrl": "https://example.com/mock-evidence-image.png",
+      "metadata": "{\"generatedAt\":\"2026-11-20T07:01:00.744Z\",\"prompt\":\"Crie uma imagem realista da cena do crime para o caso: Homicídio Qualificado. Fatos: [object Object]. Estilo: fotografia forense, evidências marcadas, iluminação profissional.\"}",
+      "id": 155
     }
   ],
   "trialEvents": [
@@ -20402,6 +20687,16 @@
       "impact": "{\"type\":\"positivo\",\"affectedParty\":\"defesa\",\"details\":\"Comprova que o acusado não estava no local no momento exato dos fatos.\"}",
       "isResolved": false,
       "id": 22
+    },
+    {
+      "triggeredAt": "2026-11-20T07:01:00.416Z",
+      "sessionId": 76,
+      "eventType": "prova_nova",
+      "title": "Testemunha Apresenta Gravação",
+      "description": "Durante a sessão, a testemunha ocular revelou gravação inédita em áudio.",
+      "impact": "{\"type\":\"positivo\",\"affectedParty\":\"defesa\",\"details\":\"Comprova que o acusado não estava no local no momento exato dos fatos.\"}",
+      "isResolved": false,
+      "id": 23
     }
   ],
   "customTrials": [
@@ -20668,6 +20963,17 @@
       "rating": 0,
       "tags": null,
       "id": 24
+    },
+    {
+      "createdAt": "2026-11-20T07:01:00.186Z",
+      "userId": 1,
+      "trialId": 150,
+      "originalPrompt": "Um motorista atropelou um pedestre na faixa de pedestres enquanto falava ao celular. O pedestre sofreu fraturas e ficou 3 meses afastado do trabalho. Testemunhas confirmam que o sinal estava vermelho para o motorista.",
+      "isPublic": false,
+      "timesPlayed": 0,
+      "rating": 0,
+      "tags": null,
+      "id": 25
     }
   ],
   "appeals": [

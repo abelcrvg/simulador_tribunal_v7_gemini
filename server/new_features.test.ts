@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { appRouter } from "./routers";
+import { ENV } from "./_core/env";
 import type { TrpcContext } from "./_core/context";
 
 // Mock invokeLLM e generateImage para testes determinísticos sem depender de rede/quota
@@ -258,22 +259,47 @@ describe("Novas Funcionalidades", () => {
   });
 
   describe("Documentos Visuais", () => {
-    it("deve gerar documento visual com IA", async () => {
-      const { ctx } = createAuthContext();
-      const caller = appRouter.createCaller(ctx);
+    it("recusa gerar imagem quando a funcionalidade está desativada", async () => {
+      const previous = ENV.imageGenerationEnabled;
+      ENV.imageGenerationEnabled = false;
+      try {
+        const { ctx } = createAuthContext();
+        const caller = appRouter.createCaller(ctx);
+        const trial = await caller.trial.generate({ area: "homicidio" });
 
-      // Criar um trial primeiro
-      const trial = await caller.trial.generate({ area: "homicidio" });
+        await expect(
+          caller.enhancements.visualDocs.generate({
+            trialId: trial.trialId,
+            category: "cena_crime",
+          }),
+        ).rejects.toThrow(/desativada/);
+      } finally {
+        ENV.imageGenerationEnabled = previous;
+      }
+    }, 30000);
 
-      // Gerar documento visual
-      const doc = await caller.enhancements.visualDocs.generate({
-        trialId: trial.trialId,
-        category: "cena_crime",
-      });
+    it("deve gerar documento visual com IA quando explicitamente ativado", async () => {
+      const previous = ENV.imageGenerationEnabled;
+      ENV.imageGenerationEnabled = true;
+      try {
+        const { ctx } = createAuthContext();
+        const caller = appRouter.createCaller(ctx);
 
-      expect(doc.docId).toBeDefined();
-      expect(doc.imageUrl).toBeDefined();
-      expect(doc.title).toBeDefined();
+        // Criar um trial primeiro
+        const trial = await caller.trial.generate({ area: "homicidio" });
+
+        // Gerar documento visual
+        const doc = await caller.enhancements.visualDocs.generate({
+          trialId: trial.trialId,
+          category: "cena_crime",
+        });
+
+        expect(doc.docId).toBeDefined();
+        expect(doc.imageUrl).toBeDefined();
+        expect(doc.title).toBeDefined();
+      } finally {
+        ENV.imageGenerationEnabled = previous;
+      }
     }, 30000);
 
     it("deve listar documentos visuais de um trial", async () => {

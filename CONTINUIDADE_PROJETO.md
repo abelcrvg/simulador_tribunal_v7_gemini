@@ -107,7 +107,7 @@ npm run check -> Exit code 0 (0 errors)
 
 # Vitest Suite (após reforma STF + OpenCode principal + contagem de votos):
 Test Files  11 passed (11)
-     Tests  81 passed (81)
+     Tests  82 passed (82)
   Duration  ~2,7s
 ```
 
@@ -169,6 +169,7 @@ JWT_SECRET=...
 | 2026-11-20 (contagem de votos) | OpenCode (Big Pickle) | Nova query `message.stfTally` (apuração provisória, somente leitura) e banner compacto no Plenário com favoráveis/contrários, mais botão **Ver votos** que abre um diálogo com a lista de cada ministro, origem do voto e barra de cadeiras manifestadas. `server/ai/speech-sanitizer.ts` centraliza a higienização e remove artefatos de agente ("MÁXIMOS PASSOS", "FERRAMENTAS DESABILITADAS", checkpoints) que apareceram como fala da IA; a instrução anti-meta foi reforçada nos prompts e no agente `tribunal-speaker`. 73/73 testes passando. |
 | 2026-11-20 (artefatos de idioma) | OpenCode (Big Pickle) | Falas com caracteres CJK/japoneses e tokens soltos ("城里", "意外的", "GTG有限") passaram a ser tratadas em duas camadas: `PORTUGUESE_ONLY_INSTRUCTION` nos prompts/agente, `hasForeignScript`/`stripForeignScript` no sanitizador e rejeição da resposta no provider OpenCode com giro para outro modelo. A rotação do OpenCode agora intercala Nvidia e `opencode/*` e tenta os 12 modelos antes de devolver a chamada ao roteador — antes, uma janela de 6 podia cair só no bloco `opencode/*`, que estava devolvendo texto vazio. O log de fallback deixou de anunciar provedores não configurados. 78/78 testes passando. |
 | 2026-11-20 (metadados em inglês) | OpenCode (Big Pickle) | Apareceu também `MAXIMUM STEPS LIMIT REACHED -` e o rótulo `Dra. Sandra Battistella [Procurador-Geral da República (PGR)](IA)` dentro da fala. O sanitizador passou a reconhecer marcadores em inglês (`MAXIMUM/MAX STEPS`, `STEP LIMIT REACHED`, `TOOL CALLS DISABLED`, `NEXT USER PROMPT`, `SYSTEM STATUS`, `CONVERSATION CHECKPOINT`) e a remover linhas de rótulo `[...](IA)` repetidas pelo modelo; se sobrar só metadado, devolve fala neutra. Instrução e agente `tribunal-speaker` reforçados. 81/81 testes passando. |
+| 2026-11-20 (imagens desativadas) | OpenCode (Big Pickle) | Geração de imagens via Forge foi **desativada por padrão** (`IMAGE_GENERATION_ENABLED=false`). A geração automática em background foi suprimida e a rota manual `enhancements.visualDocs.generate` agora recusa com erro claro. Isso evita consumo de créditos do Forge e o ruído de `[Background] Erro ao gerar ... BUILT_IN_FORGE_API_URL is not configured`. Os testes cobrem ambos os estados (desativado e ativado explicitamente). 82/82 testes passando. |
 
 ---
 

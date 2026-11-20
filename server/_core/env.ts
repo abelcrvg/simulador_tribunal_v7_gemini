@@ -12,6 +12,9 @@ export const ENV = {
   oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
   ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
   isProduction: process.env.NODE_ENV === "production",
+  // Geração de imagens é opcional e desligada por padrão: consome créditos do
+  // Forge e atualmente não é utilizável. Ative com IMAGE_GENERATION_ENABLED=true.
+  imageGenerationEnabled: process.env.IMAGE_GENERATION_ENABLED === "true",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   aiProvider: process.env.AI_PROVIDER ?? "auto",
