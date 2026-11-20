@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { openRouterProvider } from "./openrouter";
+import { FREE_MODEL_CHAIN, openRouterProvider } from "./openrouter";
 import { getAIProviders, invokeWithAIRouter } from "../router";
 import { invokeLLM } from "../../_core/llm";
 import { ENV } from "../../_core/env";
@@ -185,6 +185,41 @@ describe("OpenRouter Provider", () => {
     expect(result.choices[0].message.content).toBe('{"status":"ok"}');
   });
 
+  it("deve retentar sem reasoning se o modelo exigir reasoning obrigatório", async () => {
+    let callCount = 0;
+    const callBodies: any[] = [];
+
+    globalThis.fetch = vi.fn().mockImplementation(async (_url: string, options: any) => {
+      callCount++;
+      callBodies.push(JSON.parse(options.body));
+
+      if (callCount === 1) {
+        return {
+          ok: false,
+          status: 400,
+          text: async () => "Reasoning is mandatory for this endpoint and cannot be disabled.",
+        } as Response;
+      }
+
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          choices: [{ message: { role: "assistant", content: '{"ok":true}' } }],
+        }),
+      } as Response;
+    });
+
+    const result = await openRouterProvider.invoke({
+      messages: [{ role: "user", content: "Gere o resumo." }],
+    });
+
+    expect(callCount).toBe(2);
+    expect(callBodies[0].reasoning).toEqual({ effort: "none" });
+    expect(callBodies[1].reasoning).toBeUndefined();
+    expect(result.choices[0].message.content).toBe('{"ok":true}');
+  });
+
   it("deve tratar rate-limit (429) como retryable", async () => {
     globalThis.fetch = vi.fn().mockImplementation(async () => {
       return {
@@ -206,6 +241,38 @@ describe("OpenRouter Provider", () => {
       expect(providerError.status).toBe(429);
       expect(providerError.retryable).toBe(true);
     }
+  });
+
+  it("para no primeiro lote quando a cota diária gratuita acabou", async () => {
+    const fetchMock = vi.fn().mockImplementation(async () => ({
+      ok: false,
+      status: 429,
+      text: async () =>
+        JSON.stringify({
+          error: {
+            message:
+              "Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day",
+            code: 429,
+            metadata: { limit_source: "openrouter_free_tier_daily" },
+          },
+        }),
+      headers: {
+        get: (name: string) =>
+          name.toLowerCase() === "x-ratelimit-reset"
+            ? "1795219200000"
+            : null,
+      },
+    } as unknown as Response));
+    globalThis.fetch = fetchMock;
+
+    await expect(
+      openRouterProvider.invoke({
+        messages: [{ role: "user", content: "Teste" }],
+      }),
+    ).rejects.toThrow(/Cota diária de modelos gratuitos/);
+
+    // Não pode queimar os outros 4 lotes num balde que já está em zero.
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -241,5 +308,105 @@ describe("AI Router com OpenRouter", () => {
     });
 
     expect(response.choices[0].message.content).toBe("Resposta via invokeLLM e OpenRouter");
+  });
+});
+
+describe("Fallback: IAs gratuitas do OpenRouter primeiro", () => {
+  const originalProvider = process.env.AI_PROVIDER;
+  const originalApiKey = ENV.openRouterApiKey;
+  const originalGeminiKey = ENV.geminiApiKey;
+  const originalFetch = globalThis.fetch;
+
+  beforeEach(() => {
+    ENV.openRouterApiKey = "sk-or-v1-testkey";
+    ENV.geminiApiKey = "test-gemini-key";
+    process.env.AI_PROVIDER = "openrouter";
+  });
+
+  afterEach(() => {
+    ENV.openRouterApiKey = originalApiKey;
+    ENV.geminiApiKey = originalGeminiKey;
+    if (originalProvider === undefined) delete process.env.AI_PROVIDER;
+    else process.env.AI_PROVIDER = originalProvider;
+    globalThis.fetch = originalFetch;
+    vi.restoreAllMocks();
+  });
+
+  it("envia todas as IAs gratuitas em lotes de no máximo 3", async () => {
+    const capturedBodies: any[] = [];
+    let callCount = 0;
+    globalThis.fetch = vi.fn().mockImplementation(async (_url: string, options: any) => {
+      capturedBodies.push(JSON.parse(options.body));
+      callCount++;
+      if (callCount < Math.ceil(FREE_MODEL_CHAIN.length / 3)) {
+        return {
+          ok: false,
+          status: 429,
+          text: async () => "Rate limit",
+        } as Response;
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          model: "nvidia/nemotron-3.5-lightning:free",
+          choices: [{ index: 0, message: { role: "assistant", content: "ok" } }],
+        }),
+      } as Response;
+    });
+
+    await invokeLLM({ messages: [{ role: "user", content: "Teste" }] });
+
+    expect(capturedBodies[0].model).toBe("nvidia/nemotron-3.5-lightning:free");
+    expect(capturedBodies[0].reasoning).toEqual({ effort: "none" });
+    for (const body of capturedBodies) {
+      expect(body.models.length).toBeGreaterThan(0);
+      expect(body.models.length).toBeLessThanOrEqual(3);
+      expect(body.models[0]).toBe(body.model);
+      for (const id of body.models) {
+        expect(id === "openrouter/free" || id.endsWith(":free")).toBe(true);
+      }
+    }
+    const liquidBatch = capturedBodies.find(body => body.models.includes("liquid/lfm-3-1.7b:free"));
+    expect(liquidBatch).toBeDefined();
+    expect(liquidBatch?.reasoning).toBeUndefined();
+
+    const allModels = capturedBodies.flatMap(body => body.models);
+    expect(new Set(allModels).size).toBe(FREE_MODEL_CHAIN.length);
+    expect(allModels[allModels.length - 1]).toBe("openrouter/free");
+  });
+
+  it("só aciona o Gemini depois que todas as gratuitas falham", async () => {
+    const urls: string[] = [];
+    globalThis.fetch = vi.fn().mockImplementation(async (url: string) => {
+      urls.push(url);
+      if (url.includes("openrouter.ai")) {
+        return {
+          ok: false,
+          status: 429,
+          text: async () => "Rate limit exceeded",
+        } as Response;
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          candidates: [
+            {
+              index: 0,
+              content: { parts: [{ text: "Resposta via Gemini" }] },
+              finishReason: "STOP",
+            },
+          ],
+        }),
+      } as Response;
+    });
+
+    const response = await invokeLLM({ messages: [{ role: "user", content: "Teste" }] });
+
+    const openRouterCalls = urls.filter(url => url.includes("openrouter.ai")).length;
+    expect(openRouterCalls).toBe(Math.ceil(FREE_MODEL_CHAIN.length / 3));
+    expect(urls[openRouterCalls]).toContain("generativelanguage.googleapis.com");
+    expect(response.choices[0].message.content).toContain("Resposta via Gemini");
   });
 });

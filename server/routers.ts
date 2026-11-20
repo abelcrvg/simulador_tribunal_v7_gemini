@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { invokeLLM } from "./_core/llm";
+import { ENV } from "./_core/env";
 import { generateTimelineAndPoliceReports } from "./routers_timeline";
 import { generateHearingsForTrial } from "./routers_hearings";
 import { campaignRouter } from "./routers_campaign";
@@ -17,56 +18,22 @@ import {
   parseHearingDirectorDecision,
   type HearingDirectorDecision,
 } from "./ai/hearing-director";
+import {
+  collectSTFVotes,
+  findSTFOffice,
+  STF_FALLBACK_MINISTERS,
+  STF_MAJORITY,
+  STF_MINISTERS_IA,
+  STF_TAGS,
+  STF_TOTAL_SEATS,
+  tallySTFVotes,
+} from "./ai/stf";
+import {
+  ANTI_META_INSTRUCTION,
+  sanitizeAIResponse,
+} from "./ai/speech-sanitizer";
 
 // Função auxiliar para higienizar respostas da IA (cortar múltiplos papéis e menções ao usuário)
-function sanitizeAIResponse(
-  aiContent: string,
-  userRole: string,
-  userParticipantName: string
-): string {
-  let content = aiContent.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
-  const multipleRolesPattern = /^\s*(Juiz|Promotor|Advogado|Defensor|Testemunha|Perito|Jurado|Réu|Vítima)\s*:/gim;
-  const lines = content.split('\n');
-  const roleLines: number[] = [];
-  
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].match(multipleRolesPattern)) {
-      roleLines.push(i);
-    }
-  }
-  
-  if (roleLines.length > 1) {
-    console.log(`[AVISO] IA tentou incluir falas de múltiplos personagens. Cortando a partir da linha ${roleLines[1]}...`);
-    const cutLines = lines.slice(0, roleLines[1]);
-    
-    if (roleLines[0] === 0) {
-      const firstLine = lines[0];
-      const colonIndex = firstLine.indexOf(':');
-      if (colonIndex > 0) {
-        cutLines[0] = firstLine.substring(colonIndex + 1).trim();
-      }
-    }
-    content = cutLines.join('\n').trim();
-  }
-  
-  const userRoleMentions = userRole === "ministro"
-    ? [userParticipantName]
-    : [userRole, userRole.replace('_', ' '), userParticipantName];
-  
-  const mentionsUserRole = userRoleMentions.some(mention => 
-    content.toLowerCase().includes(mention.toLowerCase() + ':')
-  );
-  
-  if (mentionsUserRole) {
-    console.log(`[AVISO] IA incluiu prefixo do usuário. Higienizando mensagem...`);
-    for (const mention of userRoleMentions) {
-      content = content.replace(new RegExp(`^\\s*${mention}\\s*:[\\s\\S]*$`, 'gim'), '').trim();
-    }
-  }
-
-  return content;
-}
-
 // Função para gerar documentos visuais em background (não bloqueia)
 async function generateVisualDocumentsInBackground(trialId: number, trial: any) {
   console.log(`[Background] Iniciando geração de documentos visuais para trial ${trialId}`);
@@ -420,8 +387,9 @@ async function generateParticipantsForSession(sessionId: number, userRole: strin
   const difficulty = caseData.difficulty || "medio";
 
   if (isSTF) {
+    // O usuário ocupa a 11ª cadeira e é o relator; as outras 10 são de IA.
     const userRoleNotice = userRole === "ministro"
-      ? `O usuário humano é um dos MINISTROS do Plenário com o nome "${userParticipantName}". Gere os DEMAIS 4 a 5 Ministros da Suprema Corte (incluindo o Ministro Presidente e demais Vogais/Relator com nomes fictícios distintos de "${userParticipantName}").`
+      ? `O usuário humano é o MINISTRO RELATOR da 11ª cadeira do Plenário, com o nome "${userParticipantName}". Gere EXATAMENTE os OUTROS ${STF_MINISTERS_IA} ministros, todos com nomes FICTÍCIOS e diferentes de "${userParticipantName}".`
       : `O usuário humano participará como ${userRole.toUpperCase()} com o nome "${userParticipantName}".`;
 
     const promptSTF = `Gere os participantes de uma Sessão Plenária do SUPREMO TRIBUNAL FEDERAL (STF) para o seguinte caso constitucional:
@@ -431,25 +399,31 @@ DIFICULDADE: ${difficulty.toUpperCase()}
 
 ${userRoleNotice}
 
-COMPOSIÇÃO DO PLENÁRIO DO STF (PERSONAGENS DE IA):
-1. MINISTROS DO SUPREMO TRIBUNAL FEDERAL (Gere 4 a 5 Ministros com linhas hermenêuticas distintas):
-   - Ministro(a) Presidente do STF (coordena os trabalhos, concede apartes e proclama os resultados)
-   - Ministro(a) Relator (responsável pelo relatório e voto condutor, caso o usuário não seja o relator)
-   - Ministro(a) Vogal Garantista / Constitucionalista Estrito (ênfase em direitos individuais e garantias constitucionais)
-   - Ministro(a) Vogal Pragmático / Consequencialista (ênfase em repercussão econômica, financeira e estabilidade)
-   - Ministro(a) Vogal Progressista / Ativista (interpretação evolutiva e proteção aos direitos humanos)
-   Todos com role "ministro" e nomes próprios completos realistas de ministros da alta corte (ex: "Ministro Roberto Álvares", "Ministra Cármen Mendonça", "Ministro Luiz Faria").
+COMPOSIÇÃO DO PLENÁRIO (PERSONAGENS DE IA — ${STF_TOTAL_SEATS} cadeiras no total, 1 já ocupada pelo usuário):
+
+1. MINISTROS DO STF — gere EXATAMENTE ${STF_MINISTERS_IA} participantes com role "ministro" e NOMES FICTÍCIOS COMPLETOS (não use nomes de ministros reais):
+   - 1 Ministro(a) Presidente: ${STF_TAGS.presidente} no início da descrição. Conduz os trabalhos, concede apartes e proclama o resultado.
+   - 1 Ministro(a) Vice-Presidente: ${STF_TAGS["vice-presidente"]} no início da descrição.
+   - 8 Ministros(as) Vogais: ${STF_TAGS.vogal} no início da descrição, com linhas hermenêuticas distintas (garantista, estrito, pragmático, consequencialista, progressista, segurança jurídica, proporcionalidade, federalismo).
+
+   A descrição de CADA ministro DEVE começar exatamente com uma dessas tags, sem variações:
+   ${Object.values(STF_TAGS).join(" / ")}
+
 2. PROCURADOR-GERAL DA REPÚBLICA (PGR):
-   - Atuação técnica pelo Ministério Público da União perante o STF (role: "promotor").
+   - Atuação técnica do Ministério Público Federal perante o STF. role: "promotor".
+   - Descrição DEVE começar com "Procurador-Geral da República (PGR)".
 3. ADVOGADO(A) DA TRIBUNA / REQUERENTE:
-   - Advogado constitucionalista experiente sustentando da tribuna (role: "advogado_defesa").
-4. ADVOGADO-GERAL DA UNIÃO (AGU) OU ADVOGADO DO REQUERIDO:
-   - Defendendo a lei ou ato administrativo questionado perante o Plenário (role: "assistente_acusacao").
+   - Advogado constitucionalista sustentando oralmente pela parte autora. role: "advogado_defesa".
+   - Descrição DEVE começar com "Advogado da Tribuna".
+4. ADVOGADO-GERAL DA UNIÃO (AGU):
+   - Defesa da norma ou ato administrativo impugnado. role: "assistente_acusacao".
+   - Descrição DEVE começar com "Advogado-Geral da União (AGU)".
 
 IMPORTANTE:
 - NUNCA use o nome "${userParticipantName}" para os participantes gerados.
-- NUNCA use placeholders como "[nome fictício]" e NUNCA use termos genéricos como "Usuário Local" ou "Usuário". Use SEMPRE nomes próprios realistas completos.
-- Inclua nas descrições o cargo formal e perfil dogmático.
+- NUNCA use nomes de ministros reais do STF atual. Use apenas nomes fictícios completos e plausíveis.
+- NUNCA use placeholders como "[nome fictício]" ou termos genéricos como "Usuário Local".
+- Use "Ministro"/"Ministra" no nome de todos os julgadores.
 - Personalidades devem detalhar o tom em plenário, estilo oratório e postura em apartes.
 
 FORMATO DE RESPOSTA (JSON):
@@ -458,7 +432,7 @@ FORMATO DE RESPOSTA (JSON):
     {
       "role": "ministro" ou "promotor" ou "advogado_defesa" ou "assistente_acusacao",
       "name": "Nome completo",
-      "description": "Cargo e perfil dogmático",
+      "description": "Tag + cargo formal e perfil dogmático",
       "personality": "Personalidade e corrente de pensamento jurídico"
     }
   ]
@@ -504,16 +478,72 @@ FORMATO DE RESPOSTA (JSON):
       if (typeof content !== 'string') return;
       const participantsData = JSON.parse(content);
 
-      const participantsList = participantsData.participants.map((p: any) => ({
+      const allowedRoles = new Set(["ministro", "promotor", "advogado_defesa", "assistente_acusacao"]);
+      const userLowerCase = (userParticipantName || "").trim().toLowerCase();
+      const generated: any[] = Array.isArray(participantsData.participants)
+        ? participantsData.participants.filter((p: any) =>
+            p &&
+            allowedRoles.has(p.role) &&
+            String(p.name || "").trim().toLowerCase() !== userLowerCase
+          )
+        : [];
+
+      const toParticipant = (p: any) => ({
         sessionId,
         role: p.role,
-        name: p.name,
-        description: p.description,
-        personality: p.personality,
+        name: String(p.name || "").trim(),
+        description: String(p.description || "").trim(),
+        personality: String(p.personality || "").trim(),
         isUser: false,
-      }));
+      });
 
-      console.log(`[INFO STF] Criando ${participantsList.length} participantes do Plenário do STF`);
+      const participantsList: any[] = generated.map(toParticipant);
+
+      // A IA nem sempre devolve a quantidade pedida. Completar com nomes
+      // fictícios fixos para garantir as 10 cadeiras de IA (11 com o usuário).
+      let ministers = participantsList.filter(p => p.role === "ministro");
+      const usedNames = new Set(participantsList.map(p => p.name.toLowerCase()));
+      for (const fallback of STF_FALLBACK_MINISTERS) {
+        if (ministers.length >= STF_MINISTERS_IA) break;
+        if (usedNames.has(fallback.name.toLowerCase())) continue;
+        const added = toParticipant({ ...fallback, role: "ministro" });
+        participantsList.push(added);
+        usedNames.add(added.name.toLowerCase());
+        ministers.push(added);
+      }
+      if (ministers.length > STF_MINISTERS_IA) {
+        const excess = ministers
+          .filter(m => !m.description.includes(STF_TAGS.presidente) && !m.description.includes(STF_TAGS["vice-presidente"]))
+          .slice(STF_MINISTERS_IA - 2);
+        for (const extra of excess) {
+          participantsList.splice(participantsList.indexOf(extra), 1);
+        }
+        ministers = participantsList.filter(p => p.role === "ministro");
+      }
+
+      // Exactamente um Presidente, um Vice-Presidente e o restante Vogal.
+      // O papel de Relator pertence ao usuário (ver session.create).
+      const stripTag = (description: string) =>
+        description.replace(/^\[(PRESIDENTE|VICE-PRESIDENTE|RELATOR|VOGAL)\]\s*/i, "");
+      const tagAs = (participant: any, tag: string) => {
+        participant.description = `${tag} ${stripTag(participant.description)}`.trim();
+      };
+      const presidente = findSTFOffice(ministers, "presidente") || ministers[0];
+      const vice = findSTFOffice(ministers, "vice-presidente") || ministers.find(m => m !== presidente);
+      ministers.forEach(m => tagAs(m, STF_TAGS.vogal));
+      if (presidente) tagAs(presidente, STF_TAGS.presidente);
+      if (vice && vice !== presidente) tagAs(vice, STF_TAGS["vice-presidente"]);
+
+      const ensureRole = (role: string, name: string, description: string, personality: string) => {
+        if (!participantsList.some(p => p.role === role)) {
+          participantsList.push(toParticipant({ role, name, description, personality }));
+        }
+      };
+      ensureRole("promotor", "Dr. Henrique Albuquerque", "Procurador-Geral da República (PGR). Atua pelo MPF perante o STF.", "Técnico, objetivo, defesa da ordem jurídica.");
+      ensureRole("advogado_defesa", "Dra. Beatriz Fontoura", "Advogada da Tribuna. Sustentação oral pela parte autora.", "Eloquente e constitucionalista.");
+      ensureRole("assistente_acusacao", "Dr. Fábio Nogueira", "Advogado-Geral da União (AGU). Defesa da norma impugnada.", "Sóbrio, pródigo em precedentes.");
+
+      console.log(`[INFO STF] Criando ${participantsList.length} participantes (${ministers.length} ministros IA + 1 usuário = ${STF_TOTAL_SEATS} cadeiras)`);
       await db.createMultipleParticipants(participantsList);
       return;
     } catch (error) {
@@ -796,6 +826,27 @@ FORMATO DE RESPOSTA (JSON):
 }
 
 
+/** Executa tarefas secundárias com concorrência limitada. Gerar 5 complementos
+ * do caso em paralelo varredava cotas gratuitas e derrubava a latência; duas
+ * tarefas por vez mantêm a criação rápida sem gastar todas as requisições. */
+async function runWithConcurrencyLimit(
+  tasks: Array<() => Promise<unknown>>,
+  limit: number,
+): Promise<void> {
+  if (!tasks.length) return;
+  const effectiveLimit = Math.max(1, Math.min(Number.isFinite(limit) ? limit : 2, tasks.length));
+  let nextIndex = 0;
+
+  const worker = async () => {
+    while (nextIndex < tasks.length) {
+      const task = tasks[nextIndex++];
+      await task();
+    }
+  };
+
+  await Promise.all(Array.from({ length: effectiveLimit }, () => worker()));
+}
+
 // Função exportada para gerar trial (usado pelo multiplayer)
 export async function generateTrialWithAI(area?: string, difficulty?: string, userId?: number) {
   const areas = ["penal", "homicidio", "feminicidio", "latrocinio", "roubo", "furto", "estupro", "sequestro", "extorsao", "trafico_drogas", "corrupcao", "estelionato", "fraude", "apropriacao_indebita", "difamacao", "caluna", "injuria", "lesao_corporal", "criminal", "cdc", "trabalhista", "civil", "veiculos_sinistros", "tributario", "ambiental", "empresarial", "previdenciario", "familia", "administrativo", "stf_constitucional"];
@@ -896,21 +947,22 @@ FORMATO DE RESPOSTA (JSON):
     difficulty: selectedDifficulty as "facil" | "medio" | "dificil",
   });
 
-  // Gerar provas, documentos, cronologia e audiências em paralelo para máxima velocidade
-  const secondaryTasks: Promise<any>[] = [
-    generateEvidencesForTrial(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar provas:", err)),
-    generateDocumentsForTrial(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar documentos:", err)),
-    generateTimelineAndPoliceReports(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar cronologia:", err)),
-    generateHearingsForTrial(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar histórico de audiências:", err)),
+  // Complementos do caso com concorrência limitada (padrão: 2). Evita
+  // disparar 5 chamadas de IA ao mesmo tempo contra cotas gratuitas.
+  const secondaryTasks: Array<() => Promise<unknown>> = [
+    () => generateEvidencesForTrial(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar provas:", err)),
+    () => generateDocumentsForTrial(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar documentos:", err)),
+    () => generateTimelineAndPoliceReports(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar cronologia:", err)),
+    () => generateHearingsForTrial(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar histórico de audiências:", err)),
   ];
 
   if (caseData.area === "veiculos_sinistros") {
     secondaryTasks.push(
-      generateVehicleHistoryForTrial(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar histórico do veículo:", err))
+      () => generateVehicleHistoryForTrial(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar histórico do veículo:", err))
     );
   }
 
-  await Promise.allSettled(secondaryTasks);
+  await runWithConcurrencyLimit(secondaryTasks, ENV.trialSecondaryConcurrency);
 
   return {
     id: trialId,
@@ -1369,13 +1421,13 @@ export const appRouter = router({
         });
 
         // Criar mensagem inicial do sistema
-        const roleDisplay = input.userRole === "ministro" ? "Ministro do Supremo Tribunal Federal" : input.userRole.replace("_", " ");
+        const roleDisplay = input.userRole === "ministro" ? "Ministro Relator do Supremo Tribunal Federal" : input.userRole.replace("_", " ");
         await db.createMessage({
           sessionId,
           role: "sistema",
           senderName: "Tribunal",
           content: isSTF
-            ? `🏛️ **Sessão Plenária do Supremo Tribunal Federal (STF)** aberta! Você participa como **${effectiveUserName}** (${roleDisplay}). Os autos estão em pauta para julgamento colegiado perante os 11 Ministros da Suprema Corte.`
+            ? `🏛️ **Sessão Plenária do Supremo Tribunal Federal (STF)** aberta! Você participa como **${effectiveUserName}** (${roleDisplay}), ocupando a 11ª cadeira do Plenário. Os autos estão em pauta para julgamento colegiado; a maioria é de ${STF_MAJORITY} dos ${STF_TOTAL_SEATS} ministros.`
             : `Bem-vindo ao julgamento! Você foi designado como **${effectiveUserName}** (${roleDisplay}). O julgamento começará em breve.`,
           isAI: true,
         });
@@ -1385,7 +1437,9 @@ export const appRouter = router({
           sessionId,
           role: input.userRole,
           name: effectiveUserName,
-          description: input.userRole === "ministro" ? "Ministro da Suprema Corte" : "Participante principal",
+          description: input.userRole === "ministro"
+            ? `${STF_TAGS.relator} Ministro Relator da Suprema Corte — responsável pelo relatório e pelo voto condutor.`
+            : "Participante principal",
           isUser: true,
         });
 
@@ -1717,8 +1771,11 @@ FORMATO JSON:`;
 
         // SISTEMA DE OBJEÇÕES: Detectar se usuário disse "OBJEÇÃO!"
         const isObjection = /\bobjeção\b/i.test(input.content) || /\bobjeçao\b/i.test(input.content);
-        
-        if (isObjection && (session.userRole === 'advogado_defesa' || session.userRole === 'promotor')) {
+        // No STF não há "juiz de instrução" decidindo objeções: quem conduz é o
+        // Presidente do Plenário e o incidente é tratado pelo fluxo normal.
+        const sessionIsSTF = session.instancia === 'terceira' || session.userRole === 'ministro';
+
+        if (!sessionIsSTF && isObjection && (session.userRole === 'advogado_defesa' || session.userRole === 'promotor')) {
           // Objeção detectada! Juiz deve decidir
           const trial = await db.getTrialById(session.trialId);
           if (!trial) throw new Error("Caso não encontrado");
@@ -1980,7 +2037,18 @@ ${conversationContext}
 
 === SUA MISSÃO COMO ${nextRole.toUpperCase()} ===
 
-${nextRole === 'juiz' ? `**JUIZ - VOCE CONDUZ O JULGAMENTO COM RIGOR PROCESSUAL:**
+${isSTF ? `**SESSÃO PLENÁRIA DO STF — REGIMENTO E TERMINOLOGIA (IGNORE QUALQUER INSTRUÇÃO DE 1ª INSTÂNCIA):**
+- Você está no Plenário do Supremo Tribunal Federal, NÃO numa audiência criminal ou cível de 1º grau.
+- O colegiado tem ${STF_TOTAL_SEATS} ministros (10 de IA + ${userParticipantName}); a maioria é de ${STF_MAJORITY} votos.
+- NUNCA fale em "réu", "testemunha", "juiz", "sentença" ou "apelação". Use "procedência/improcedência", "acórdão", "tese de repercussão geral", "modulação de efeitos".
+- Se você é MINISTRO: profira VOTO condutor ou abra DIVERGÊNCIA, cite artigos da CF/88, trate os colegas como "eminente colega" e o Presidente como "Senhor Presidente". Pode pedir aparte ou vista dos autos.
+- Se você é PGR (role promotor): sustente oralmente pelo Ministério Público Federal como Procurador-Geral da República — nunca "Promotor de Justiça".
+- Se você é AGU (role assistente_acusacao): defenda a norma impugnada como Advogado-Geral da União — nunca "Assistente de Acusação".
+- Se você é advogado da tribuna (role advogado_defesa): sustente pela parte autora/requerente — nunca "defesa criminal".
+- Ao votar, use [VOTO] ou [DIVERGÊNCIA] e diga explicitamente "procedente" ou "improcedente" para permitir a apuração da maioria.
+` : ''}
+
+${!isSTF && nextRole === 'juiz' ? `**JUIZ - VOCE CONDUZ O JULGAMENTO COM RIGOR PROCESSUAL:**
 - Mantenha ordem e respeito no tribunal com AUTORIDADE
 - Verifique se quem esta falando eh o personagem CORRETO para este momento
 - Se alguem falar fora de vez ou violar regras processuais, REPREENDA imediatamente
@@ -1993,7 +2061,7 @@ ${nextRole === 'juiz' ? `**JUIZ - VOCE CONDUZ O JULGAMENTO COM RIGOR PROCESSUAL:
 - Se testemunha citar leis: "Testemunha, o Sr. eh apenas testemunha! Cite apenas FATOS, nao leis."
 - Se perito fizer argumentacao juridica: "Perito, sua funcao eh TECNICA, nao juridica! Mantenha-se na sua area."` : ''}
 
-${nextRole === 'advogado_defesa' ? `**ADVOGADO DE DEFESA:**
+${!isSTF && nextRole === 'advogado_defesa' ? `**ADVOGADO DE DEFESA:**
 - DEFENDA seu cliente com VEEMENCIA
 - CONTESTE argumentos do promotor com base em LEIS
 - QUESTIONE provas apresentadas
@@ -2001,7 +2069,7 @@ ${nextRole === 'advogado_defesa' ? `**ADVOGADO DE DEFESA:**
 - Se o promotor falar algo errado, OBJETE imediatamente
 - Cite artigos especificos do Codigo (Penal, Civil, CLT, CDC, etc.)` : ''}
 
-${nextRole === 'promotor' ? `**PROMOTOR - ACUSAÇÃO:**
+${!isSTF && nextRole === 'promotor' ? `**PROMOTOR - ACUSAÇÃO:**
 - ACUSE com base em PROVAS e LEIS
 - REFUTE argumentos da defesa
 - Cite JURISPRUDÊNCIA desfavorável ao réu
@@ -2097,7 +2165,7 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}), REAGINDO DIRETAM
 
         const aiResponse = await invokeLLM({
           messages: [
-            { role: "system", content: `Você é um ${nextRole} experiente em um tribunal brasileiro. Fundamente sempre suas afirmações em leis e jurisprudência.` },
+            { role: "system", content: `Você é um ${nextRole} experiente em um tribunal brasileiro. Fundamente sempre suas afirmações em leis e jurisprudência. ${ANTI_META_INSTRUCTION}` },
             { role: "user", content: aiPrompt }
           ],
         });
@@ -2391,6 +2459,39 @@ Responda AGORA:`;
         return await db.getSessionMessages(input.sessionId);
       }),
 
+    // Apuração provisória do Plenário do STF. Somente leitura: a proclamação
+    // definitiva (que gera o acórdão) continua em `message.proclamar`.
+    stfTally: protectedProcedure
+      .input(z.object({ sessionId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const session = await db.getSessionById(input.sessionId);
+        if (!session) throw new Error("Sessão não encontrada");
+        if (session.userId !== ctx.user.id) throw new Error("Acesso negado");
+
+        const trial = await db.getTrialById(session.trialId);
+        const isSTF = trial?.area === "stf_constitucional" ||
+          session.userRole === "ministro" || session.instancia === "terceira";
+        if (!isSTF) {
+          return {
+            votes: [],
+            tally: tallySTFVotes([]),
+            totalSeats: 0,
+            majority: 0,
+          };
+        }
+
+        const participants = await db.getSessionParticipants(input.sessionId);
+        const messages = await db.getSessionMessages(input.sessionId);
+        const votes = collectSTFVotes(messages as any, participants as any);
+
+        return {
+          votes,
+          tally: tallySTFVotes(votes),
+          totalSeats: STF_TOTAL_SEATS,
+          majority: STF_MAJORITY,
+        };
+      }),
+
     // Continuar julgamento (gerar próxima resposta da IA)
     continuar: protectedProcedure
       .input(z.object({ sessionId: z.number() }))
@@ -2415,9 +2516,12 @@ Responda AGORA:`;
           if (isSTF) {
             const openerRole = "ministro";
             const aiMinisters = sessionParticipants.filter(p => !p.isUser && p.role === "ministro");
-            const presidente = aiMinisters.find(p => p.name.includes("Presidente")) || aiMinisters[0];
+            const presidente = findSTFOffice(aiMinisters, "presidente") || aiMinisters[0];
+            const relator = sessionParticipants.find(p => p.isUser && p.role === "ministro")
+              || findSTFOffice(sessionParticipants, "relator", true);
             const openerName = presidente?.name || "Ministro Presidente";
-            const openingText = `Declaro aberta a Sessão Plenária do Supremo Tribunal Federal. Em julgamento os autos de "${trial?.title || "ação constitucional"}". Concedo a palavra ao eminente Ministro Relator para a leitura circunstanciada do relatório e resumo da controvérsia.`;
+            const relatorName = relator?.name || "Ministro Relator";
+            const openingText = `Declaro aberta a Sessão Plenária do Supremo Tribunal Federal, com ${STF_TOTAL_SEATS} ministros e maioria de ${STF_MAJORITY} votos. Em julgamento os autos de "${trial?.title || "ação constitucional"}". Concedo a palavra ao eminente ${relatorName} para a leitura circunstanciada do relatório e resumo da controvérsia.`;
             const created = await db.createMessage({
               sessionId: input.sessionId,
               role: openerRole,
@@ -2479,6 +2583,7 @@ Responda AGORA:`;
           evidences,
           userRole: session.userRole,
           userName: userParticipant?.name || "Usuário",
+          instancia: session.instancia,
         });
 
         let directorDecision: HearingDirectorDecision;
@@ -2561,8 +2666,7 @@ Responda AGORA:`;
         // Verificar se a palavra foi expressamente concedida ao usuário humano:
         const userExplicitlyTargeted = directorDecision.action === "passar_palavra" && (
           candidateTarget === "usuario" ||
-          (userParticipant && candidateTarget === userParticipant.name) ||
-          (!isSTF && candidateTarget === session.userRole)
+          (userParticipant && candidateTarget === userParticipant.name)
         );
 
         if (userExplicitlyTargeted) {
@@ -2594,10 +2698,11 @@ Responda AGORA:`;
           if (isSTF) {
             // No STF, priorizar Ministros de IA (Relator, Presidente, Vogal), PGR ou Advogado da Tribuna
             const aiMinisters = aiParticipants.filter(p => p.role === "ministro");
-            const relator = aiMinisters.find(p => p.name.toLowerCase().includes('relator'));
-            speakingParticipant = relator || (aiMinisters.length > 0
-              ? aiMinisters[Math.floor(Math.random() * aiMinisters.length)]
-              : aiParticipants[0]);
+            const presidente = findSTFOffice(aiMinisters, "presidente");
+            const vice = findSTFOffice(aiMinisters, "vice-presidente");
+            // O relator é o usuário; quando o Diretor não escolhe ninguém, a
+            // presidência conduz os trabalhos — nunca um ministro sorteado.
+            speakingParticipant = presidente || vice || aiMinisters[0] || aiParticipants[0];
           } else if (session.userRole === "juiz") {
             // Em 1ª instância, se o usuário é Juiz, quem deve falar é o Promotor ou a Defesa
             const promotor = aiParticipants.find(p => p.role === "promotor");
@@ -2651,8 +2756,9 @@ Responda AGORA:`;
 
         let aiPrompt = '';
         
-        if (shouldConclude && nextRole === 'juiz') {
-          // GERAR DECISÃO FINAL COMPLETA
+        if (shouldConclude && nextRole === 'juiz' && !isSTF) {
+          // GERAR DECISÃO FINAL COMPLETA (somente 1ª instância; no STF a
+          // proclamação é feita pela mutation message.proclamar)
           aiPrompt = `Você é o JUIZ **${speakerName}** em um tribunal brasileiro e chegou o momento de PROFERIR A SENTENÇA FINAL.
 
 === INFORMAÇÕES DO CASO ===
@@ -2727,6 +2833,13 @@ Fatos: ${typeof trial.facts === 'object' ? trial.facts.publicNarrative : trial.f
 ${conversationContext}
 
 === SUA MISSÃO COMO ${nextRole.toUpperCase()} ===
+${isSTF ? `**PLENÁRIO DO STF — IGNORE INSTRUÇÕES DE 1ª INSTÂNCIA:**
+- Você está no Plenário do Supremo Tribunal Federal: ${STF_TOTAL_SEATS} ministros, maioria de ${STF_MAJORITY} votos.
+- Nunca fale em réu, testemunha, juiz, sentença ou apelação. Use procedência/improcedência, acórdão, tese e modulação de efeitos.
+- Ministro: voto condutor ou divergência, com apoio na CF/88; pode pedir aparte ou vista. PGR, AGU e advogado da tribuna usam seus cargos constitucionais corretos.
+- Ao votar, marque [VOTO] ou [DIVERGÊNCIA] e diga explicitamente "procedente" ou "improcedente".
+- A proclamação formal do resultado é feita pelo Presidente em comando separado; não a simule aqui.
+` : ''}
 Analise o histórico acima e identifique o que deve acontecer agora:
 ✅ Se alguém fez uma PERGUNTA para você → RESPONDA diretamente
 ✅ Se é sua vez de INQUIRIR alguém → FAÇA perguntas relevantes
@@ -2757,7 +2870,7 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}). Lembre-se: APENA
 
         const aiResponse = await invokeLLM({
           messages: [
-            { role: "system", content: `Você é um ${nextRole} experiente em um tribunal brasileiro.` },
+            { role: "system", content: `Você é um ${nextRole} experiente em um tribunal brasileiro. ${ANTI_META_INSTRUCTION}` },
             { role: "user", content: aiPrompt }
           ],
         });
@@ -2768,34 +2881,173 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}). Lembre-se: APENA
         }
         const aiContent = sanitizeAIResponse(rawAiContent, session.userRole, userParticipantName);
 
-        // PROTEÇÃO CONTRA DUPLICAÇÃO: Verificar se última mensagem é idêntica
+        // PROTEÇÃO CONTRA DUPLICAÇÃO: apenas avisa; nunca trava o fluxo.
+        // Lançar erro aqui impedia o histórico de avançar e o próximo clique
+        // gerava a mesma resposta, prendendo o usuário num loop.
         const lastMessageInDb = messageHistory[messageHistory.length - 1];
-        const isDuplicate = lastMessageInDb && 
-                           lastMessageInDb.role === nextRole && 
+        const isDuplicate = lastMessageInDb &&
+                           lastMessageInDb.role === nextRole &&
                            lastMessageInDb.content.trim() === aiContent.trim() &&
                            lastMessageInDb.isAI === true;
-        
+
         if (isDuplicate) {
-          console.log(`[AVISO continuar] Mensagem duplicada detectada. Não salvando.`);
-          throw new Error("Mensagem duplicada detectada. O sistema já gerou esta resposta. Por favor, aguarde ou envie uma nova mensagem.");
+          console.log(`[AVISO continuar] Resposta idêntica à última fala; registrando assim mesmo para não travar o fluxo.`);
         }
 
-        // Salvar mensagem da IA
+        // Salvar mensagem da IA (senderName identifica o ministro/personagem correto)
         await db.createMessage({
           sessionId: input.sessionId,
           role: nextRole,
           content: aiContent,
           isAI: true,
+          senderName: speakerName,
         });
 
         // Se foi uma decisão final do juiz, marcar sessão como concluída e salvar veredicto
-        if (shouldConclude && nextRole === 'juiz') {
+        if (shouldConclude && nextRole === 'juiz' && !isSTF) {
           await db.updateSessionStatus(input.sessionId, 'concluido', aiContent);
         }
 
         return {
           role: nextRole,
           content: aiContent,
+        };
+      }),
+
+    // Proclamação do resultado no STF: apura os votos dos 11 ministros e gera
+    // o acórdão (com tese e modulação, quando cabíveis), proferido pelo Presidente.
+    proclamar: protectedProcedure
+      .input(z.object({ sessionId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const session = await db.getSessionById(input.sessionId);
+        if (!session) throw new Error("Sessão não encontrada");
+        if (session.userId !== ctx.user.id) throw new Error("Acesso negado");
+
+        const trial = await db.getTrialById(session.trialId);
+        if (!trial) throw new Error("Caso não encontrado");
+        const isSTF = trial.area === "stf_constitucional" ||
+          session.userRole === "ministro" || session.instancia === "terceira";
+        if (!isSTF) throw new Error("A proclamação é exclusiva do Plenário do STF");
+
+        const participants = await db.getSessionParticipants(input.sessionId);
+        const messages = await db.getSessionMessages(input.sessionId);
+        const realMessages = messages.filter(m => m.role !== "sistema");
+        if (realMessages.length < 3) {
+          throw new Error("Ainda não houve debate suficiente para proclamar o resultado");
+        }
+
+        const votes = collectSTFVotes(messages as any, participants as any);
+        const tally = tallySTFVotes(votes);
+        const aiMinisters = participants.filter(p => !p.isUser && p.role === "ministro");
+        const presidente = findSTFOffice(aiMinisters, "presidente") || aiMinisters[0];
+        const presidenteName = presidente?.name || "Ministro Presidente";
+        const relator = participants.find(p => p.isUser && p.role === "ministro") ||
+          findSTFOffice(participants as any, "relator", true);
+        const relatorName = relator?.name || "Ministro Relator";
+
+        const votesText = votes.length
+          ? votes.map(v =>
+              `- ${v.ministerName}${v.isUser ? " (USUÁRIO)" : ""}: ${v.position} [${v.origin}]`
+            ).join("\n")
+          : "- Nenhum voto marcado explicitamente; apurar pela manifestação das falas.";
+
+        const conversationContext = realMessages
+          .map(m => `**${m.senderName || m.role} (${m.role})**: ${m.content}`)
+          .join("\n\n");
+
+        const prompt = `Você é **${presidenteName}**, Presidente do Supremo Tribunal Federal. Chegou o momento de PROCLAMAR O RESULTADO do julgamento em Sessão Plenária.
+
+=== CASO ===
+${trial.title}
+Área: ${trial.area}
+${trial.description}
+Fundamentação: ${trial.legalBasis}
+Jurisprudência: ${trial.jurisprudence}
+
+=== PLENÁRIO ===
+${STF_TOTAL_SEATS} ministros. Relator: ${relatorName} (controlado pelo usuário). Presidente: você (${presidenteName}).
+Maioria necessária: ${STF_MAJORITY} votos.
+
+=== APURAÇÃO DOS VOTOS ===
+${votesText}
+Total apurado: ${tally.total}. Procedente: ${tally.procedente}. Improcedente: ${tally.improcedente}. Parcial: ${tally.parcial}. Indefinido: ${tally.indefinido}.
+Maioria atingida: ${tally.majorityReached ? "SIM" : "NÃO"}.
+
+=== HISTÓRICO DO JULGAMENTO ===
+${conversationContext}
+
+=== SUA MISSÃO ===
+Fale APENAS como o Presidente, em primeira pessoa, com solemnidade regimental. Estruture a proclamação:
+
+1. **RELATÓRIO**: síntese do caso e da controvérsia constitucional, com referência ao Relator ${relatorName}.
+2. **VOTAÇÃO**: relacione os votos apurados, identificando quem acompanhou o relator e quem divergiu. Respeite a apuração acima — não invente votos nem números diferentes.
+3. **TESE**: se cabível (controle concentrado ou RE com repercussão geral), fixe a tese de forma clara e objetiva.
+4. **MODULAÇÃO DE EFEITOS**: se a decisão comportar, indique expressamente a modulação (ou diga que não há modulação).
+5. **DISPOSITIVO E PROCLAMAÇÃO**: declare o resultado por maioria, com o dispositivo (procedência/improcedência, com ou sem modulação) e o nome do acórdão.
+
+Se a maioria NÃO tiver sido atingida, diga explicitamente que não se formou maioria e que o julgamento prossegue — não declare decisão final.
+
+NUNCA escreva falas de outros ministros. NUNCA use termos de 1ª instância (réu, sentença, apelação, júri). Use linguagem do art. 102 da CF/88 e do regimento do STF.
+
+Proclame:`;
+
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: "system",
+              content: `Você é o Presidente do Supremo Tribunal Federal proclamando o resultado de um julgamento colegiado. ${ANTI_META_INSTRUCTION}`,
+            },
+            { role: "user", content: prompt },
+          ],
+        });
+
+        const rawContent = response.choices[0]?.message?.content;
+        if (typeof rawContent !== "string") throw new Error("Resposta inválida da IA na proclamação");
+        const userParticipantName = participants.find(p => p.isUser)?.name || "Usuário";
+        const content = sanitizeAIResponse(rawContent, session.userRole, userParticipantName);
+
+        const created = await db.createMessage({
+          sessionId: input.sessionId,
+          role: "ministro",
+          senderName: presidenteName,
+          content,
+          isAI: true,
+        });
+
+        const verdict = tally.majorityReached
+          ? tally.winningPosition === "procedente"
+            ? "procedente"
+            : tally.winningPosition === "improcedente"
+              ? "improcedente"
+              : "parcialmente_procedente"
+          : undefined;
+
+        if (tally.majorityReached) {
+          await db.updateSessionDecision(
+            input.sessionId,
+            JSON.stringify({
+              veredicto: verdict,
+              sentencaFundamentada: content,
+              votos: votes.map(v => ({
+                ministro: v.ministerName,
+                posicao: v.position,
+                origem: v.origin,
+              })),
+              apuracao: tally,
+              tipo: "acordao_stf",
+            }),
+            "concluido",
+          );
+        }
+
+        return {
+          role: "ministro",
+          content,
+          messageId: created.id,
+          votes,
+          tally,
+          concluded: tally.majorityReached,
+          presidenteName,
         };
       }),
   }),
@@ -2970,7 +3222,14 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}). Lembre-se: APENA
           { cargo: "2º Vogal", ordem: 3 },
         ];
 
-        const tribunalNome = isTerceiraInstancia ? "Superior Tribunal de Justiça (STJ)" : "Tribunal de Justiça";
+        // No modo STF a instância superior é o próprio Supremo, nunca o STJ.
+        const isSTFTrial =
+          trial.area === "stf_constitucional" ||
+          session.userRole === "ministro" ||
+          session.instancia === "terceira";
+        const tribunalNome = isTerceiraInstancia
+          ? (isSTFTrial ? "Supremo Tribunal Federal (STF)" : "Superior Tribunal de Justiça (STJ)")
+          : "Tribunal de Justiça";
         const cargoNome = isTerceiraInstancia ? "MINISTRO" : "DESEMBARGADOR";
 
         const votos: any[] = [];

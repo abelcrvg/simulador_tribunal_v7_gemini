@@ -47,12 +47,19 @@ vi.mock("./_core/llm", () => {
     ) {
       return { choices: [{ message: { content: JSON.stringify({
         participants: [
-          { name: "Ministro Alexandre Faria", role: "ministro", description: "Presidente do STF. Coordena os trabalhos e proclama os resultados.", personality: "Firme, imparcial, formalista." },
-          { name: "Ministra Carmen Lúcia Mendonça", role: "ministro", description: "Relatora. Especialista em direitos fundamentais.", personality: "Erudita, progressista." },
-          { name: "Ministro Roberto Álvares", role: "ministro", description: "Vogal. Pragmático.", personality: "Conservador, cita precedentes internacionais." },
-          { name: "Dr. Paulo Souza", role: "promotor", description: "Procurador-Geral da República — PGR.", personality: "Técnico, objetivo." },
-          { name: "Dra. Fernanda Lima", role: "advogado_defesa", description: "Advogada Constitucionalista pela OAB.", personality: "Eloquente." },
-          { name: "Dr. Marcos Vinicius", role: "assistente_acusacao", description: "Advogado-Geral da União — AGU.", personality: "Defende prerrogativas do Estado." },
+          { name: "Ministro Aureliano Bastos", role: "ministro", description: "[PRESIDENTE] Presidente do STF. Coordena os trabalhos e proclama os resultados.", personality: "Solene, imparcial, rigoroso no regimento." },
+          { name: "Ministra Heloísa Camargo", role: "ministro", description: "[VICE-PRESIDENTE] Vice-Presidente do STF. Substitui a presidência.", personality: "Serena e precisa." },
+          { name: "Ministro Rafael Nogueira", role: "ministro", description: "[VOGAL] Vogal. Constitucionalista estrito.", personality: "Técnico, fiel à literalidade da CF/88." },
+          { name: "Ministra Beatriz Alencar", role: "ministro", description: "[VOGAL] Vogal. Perfil garantista.", personality: "Erudita, interpretação evolutiva." },
+          { name: "Ministro Otávio Ribeiro", role: "ministro", description: "[VOGAL] Vogal. Consequencialista.", personality: "Pragmático, atento à estabilidade." },
+          { name: "Ministra Clara Villela", role: "ministro", description: "[VOGAL] Vogal. Especialista em federalismo.", personality: "Analítica, firme na separação de poderes." },
+          { name: "Ministro Sérgio Portela", role: "ministro", description: "[VOGAL] Vogal. Proporcionalidade e razoabilidade.", personality: "Metódico, propõe modulação." },
+          { name: "Ministra Luísa Andrade", role: "ministro", description: "[VOGAL] Vogal. Direitos sociais.", personality: "Empática, argumenta com princípios." },
+          { name: "Ministro Henrique Salgado", role: "ministro", description: "[VOGAL] Vogal. Segurança jurídica.", personality: "Respeitador do stare decisis." },
+          { name: "Ministra Marta Coimbra", role: "ministro", description: "[VOGAL] Vogal. Controle concentrado.", personality: "Precisa, gosta de fixar teses." },
+          { name: "Dr. Paulo Souza", role: "promotor", description: "Procurador-Geral da República (PGR). Atua pelo MPF perante o STF.", personality: "Técnico, objetivo." },
+          { name: "Dra. Fernanda Lima", role: "advogado_defesa", description: "Advogada da Tribuna. Sustentação pela parte autora.", personality: "Eloquente." },
+          { name: "Dr. Marcos Vinicius", role: "assistente_acusacao", description: "Advogado-Geral da União (AGU). Defesa da norma impugnada.", personality: "Sóbrio, pródigo em precedentes." },
         ],
       }) } }] };
     }
@@ -206,13 +213,24 @@ describe("🏛️ Fluxo STF — Integração Completa via tRPC", () => {
       console.log(`   - [${p.role.padEnd(20)}] ${p.name}${p.isUser ? " 👤 USUÁRIO" : ""}`)
     );
 
-    expect(participants.length).toBeGreaterThanOrEqual(3);
-    expect(ministros.length).toBeGreaterThanOrEqual(2);  // Usuário + pelo menos 1 Ministro IA
-    expect(aiParticipants.length).toBeGreaterThan(0);
+    // 10 ministros de IA + o usuário (11ª cadeira) + PGR + tribuna + AGU
+    expect(ministros).toHaveLength(11);
+    expect(aiParticipants.filter(p => p.role === "ministro")).toHaveLength(10);
+    expect(participants).toHaveLength(14);
     expect(userPart).toBeDefined();
     expect(userPart!.role).toBe("ministro");
-    // PGR ou Advogado deve existir
-    expect(promotor || defesa).toBeTruthy();
+    expect(userPart!.name).toBe("Ministro Relator"); // nome informado em session.create
+    expect(userPart!.description).toContain("[RELATOR]");
+    expect(promotor).toBeTruthy();
+    expect(promotor!.description).toContain("PGR");
+    expect(defesa).toBeTruthy();
+    expect(participants.find(p => p.role === "assistente_acusacao")!.description).toContain("AGU");
+
+    // Cargos: exatamente um Presidente e um Vice-Presidente entre os ministros IA
+    const aiMinisters = aiParticipants.filter(p => p.role === "ministro");
+    expect(aiMinisters.filter(p => p.description?.includes("[PRESIDENTE]"))).toHaveLength(1);
+    expect(aiMinisters.filter(p => p.description?.includes("[VICE-PRESIDENTE]"))).toHaveLength(1);
+    expect(aiMinisters.filter(p => p.description?.includes("[VOGAL]"))).toHaveLength(8);
   }, 10000);
 
   // ----------------------------------------------------------
@@ -306,4 +324,37 @@ describe("🏛️ Fluxo STF — Integração Completa via tRPC", () => {
     console.log(`   🤖 ${aiMessages.length} falas de IA`);
     console.log(`   📋 Total: ${realMessages.length} manifestações`);
   }, 10000);
+
+  // ----------------------------------------------------------
+  it("8. Deve apurar maioria de 6 votos e proclamar o acórdão", async () => {
+    const db = await import("./db");
+    const ministers = (await db.getSessionParticipants(sessionId))
+      .filter(p => p.role === "ministro");
+
+    // Garante 6 votos explícitos de ministros diferentes (maioria de 11).
+    for (const minister of ministers.slice(0, 6)) {
+      await db.createMessage({
+        sessionId,
+        role: "ministro",
+        senderName: minister.name,
+        content: `[VOTO]: Acompanho o Relator e voto pela PROCEDENTE da ADI, por violação ao art. 5º, XII da CF/88. Fixo a tese com modulação de efeitos.`,
+        isAI: minister.isUser ? false : true,
+      });
+    }
+
+    const { ctx } = createSTFContext();
+    const caller = appRouter.createCaller(ctx);
+    const result: any = await caller.message.proclamar({ sessionId });
+
+    expect(result.concluded).toBe(true);
+    expect(result.tally.total).toBeGreaterThanOrEqual(6);
+    expect(result.tally.majorityReached).toBe(true);
+    expect(result.tally.procedente).toBeGreaterThanOrEqual(6);
+    expect(result.presidenteName).toContain("Aureliano Bastos");
+    expect(result.content).toBeTruthy();
+
+    const sessao = await db.getSessionById(sessionId);
+    expect(sessao?.status).toBe("concluido");
+    expect(sessao?.decisionDetails).toContain("acordao_stf");
+  }, 15000);
 });

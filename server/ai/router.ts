@@ -1,4 +1,5 @@
 import { AIProviderError } from "./errors";
+import { openCodeProvider } from "./providers/opencode";
 import { manusProvider } from "./providers/manus";
 import { geminiProvider } from "./providers/gemini";
 import { ollamaProvider } from "./providers/ollama";
@@ -6,18 +7,44 @@ import { openAIProvider } from "./providers/openai";
 import { openRouterProvider } from "./providers/openrouter";
 import type { AIProvider, AIProviderId, AIRequest, AIResponse } from "./types";
 
-const providers: AIProvider[] = [openRouterProvider, geminiProvider, ollamaProvider, openAIProvider, manusProvider];
+const providers: AIProvider[] = [
+  openCodeProvider,
+  openRouterProvider,
+  geminiProvider,
+  ollamaProvider,
+  openAIProvider,
+  manusProvider,
+];
 
 function preferredProvider(): AIProviderId | "auto" {
   const value = process.env.AI_PROVIDER?.trim().toLowerCase();
-  if (value === "openrouter" || value === "ollama" || value === "gemini" || value === "openai" || value === "manus") return value;
+  if (
+    value === "opencode" ||
+    value === "openrouter" ||
+    value === "ollama" ||
+    value === "gemini" ||
+    value === "openai" ||
+    value === "manus"
+  ) {
+    return value;
+  }
   return "auto";
 }
 
+// Ordem padrão definida pelo usuário: OpenCode primeiro (agrupa várias fontes
+// gratuitas), OpenRouter em seguida (esgota os 13 modelos `:free`) e só depois
+// Gemini/OpenAI/Ollama/Manus como último recurso.
 function orderedProviders(): AIProvider[] {
   const preferred = preferredProvider();
-  if (preferred === "auto") return providers;
-  return [...providers.filter(p => p.id === preferred), ...providers.filter(p => p.id !== preferred)];
+  if (preferred === "auto" || preferred === "opencode") return providers;
+
+  // Um provedor explicitamente escolhido (ex.: AI_PROVIDER=openrouter nos
+  // testes) assume a dianteira; OpenCode volta para o fim da cadeia.
+  return [
+    ...providers.filter(p => p.id === preferred),
+    ...providers.filter(p => p.id !== preferred && p.id !== "opencode"),
+    ...providers.filter(p => p.id === "opencode"),
+  ];
 }
 
 export function getAIProviders() {
@@ -54,7 +81,7 @@ export async function invokeWithAIRouter(params: AIRequest): Promise<AIResponse>
 
       const nextProvider = candidates[candidates.indexOf(provider) + 1];
       if (nextProvider) {
-        console.log(`[AI Router] Fallback para ${nextProvider.name}`);
+        console.log(`[AI Router] Fallback para ${nextProvider.name} (último recurso)`);
       }
     }
   }
@@ -64,6 +91,6 @@ export async function invokeWithAIRouter(params: AIRequest): Promise<AIResponse>
   }
 
   throw new Error(
-    "Nenhum provedor de IA está configurado. Configure OPENROUTER_API_KEY, OLLAMA_API_KEY, GEMINI_API_KEY, OPENAI_API_KEY ou BUILT_IN_FORGE_API_KEY.",
+    "Nenhum provedor de IA está configurado. Inicie o OpenCode (`opencode serve`) ou configure OPENROUTER_API_KEY, OLLAMA_API_KEY, GEMINI_API_KEY, OPENAI_API_KEY ou BUILT_IN_FORGE_API_KEY.",
   );
 }

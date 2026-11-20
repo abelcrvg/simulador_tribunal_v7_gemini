@@ -436,7 +436,7 @@ function InstanciaSuperiorLink({ sessionId }: { sessionId: number }) {
               <div>
                 <p className="font-semibold">
                   {child.instancia === 'segunda' && '🏛️ Segunda Instância - Tribunal de Justiça'}
-                  {child.instancia === 'terceira' && '🏛️ Terceira Instância - Superior Tribunal de Justiça'}
+                  {child.instancia === 'terceira' && '🏛️ Supremo Tribunal Federal (STF) — Sessão Plenária'}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Status: {child.status === 'em_andamento' ? 'Em andamento' : child.status === 'concluido' ? 'Concluído' : 'Abandonado'}
@@ -654,6 +654,29 @@ const roleLabels: Record<string, string> = {
   sistema: "Sistema",
 };
 
+/** No STF os papéis da tribuna criminal recebem os cargos constitucionais
+ * correspondentes. Fora do STF, os rótulos penais continuam corretos. */
+function stfRoleLabel(role: string, isSTF: boolean): string {
+  if (!isSTF) return roleLabels[role] || role;
+  const stfLabels: Record<string, string> = {
+    ministro: "Ministro do STF",
+    promotor: "Procurador-Geral da República (PGR)",
+    assistente_acusacao: "Advogado-Geral da União (AGU)",
+    advogado_defesa: "Advogado da Tribuna",
+    juiz: "Presidente do STF",
+  };
+  return stfLabels[role] || roleLabels[role] || role;
+}
+
+/** No Plenário, "procedente" é o voto favorável à tese e "improcedente" o
+ * contrário. "Parcial" aparece à parte para não distorcer a maioria. */
+const stfPositionLabels: Record<string, string> = {
+  procedente: "Favorável",
+  improcedente: "Contrário",
+  parcial: "Parcial",
+  indefinido: "Sem posição clara",
+};
+
 const roleStyles: Record<string, { bg: string; border: string; text: string; badge: string }> = {
   juiz: {
     bg: "bg-amber-50 dark:bg-amber-950",
@@ -755,6 +778,7 @@ export default function Trial() {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showVoteTally, setShowVoteTally] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: session, isLoading: sessionLoading } = trpc.session.getById.useQuery(
@@ -789,6 +813,13 @@ export default function Trial() {
     { enabled: !!sessionId && isAuthenticated }
   );
 
+  // A instância é a fonte autoritativa: sessões STF antigas podem não ter a
+  // área "stf_constitucional" preenchida.
+  const isSTF =
+    session?.instancia === 'terceira' ||
+    session?.userRole === 'ministro' ||
+    trial?.area === 'stf_constitucional';
+
   const { data: vehicleHistory } = trpc.vehicleHistory.list.useQuery(
     { trialId: session?.trialId || 0 },
     { enabled: !!session?.trialId && trial?.area === "veiculos_sinistros" }
@@ -803,6 +834,22 @@ export default function Trial() {
     { sessionId },
     { enabled: !!sessionId && isAuthenticated }
   );
+
+  const { data: stfTally, refetch: refetchStfTally } = trpc.message.stfTally.useQuery(
+    { sessionId },
+    {
+      enabled: !!sessionId && isAuthenticated && isSTF,
+      refetchInterval: (query) => {
+        const data = query.state.data;
+        if (!data || session?.status === 'concluido') return false;
+        return data.tally.total >= data.totalSeats ? false : 4000;
+      },
+    }
+  );
+
+  useEffect(() => {
+    if (isSTF) void refetchStfTally();
+  }, [messages?.length, isSTF, refetchStfTally]);
 
   const sendMutation = trpc.message.send.useMutation({
     onSuccess: () => {
@@ -855,6 +902,16 @@ export default function Trial() {
       const errorMessage = error.message || "Erro ao continuar julgamento. Tente novamente.";
       alert(errorMessage);
       refetchMessages();
+    },
+  });
+
+  const proclamarMutation = trpc.message.proclamar.useMutation({
+    onSuccess: () => {
+      refetchMessages();
+      setTimeout(() => refetchMessages(), 500);
+    },
+    onError: (error: any) => {
+      alert(error.message || "Erro ao proclamar o resultado.");
     },
   });
 
@@ -1016,7 +1073,7 @@ export default function Trial() {
                   <DialogTitle>⚖️ Decisão Final do Julgamento</DialogTitle>
                   <DialogDescription>Sentença fundamentada completa com veredicto</DialogDescription>
                 </DialogHeader>
-                <FinalDecisionView sessionId={sessionId} userRole={session?.userRole || ''} />
+                <FinalDecisionView sessionId={sessionId} userRole={session?.userRole || ''} isSTF={isSTF} />
               </DialogContent>
             </Dialog>
             {trial?.admiteJuri && (
@@ -1262,18 +1319,122 @@ export default function Trial() {
           )}
 
           {/* Placar e Contexto do Plenário do STF */}
-          {(session.instancia === 'terceira' || trial?.area === 'stf_constitucional') && (
-            <div className="shrink-0 bg-gradient-to-r from-purple-900/15 via-indigo-900/10 to-purple-900/15 border-b border-purple-200 dark:border-purple-800/50 px-3 py-2 flex items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-1.5 font-semibold text-purple-950 dark:text-purple-200">
-                <Scale className="h-4 w-4 text-purple-600 dark:text-purple-400 shrink-0" />
-                <span className="truncate">Supremo Tribunal Federal • Sessão Plenária</span>
+          {isSTF && (
+            <div className="shrink-0 bg-gradient-to-r from-purple-900/15 via-indigo-900/10 to-purple-900/15 border-b border-purple-200 dark:border-purple-800/50 px-3 py-2 space-y-1.5 text-xs">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 font-semibold text-purple-950 dark:text-purple-200">
+                  <Scale className="h-4 w-4 text-purple-600 dark:text-purple-400 shrink-0" />
+                  <span className="truncate">Supremo Tribunal Federal • Sessão Plenária</span>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-purple-800 dark:text-purple-300">
+                  <span className="bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full font-mono font-medium">
+                    11 Cadeiras · 10 IA + você
+                  </span>
+                  <span className="bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full font-mono font-medium">
+                    Maioria: 6 votos
+                  </span>
+                  {participants?.some(p => p.role === "promotor") && (
+                    <span className="hidden sm:inline">PGR na Tribuna</span>
+                  )}
+                  {participants?.some(p => p.role === "assistente_acusacao") && (
+                    <span className="hidden lg:inline">AGU na Tribuna</span>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-[11px] text-purple-800 dark:text-purple-300">
-                <span className="bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full font-mono font-medium">11 Ministros</span>
-                <span className="hidden sm:inline">PGR na Tribuna</span>
+
+              {/* Contagem compacta: só favoráveis e contrários no banner */}
+              <div className="flex items-center justify-between gap-2 text-[11px]">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="font-semibold text-purple-950 dark:text-purple-200">Apuração:</span>
+                  <span className="bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 px-1.5 py-0.5 rounded-full font-mono font-medium">
+                    ✅ {stfTally?.tally.procedente ?? 0} favoráveis
+                  </span>
+                  <span className="bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-200 px-1.5 py-0.5 rounded-full font-mono font-medium">
+                    ❌ {stfTally?.tally.improcedente ?? 0} contrários
+                  </span>
+                  {(stfTally?.tally.parcial ?? 0) > 0 && (
+                    <span className="bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 rounded-full font-mono font-medium">
+                      ⚖️ {stfTally?.tally.parcial} parciais
+                    </span>
+                  )}
+                  <span className="text-purple-700 dark:text-purple-300 font-mono">
+                    {stfTally?.tally.total ?? 0}/{stfTally?.totalSeats ?? 11} manifestados
+                  </span>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-[11px] shrink-0 text-purple-800 dark:text-purple-200 hover:bg-purple-100 dark:hover:bg-purple-900/60"
+                  onClick={() => setShowVoteTally(true)}
+                >
+                  Ver votos
+                </Button>
               </div>
             </div>
           )}
+
+          <Dialog open={showVoteTally} onOpenChange={setShowVoteTally}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Apuração de votos</DialogTitle>
+                <DialogDescription>
+                  Contagem provisória do Plenário. A proclamação do acórdão é feita pelo Presidente.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="rounded-md border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/50 p-2">
+                  <div className="text-[10px] uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Favoráveis</div>
+                  <div className="text-lg font-semibold text-emerald-800 dark:text-emerald-200">{stfTally?.tally.procedente ?? 0}</div>
+                </div>
+                <div className="rounded-md border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/50 p-2">
+                  <div className="text-[10px] uppercase tracking-wide text-rose-700 dark:text-rose-300">Contrários</div>
+                  <div className="text-lg font-semibold text-rose-800 dark:text-rose-200">{stfTally?.tally.improcedente ?? 0}</div>
+                </div>
+                <div className="rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/50 p-2">
+                  <div className="text-[10px] uppercase tracking-wide text-amber-700 dark:text-amber-300">Parciais</div>
+                  <div className="text-lg font-semibold text-amber-800 dark:text-amber-200">{stfTally?.tally.parcial ?? 0}</div>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex justify-between text-[11px] text-muted-foreground">
+                  <span>{stfTally?.tally.total ?? 0} de {stfTally?.totalSeats ?? 11} cadeiras manifestadas</span>
+                  <span>Maioria: {stfTally?.majority ?? 6}</span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-purple-600 dark:bg-purple-400 transition-all"
+                    style={{ width: `${Math.min(100, ((stfTally?.tally.total ?? 0) / (stfTally?.totalSeats || 11)) * 100)}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="max-h-60 overflow-y-auto space-y-1.5">
+                {stfTally?.votes?.length ? stfTally.votes.map((vote, index) => (
+                  <div key={`${vote.ministerName}-${index}`} className="flex items-center justify-between gap-2 rounded-md border bg-muted/30 px-2.5 py-1.5 text-xs">
+                    <span className="truncate font-medium">
+                      {vote.ministerName}{vote.isUser ? " (você)" : ""}
+                    </span>
+                    <span className="shrink-0 text-[10px] text-muted-foreground">
+                      {stfPositionLabels[vote.position] || vote.position} · {vote.origin}
+                    </span>
+                  </div>
+                )) : (
+                  <p className="text-xs text-muted-foreground text-center py-4">
+                    Nenhum voto apurado ainda. Use [VOTO] ou [DIVERGÊNCIA] ao se manifestar.
+                  </p>
+                )}
+              </div>
+
+              {stfTally?.tally.majorityReached && (
+                <p className="text-xs font-semibold text-purple-800 dark:text-purple-200">
+                  Maioria formada: {stfPositionLabels[stfTally.tally.winningPosition] || stfTally.tally.winningPosition}.
+                </p>
+              )}
+            </DialogContent>
+          </Dialog>
 
           {/* Messages Area - OCUPA O RESTO DA TELA */}
           <ScrollArea className="flex-1 min-h-0 pr-4" ref={scrollRef}>
@@ -1281,10 +1442,14 @@ export default function Trial() {
               {messages?.map((msg) => {
                 const isUser = !msg.isAI;
                 const isSystem = msg.role === "sistema";
-                const participant = participants?.find(p => p.role === msg.role);
-                const displayName = participant?.name
-                  ? `${participant.name} [${roleLabels[msg.role] || msg.role}]`
-                  : (roleLabels[msg.role] || msg.role);
+                // senderName é a fonte autoritativa: no STF vários participantes têm role "ministro"
+                // e o find por role acabava sempre retornando o participante do usuário.
+                const displayNameBase = msg.senderName?.trim()
+                  || participants?.find(p => !p.isUser && p.role === msg.role)?.name;
+                const roleText = stfRoleLabel(msg.role, isSTF);
+                const displayName = displayNameBase
+                  ? `${displayNameBase} [${roleText}]`
+                  : roleText;
                 const styles = roleStyles[msg.role] || roleStyles.sistema;
 
                 return (
@@ -1334,7 +1499,7 @@ export default function Trial() {
                     <Loader2 className="h-3 w-3 animate-spin" /> IA respondendo...
                   </span>
                 ) : (
-                  <span>✓ Sua vez: <strong>{roleLabels[session.userRole]}</strong></span>
+                  <span>✓ Sua vez: <strong>{stfRoleLabel(session.userRole, isSTF)}</strong></span>
                 )}
               </p>
             </div>
@@ -1386,6 +1551,16 @@ export default function Trial() {
                   onClick={() => setMessage((prev) => `[PROPOSTA DE TESE]: Proponho a fixação da seguinte tese com repercussão geral: "${prev}"`)}
                 >
                   📜 Propor Tese
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={proclamarMutation.isPending || session?.status === 'concluido'}
+                  className="h-7 text-[11px] px-2.5 py-0 border-fuchsia-500 dark:border-fuchsia-700 bg-fuchsia-100/70 dark:bg-fuchsia-950/50 hover:bg-fuchsia-200 dark:hover:bg-fuchsia-900 shrink-0 font-semibold"
+                  onClick={() => proclamarMutation.mutate({ sessionId })}
+                >
+                  {proclamarMutation.isPending ? '⏳ Proclamando...' : '🏛️ Proclamar Resultado'}
                 </Button>
               </div>
             ) : (

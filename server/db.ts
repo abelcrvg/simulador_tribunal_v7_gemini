@@ -99,8 +99,24 @@ async function persist(mutation?: (s: Store) => void | Promise<void>) {
     await mkdir(dirname(DB_PATH), { recursive: true });
     const tmp = `${DB_PATH}.${process.pid}.${Date.now()}.${Math.random().toString(36).slice(2)}.tmp`;
     await writeFile(tmp, snapshot, "utf8");
-    const { rename } = await import("node:fs/promises");
-    await rename(tmp, DB_PATH);
+    const { rename, unlink } = await import("node:fs/promises");
+
+    // No Windows, outro worker de teste (ou outra instância do servidor) pode
+    // estar com o arquivo aberto no instante do rename. A fila `saveQueue`
+    // serializa dentro do processo, mas não entre processos.
+    for (let attempt = 0; attempt < 6; attempt++) {
+      try {
+        await rename(tmp, DB_PATH);
+        return;
+      } catch (error: any) {
+        const busy = error?.code === "EPERM" || error?.code === "EBUSY" || error?.code === "EACCES";
+        if (!busy || attempt === 5) {
+          await unlink(tmp).catch(() => {});
+          throw error;
+        }
+        await new Promise(resolve => setTimeout(resolve, 25 * (attempt + 1)));
+      }
+    }
   };
 
   saveQueue = saveQueue.then(() => task()).catch((err) => {

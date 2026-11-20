@@ -8,6 +8,7 @@ import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Streamdown } from "streamdown";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
@@ -31,6 +32,15 @@ const roles: { value: Role; label: string; description: string }[] = [
   { value: "testemunha", label: "Testemunha", description: "Forneça depoimentos sobre os fatos" },
   { value: "perito", label: "Perito", description: "Apresente análises técnicas especializadas" },
   { value: "jurado", label: "Jurado Popular", description: "Avalie as provas e participe da decisão" },
+];
+
+// No STF não há réu, júri nem inquirição de testemunhas: a tribuna é ocupada
+// pelo PGR, pelo Advogado-Geral da União e pelos advogados das partes.
+const stfRoles: { value: Role; label: string; description: string }[] = [
+  { value: "ministro", label: "🏛️ Ministro Relator do STF (11ª cadeira)", description: "Você ocupa a 11ª cadeira do Plenário: apresenta o relatório, profira o voto condutor, faz apartes e participa da votação por maioria (6 votos)." },
+  { value: "promotor", label: "Procurador-Geral da República (PGR)", description: "Sustente oralmente pelo Ministério Público Federal perante o Plenário." },
+  { value: "advogado_defesa", label: "Advogado da Tribuna", description: "Sustente oralmente pela parte autora/requerente em uma ação constitucional." },
+  { value: "assistente_acusacao", label: "Advogado-Geral da União (AGU)", description: "Defenda a norma ou ato administrativo impugnado perante o Supremo." },
 ];
 
 const areas = [
@@ -74,6 +84,12 @@ export default function NewSession() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<"facil" | "medio" | "dificil">("medio");
   const [selectedRole, setSelectedRole] = useState<Role>("juiz");
   const [generatedTrial, setGeneratedTrial] = useState<any>(null);
+  // Nome com o qual a IA deve tratar o usuário. Já vem preenchido com o nome da conta
+  // quando ele é real (o session.create também o persiste no perfil).
+  const [userName, setUserName] = useState<string>(() => {
+    const raw = user?.name?.trim();
+    return raw && raw !== "Usuário Local" && raw !== "local-dev-user" ? raw : "";
+  });
 
   // Verificar se há trialId na URL (vindo de caso personalizado)
   const urlParams = new URLSearchParams(window.location.search);
@@ -133,6 +149,7 @@ export default function NewSession() {
     createSessionMutation.mutate({
       trialId: generatedTrial.id,
       userRole: selectedRole,
+      userName: userName.trim() || undefined,
     });
   };
 
@@ -194,6 +211,21 @@ export default function NewSession() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="userName-area">Seu nome (opcional)</Label>
+                  <Input
+                    id="userName-area"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                    placeholder="Ex.: Dr. João Silva"
+                    maxLength={80}
+                    autoComplete="name"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    A IA usará esse nome para se dirigir a você durante o julgamento. Se deixar em branco, usaremos o nome da sua conta.
+                  </p>
+                </div>
+
                 <div className="space-y-3">
                   <Label>Área do Direito (opcional)</Label>
                   <Select value={selectedArea} onValueChange={setSelectedArea}>
@@ -317,6 +349,21 @@ export default function NewSession() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="userName-role">Nome que a IA usará para te chamar</Label>
+                    <Input
+                      id="userName-role"
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      placeholder="Ex.: Dr. João Silva"
+                      maxLength={80}
+                      autoComplete="name"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Esse nome aparecerá nas falas e será usado pelos personagens e pelo Diretor de Audiência.
+                    </p>
+                  </div>
+
                   {generatedTrial.area === "stf_constitucional" && (
                     <div className="bg-purple-50 dark:bg-purple-950/40 border-2 border-purple-300 dark:border-purple-700 rounded-lg p-4 flex items-start gap-3">
                       <Scale className="h-6 w-6 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
@@ -325,7 +372,7 @@ export default function NewSession() {
                           🏛️ Julgamento no Plenário do Supremo Tribunal Federal
                         </p>
                         <p className="text-purple-800 dark:text-purple-200 mt-1 leading-relaxed">
-                          Este caso será julgado diretamente no Plenário do STF perante os 11 Ministros da Suprema Corte. Como Ministro, você debaterá teses com os outros ministros, ouvirá sustentações orais do Procurador-Geral da República (PGR) e advogados da tribuna, podendo fazer apartes, pedir vista dos autos e proferir seu voto constitucional com fixação de tese de repercussão geral.
+                          Este caso será julgado diretamente no Plenário do STF perante os Ministros da Suprema Corte. Como Ministro, você debaterá teses com os outros ministros, ouvirá sustentações orais do Procurador-Geral da República (PGR) e advogados da tribuna, podendo fazer apartes, pedir vista dos autos e proferir seu voto constitucional com fixação de tese de repercussão geral.
                         </p>
                       </div>
                     </div>
@@ -333,7 +380,7 @@ export default function NewSession() {
 
                   <RadioGroup value={selectedRole} onValueChange={(v) => setSelectedRole(v as Role)}>
                     <div className="space-y-3">
-                      {roles.map((role) => (
+                      {(generatedTrial.area === "stf_constitucional" ? stfRoles : roles).map((role) => (
                         <div key={role.value} className="flex items-start space-x-3 border rounded-lg p-4 hover:bg-muted/50 transition-colors">
                           <RadioGroupItem value={role.value} id={role.value} className="mt-1" />
                           <Label htmlFor={role.value} className="flex-1 cursor-pointer">

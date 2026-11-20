@@ -25,8 +25,14 @@ interface HearingDirectorPromptParams {
   evidences: any[];
   userRole: string;
   userName: string;
+  instancia?: string | null;
   appeal?: any | null;
 }
+
+/** No STF todos os julgadores têm role "ministro". O identificador "usuario"
+ * é o único alvo não ambíguo para a passagem de palavra, conforme a regra
+ * "NUNCA use uma ação chamada usuario" (ação ≠ targetRole). */
+const USER_TARGET_ROLE = "usuario";
 
 const VALID_ACTIONS: HearingAction[] = [
   "fala",
@@ -131,6 +137,7 @@ export function buildHearingDirectorPrompt(
     evidences,
     userRole,
     userName,
+    instancia,
     appeal,
   } = params;
 
@@ -144,7 +151,12 @@ export function buildHearingDirectorPrompt(
     ? `[${normalizeText(lastMessage.role)}] ${normalizeText(lastMessage.content)}`
     : "Nenhuma fala anterior.";
 
-  const isSTFSession = trial?.area === "stf_constitucional" || userRole === "ministro";
+  // A instância é a fonte autoritativa: sessões antigas podem não ter a área
+  // "stf_constitucional" preenchida, mas chegam como "terceira" do recurso.
+  const isSTFSession =
+    trial?.area === "stf_constitucional" ||
+    userRole === "ministro" ||
+    instancia === "terceira";
 
   return `
 Você é o DIRETOR DE AUDIÊNCIA de um simulador de tribunal brasileiro.
@@ -172,7 +184,7 @@ Dinâmica Processual do Plenário do STF:
    - Pedidos de Aparte ("Permite um aparte, eminente colega?").
    - Pedidos de Vista ("Peço vista dos autos").
    - Discussão sobre modulação de efeitos e fixação da tese de repercussão geral.
-3. O usuário é o participante ${normalizeText(userName)} (Papel: ${normalizeText(userRole)}). Quando houver oportunidade para ele votar ou debater, use a ação "passar_palavra" com targetRole: "${normalizeText(userRole)}".
+3. O usuário é o participante ${normalizeText(userName)} (Papel: ${normalizeText(userRole)}). Quando houver oportunidade para ele votar ou debater, use a ação "passar_palavra" com targetRole: "usuario".
 ` : ""}
 
 ============================================================
@@ -467,12 +479,12 @@ NUNCA use "usuario" como valor de "action".
 
 O usuário é apenas um participante do processo.
 
-Se o usuário for o alvo de uma passagem de palavra, use:
+Se o usuário for o alvo de uma passagem de palavra, use SEMPRE "usuario" como targetRole (NUNCA o role dele: no STF, "ministro" também é a role dos ministros de IA e não identifica o usuário):
 
 {
   "action": "passar_palavra",
   "speakerRole": "participante_que_passa_a_palavra",
-  "targetRole": "${normalizeText(userRole)}",
+  "targetRole": "${USER_TARGET_ROLE}",
   "content": "Passagem de palavra plausível."
 }
 

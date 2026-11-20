@@ -15,6 +15,15 @@ export const ENV = {
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   aiProvider: process.env.AI_PROVIDER ?? "auto",
+  // OpenCode é o provedor principal. Por padrão reutilizamos o background
+  // service (~/.local/state/opencode/service.json), sem precisar de chave.
+  opencodeEnabled: process.env.OPENCODE_ENABLED ?? "true",
+  opencodeBaseUrl: process.env.OPENCODE_BASE_URL ?? "",
+  opencodePassword: process.env.OPENCODE_SERVER_PASSWORD ?? "",
+  opencodeAgent: process.env.OPENCODE_AGENT ?? "tribunal-speaker",
+  opencodeModel: process.env.OPENCODE_MODEL ?? "",
+  opencodeProjectDir: process.env.OPENCODE_PROJECT_DIR ?? "",
+  trialSecondaryConcurrency: Number(process.env.TRIAL_SECONDARY_CONCURRENCY ?? "2"),
   localAuth: process.env.LOCAL_AUTH === "true",
   openAIModel: process.env.OPENAI_MODEL ?? "gpt-4o",
   geminiApiKey: process.env.GEMINI_API_KEY ?? "",

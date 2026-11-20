@@ -46,6 +46,9 @@ pids
 *.pid.lock
 *.bak
 
+# Arquivos temporários do banco JSON local
+data/*.tmp
+
 # Coverage directory used by tools like istanbul
 coverage/
 *.lcov

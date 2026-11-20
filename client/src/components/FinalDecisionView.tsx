@@ -9,15 +9,38 @@ import { toast } from "sonner";
 interface FinalDecisionViewProps {
   sessionId: number;
   userRole: string;
+  isSTF?: boolean;
 }
 
-export default function FinalDecisionView({ sessionId, userRole }: FinalDecisionViewProps) {
+export default function FinalDecisionView({ sessionId, userRole, isSTF = false }: FinalDecisionViewProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   
   const { data: session, refetch } = trpc.session.getById.useQuery({ id: sessionId });
   const generateDecisionMutation = trpc.session.generateFinalDecision.useMutation();
+  const proclamarMutation = trpc.message.proclamar.useMutation();
 
   const handleGenerateDecision = async () => {
+    if (isSTF) {
+      setIsGenerating(true);
+      try {
+        const result = await proclamarMutation.mutateAsync({ sessionId });
+        await refetch();
+        if ((result as any).concluded) {
+          toast.success("🏛️ Resultado proclamado pelo Presidente do STF!", {
+            description: "Acórdão registrado com tese, modulação e apuração dos votos.",
+            duration: 8000,
+          });
+        } else {
+          toast.info("Ainda não há maioria de 6 votos. O julgamento continua.", { duration: 8000 });
+        }
+      } catch (error: any) {
+        toast.error(error.message || "Erro ao proclamar o resultado");
+      } finally {
+        setIsGenerating(false);
+      }
+      return;
+    }
+
     if (userRole !== 'juiz') {
       toast.error("Apenas o juiz pode gerar a decisão final");
       return;
@@ -50,7 +73,7 @@ export default function FinalDecisionView({ sessionId, userRole }: FinalDecision
 
   // Se não há decisão ainda
   if (!decision) {
-    if (userRole !== 'juiz') {
+    if (!isSTF && userRole !== 'juiz') {
       return (
         <Card className="border-amber-200 bg-amber-50">
           <CardHeader>
@@ -71,10 +94,12 @@ export default function FinalDecisionView({ sessionId, userRole }: FinalDecision
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Gavel className="h-5 w-5" />
-            Gerar Decisão Final
+            {isSTF ? 'Proclamar Resultado do Plenário' : 'Gerar Decisão Final'}
           </CardTitle>
           <CardDescription>
-            Como juiz, você pode gerar a sentença fundamentada completa baseada em todo o histórico do julgamento.
+            {isSTF
+              ? 'O Presidente apura os 11 votos, fixa a tese e proclama o acórdão por maioria (6 votos).'
+              : 'Como juiz, você pode gerar a sentença fundamentada completa baseada em todo o histórico do julgamento.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -86,12 +111,12 @@ export default function FinalDecisionView({ sessionId, userRole }: FinalDecision
             {isGenerating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Gerando Sentença...
+                {isSTF ? 'Proclamando Acórdão...' : 'Gerando Sentença...'}
               </>
             ) : (
               <>
                 <Gavel className="mr-2 h-4 w-4" />
-                Proferir Sentença Final
+                {isSTF ? 'Proclamar Acórdão' : 'Proferir Sentença Final'}
               </>
             )}
           </Button>
@@ -135,7 +160,7 @@ export default function FinalDecisionView({ sessionId, userRole }: FinalDecision
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              Sentença Fundamentada
+              {isSTF ? 'Acórdão Fundamentado' : 'Sentença Fundamentada'}
             </CardTitle>
           </CardHeader>
           <CardContent>
