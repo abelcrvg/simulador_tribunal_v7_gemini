@@ -14,6 +14,29 @@ export const ANTI_META_INSTRUCTION = [
   "Sua resposta deve conter APENAS a fala, em primeira pessoa, como em uma sessão real.",
 ].join(" ");
 
+export const PORTUGUESE_ONLY_INSTRUCTION =
+  "Escreva APENAS em português, usando exclusivamente caracteres latinos (com acentos). Nunca misture caracteres chineses, japoneses, coreanos, cirílicos, árabes ou de qualquer outro alfabeto, nem tokens soltos em outros idiomas.";
+
+// CJK, Hiragana/Katakana, Hangul, Cirílico, Hebraico, Árabe, Tailândes e
+// formulários fullwidth. Latim (incluindo acentos) é permitido.
+const FOREIGN_SCRIPT_PATTERN =
+  /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uac00-\ud7af\u0400-\u04ff\u0590-\u05ff\u0600-\u06ff\u0e00-\u0e7f\uff01-\uff60]/;
+
+/** Detecta respostas em que o modelo misturou outro alfabeto no português. */
+export function hasForeignScript(text: string): boolean {
+  return FOREIGN_SCRIPT_PATTERN.test(text);
+}
+
+/** Remove apenas os caracteres de outro alfabeto e normaliza os espaços. */
+export function stripForeignScript(text: string): string {
+  return text
+    .replace(new RegExp(FOREIGN_SCRIPT_PATTERN.source, "gu"), " ")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/\(\s*\)/g, "")
+    .trim();
+}
+
 const META_BLOCK_PATTERN = new RegExp(
   [
     "<conversation-checkpoint",
@@ -50,6 +73,11 @@ export function sanitizeAIResponse(
       .replace(new RegExp(`<${tag}[\\s\\S]*?<\\/${tag}>`, "gi"), "")
       .replace(new RegExp(`<\\/?${tag}[^>]*>`, "gi"), "")
       .trim();
+  }
+
+  if (hasForeignScript(content)) {
+    console.log("[AVISO] IA misturou caracteres de outro alfabeto; removendo.");
+    content = stripForeignScript(content);
   }
 
   const multipleRolesPattern =

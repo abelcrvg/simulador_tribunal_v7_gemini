@@ -79,9 +79,14 @@ export async function invokeWithAIRouter(params: AIRequest): Promise<AIResponse>
       errors.push(`${provider.name}: ${providerError.message}`);
       console.error(`[AI Router] ${provider.name} falhou: ${providerError.message}`);
 
-      const nextProvider = candidates[candidates.indexOf(provider) + 1];
-      if (nextProvider) {
-        console.log(`[AI Router] Fallback para ${nextProvider.name} (último recurso)`);
+      // Só anuncia o próximo provedor se ele realmente estiver configurado;
+      // caso contrário o log mente ("Fallback para Gemini") e repete
+      // OpenRouter sem explicar por quê.
+      const nextProvider = candidates
+        .slice(candidates.indexOf(provider) + 1)
+        .find(candidate => candidate.id !== provider.id);
+      if (nextProvider && (await nextProvider.isConfigured(params))) {
+        console.log(`[AI Router] Fallback para ${nextProvider.name}`);
       }
     }
   }

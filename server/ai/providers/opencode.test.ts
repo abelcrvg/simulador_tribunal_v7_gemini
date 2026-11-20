@@ -31,6 +31,42 @@ function modelResponse() {
         cost: [{ input: 0, output: 0 }],
       },
       {
+        id: "tidepool-alpha-free",
+        providerID: "opencode",
+        modelID: "tidepool-alpha-free",
+        name: "Tidepool Alpha",
+        type: "chat",
+        enabled: true,
+        cost: [{ input: 0, output: 0 }],
+      },
+      {
+        id: "hy4-flash-free",
+        providerID: "opencode",
+        modelID: "hy4-flash-free",
+        name: "HY4 Flash",
+        type: "chat",
+        enabled: true,
+        cost: [{ input: 0, output: 0 }],
+      },
+      {
+        id: "nemotron-3.5-lightning-free",
+        providerID: "opencode",
+        modelID: "nemotron-3.5-lightning-free",
+        name: "Nemotron Free",
+        type: "chat",
+        enabled: true,
+        cost: [{ input: 0, output: 0 }],
+      },
+      {
+        id: "iceman-free",
+        providerID: "opencode",
+        modelID: "iceman-free",
+        name: "Iceman",
+        type: "chat",
+        enabled: true,
+        cost: [{ input: 0, output: 0 }],
+      },
+      {
         id: "paid-model",
         providerID: "openai",
         modelID: "paid-model",
@@ -160,6 +196,32 @@ describe("OpenCode provider", () => {
     expect(result.choices[0].message.content).toBe("Resposta do segundo modelo");
   });
 
+  it("intercala Nvidia e opencode na rotação", async () => {
+    const base = defaultFetch();
+    let attempts = 0;
+    const { provider, calls } = await loadProvider(async call => {
+      if (call.url.endsWith("/api/session") && call.init?.method === "POST") {
+        attempts += 1;
+        if (attempts <= 4) {
+          return json({ _tag: "UnknownError", message: "indisponível" }, 503);
+        }
+      }
+      return base(call);
+    });
+
+    const result = await provider.invoke({ messages: [{ role: "user", content: "Olá" }] });
+
+    const bodies = calls
+      .filter(c => c.url.endsWith("/api/session") && c.init?.method === "POST")
+      .map(c => JSON.parse(String(c.init?.body)));
+    expect(bodies.length).toBeGreaterThanOrEqual(5);
+
+    const attemptedProviders = bodies.slice(0, 5).map(body => body.model.providerID);
+    expect(attemptedProviders).toContain("nvidia");
+    expect(attemptedProviders).toContain("opencode");
+    expect(result.choices[0].message.content).toBe("Fala do personagem");
+  });
+
   it("extrai JSON de blocos Markdown quando a saída estruturada é pedida", async () => {
     const { provider } = await loadProvider(defaultFetch('```json\n{"acao":"fala"}\n```'));
 
@@ -169,5 +231,42 @@ describe("OpenCode provider", () => {
     });
 
     expect(JSON.parse(String(result.choices[0].message.content))).toEqual({ acao: "fala" });
+  });
+
+  it("rejeita fala com caracteres de outro alfabeto e gira o modelo", async () => {
+    const base = defaultFetch();
+    let currentModel = "";
+    const { provider, calls } = await loadProvider(async call => {
+      if (call.url.endsWith("/api/session") && call.init?.method === "POST") {
+        currentModel = JSON.parse(String(call.init.body)).model.id;
+      }
+      if (
+        call.url.includes("/api/session/ses_teste/message") &&
+        currentModel === "google/gemma-4-31b-it"
+      ) {
+        return json({
+          data: [
+            {
+              type: "assistant",
+              content: [{ type: "text", text: "aborto城里 não voluntário" }],
+            },
+          ],
+        });
+      }
+      return base(call);
+    });
+
+    const result = await provider.invoke({
+      messages: [{ role: "user", content: "Profira seu voto." }],
+    });
+
+    const createCalls = calls.filter(
+      c => c.url.endsWith("/api/session") && c.init?.method === "POST",
+    );
+    expect(createCalls).toHaveLength(2);
+    const bodies = createCalls.map(c => JSON.parse(String(c.init?.body)));
+    expect(bodies[0].model.id).toBe("google/gemma-4-31b-it");
+    expect(bodies[1].model.id).not.toBe("google/gemma-4-31b-it");
+    expect(result.choices[0].message.content).toBe("Fala do personagem");
   });
 });

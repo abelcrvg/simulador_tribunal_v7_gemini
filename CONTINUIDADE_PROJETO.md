@@ -107,14 +107,14 @@ npm run check -> Exit code 0 (0 errors)
 
 # Vitest Suite (após reforma STF + OpenCode principal + contagem de votos):
 Test Files  11 passed (11)
-     Tests  73 passed (73)
+     Tests  78 passed (78)
   Duration  ~2,7s
 ```
 
 > ℹ️ `openrouter.test.ts`: **13/13 passando** (cadeia em lotes, reasoning, retentativas, ordem de fallback e short-circuit de cota diária).
 > ℹ️ `stf_integration.test.ts`: **8/8 passando** — 10 ministros IA + usuário, cargos, PGR/AGU e proclamação com maioria.
-> ℹ️ `opencode.test.ts`: **5/5 passando** — descoberta de modelo gratuito, agente dedicado, rotação em falha e extração de JSON. Validação real: `OK` via `nvidia/google/gemma-4-31b-it`.
-> ℹ️ `speech-sanitizer.test.ts`: **5/5 passando** — fala preservada, remoção de metadados de agente, fallback neutro, tags de contexto e múltiplos personagens.
+> ℹ️ `opencode.test.ts`: **7/7 passando** — descoberta de modelo gratuito, agente dedicado, rotação em falha, intercalação Nvidia/`opencode`, rejeição de fala com outro alfabeto e extração de JSON. Validação real: `OK` via `nvidia/google/gemma-4-31b-it`.
+> ℹ️ `speech-sanitizer.test.ts`: **8/8 passando** — fala preservada, remoção de metadados de agente, fallback neutro, tags de contexto, múltiplos personagens e higienização de CJK/caracteres estrangeiros.
 > ⚠️ Numa execução anterior apareceram 7 `EPERM: rename` em `server/db.ts` (Windows),
 > com 2 `.tmp` deixados em `data/`; não foram removidos.
 
@@ -167,6 +167,7 @@ JWT_SECRET=...
 | 2026-11-20 (OpenCode principal) | OpenCode (Big Pickle) | **OpenCode virou o provedor principal**: novo `server/ai/providers/opencode.ts` reutiliza o background service (`~/.local/state/opencode/service.json`, sem chave), descobre modelos gratuitos via `/api/model`, filtra modelos inadequados e rotaciona Nvidia → pool `opencode`. Cada fala usa sessão descartável com o agente `.opencode/agents/tribunal-speaker.md` (`steps: 1`, permissões negadas) e aguarda o texto via `/api/experimental/session/{id}/wait`. Ordem final: OpenCode → OpenRouter → Gemini/Ollama/OpenAI/Manus. `.env` ajustado para `AI_PROVIDER=opencode`; teste real retornou `OK` via `nvidia/google/gemma-4-31b-it`. 5 testes novos do provider. |
 | 2026-11-20 (amplificação) | OpenCode (Big Pickle) | Complementos da criação de caso (provas, documentos, cronologia, audiências e histórico de veículos) passaram a rodar com concorrência limitada por `TRIAL_SECONDARY_CONCURRENCY` (padrão 2) em vez de 5 chamadas simultâneas. `server/db.ts` agora retenta `rename` em EPERM/EBUSY/EACCES (6 tentativas com backoff) para eliminar a flakidade do JSON local entre workers do Vitest no Windows. |
 | 2026-11-20 (contagem de votos) | OpenCode (Big Pickle) | Nova query `message.stfTally` (apuração provisória, somente leitura) e banner compacto no Plenário com favoráveis/contrários, mais botão **Ver votos** que abre um diálogo com a lista de cada ministro, origem do voto e barra de cadeiras manifestadas. `server/ai/speech-sanitizer.ts` centraliza a higienização e remove artefatos de agente ("MÁXIMOS PASSOS", "FERRAMENTAS DESABILITADAS", checkpoints) que apareceram como fala da IA; a instrução anti-meta foi reforçada nos prompts e no agente `tribunal-speaker`. 73/73 testes passando. |
+| 2026-11-20 (artefatos de idioma) | OpenCode (Big Pickle) | Falas com caracteres CJK/japoneses e tokens soltos ("城里", "意外的", "GTG有限") passaram a ser tratadas em duas camadas: `PORTUGUESE_ONLY_INSTRUCTION` nos prompts/agente, `hasForeignScript`/`stripForeignScript` no sanitizador e rejeição da resposta no provider OpenCode com giro para outro modelo. A rotação do OpenCode agora intercala Nvidia e `opencode/*` e tenta os 12 modelos antes de devolver a chamada ao roteador — antes, uma janela de 6 podia cair só no bloco `opencode/*`, que estava devolvendo texto vazio. O log de fallback deixou de anunciar provedores não configurados. 78/78 testes passando. |
 
 ---
 

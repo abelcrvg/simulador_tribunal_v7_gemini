@@ -3,6 +3,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { ENV } from "../../_core/env";
 import { AIProviderError, isRetryableStatus } from "../errors";
+import { hasForeignScript } from "../speech-sanitizer";
 import type { AIProvider, AIRequest, AIResponse } from "../types";
 
 /**
@@ -39,7 +40,10 @@ const CONNECT_TIMEOUT_MS = 4000;
 const GENERATION_TIMEOUT_MS = 45000;
 const CATALOG_CACHE_MS = 5 * 60 * 1000;
 const REACHABILITY_CACHE_MS = 30 * 1000;
-const MAX_MODELS_TO_TRY = 6;
+// Tenta toda a rotação antes de devolver a chamada ao roteador: modelos
+// `opencode/*` e Nvidia alternam na lista, então uma janela menor poderia
+// percorrer apenas um dos grupos e devolver texto vazio em todos.
+const MAX_MODELS_TO_TRY = 12;
 
 // Modelos gratuitos conhecidos por responderem com texto (não apenas
 // raciocínio) no catálogo do OpenCode em 2026-11-20. A ordem privilegia os
@@ -209,7 +213,28 @@ async function availableModels(): Promise<OpenCodeModelRef[]> {
     if (!ordered.some(m => sameModel(m, ref))) ordered.push(ref);
   }
 
-  const models = ordered.slice(0, 12);
+  // Intercala os provedores para que qualquer janela da rotação contenha
+  // modelos Nvidia e `opencode`. Sem isso, quando o cursor caía no meio do
+  // bloco `opencode/*`, todos os modelos tentados devolviam texto vazio e o
+  // OpenCode passava a impressão de estar fora do ar.
+  const head = ordered.slice(0, 1);
+  const groups = new Map<string, OpenCodeModelRef[]>();
+  for (const model of ordered.slice(1)) {
+    const group = groups.get(model.providerID) ?? [];
+    group.push(model);
+    groups.set(model.providerID, group);
+  }
+
+  const interleaved: OpenCodeModelRef[] = [];
+  while (groups.size > 0) {
+    for (const [providerID, group] of Array.from(groups.entries())) {
+      const next = group.shift();
+      if (next) interleaved.push(next);
+      if (group.length === 0) groups.delete(providerID);
+    }
+  }
+
+  const models = [...head, ...interleaved].slice(0, 12);
   catalogCache = { at: now, models };
   console.log(`[AI/OpenCode] ${free.length} modelos gratuitos no catálogo; ${models.length} na rotação`);
   return models;
@@ -413,6 +438,18 @@ export const openCodeProvider: AIProvider = {
         console.log(`[AI/OpenCode] tentando ${model.providerID}/${model.id}`);
         const raw = await generateOnce(conn, model, prompt);
         const content = wantsJson ? cleanJson(raw) : raw;
+
+        // Alguns modelos Barato/flash misturam CJK no meio do português. Isso
+        // é uma resposta inválida para a fala do personagem: girar para o
+        // próximo modelo é preferível a salar o artefato no histórico.
+        if (!wantsJson && hasForeignScript(content)) {
+          throw new AIProviderError({
+            provider: "opencode",
+            message: `OpenCode (${model.providerID}/${model.id}) misturou caracteres de outro alfabeto`,
+            retryable: true,
+          });
+        }
+
         console.log(`[AI/OpenCode] resposta recebida de ${model.providerID}/${model.id}`);
         return {
           id: `opencode-${Date.now()}`,

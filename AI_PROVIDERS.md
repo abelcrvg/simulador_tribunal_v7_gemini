@@ -27,7 +27,7 @@ As chaves Gemini/OpenAI/Ollama/Manus são **último recurso**: só entram depois
 
 O provider (`server/ai/providers/opencode.ts`) reutiliza o background service do OpenCode em `~/.local/state/opencode/service.json` — não precisa de chave de API. Para subir manualmente: `opencode serve --port 4096`. Variáveis opcionais: `OPENCODE_BASE_URL`, `OPENCODE_SERVER_PASSWORD`, `OPENCODE_AGENT`, `OPENCODE_MODEL`, `OPENCODE_PROJECT_DIR`, `OPENCODE_ENABLED`.
 
-Cada fala usa uma sessão descartável com o agente `.opencode/agents/tribunal-speaker.md` (`steps: 1`, todas as permissões negadas), garantindo que o modelo produza apenas o texto do personagem. A rotação de modelos gratuitos é feita no app: modelos Nvidia primeiro, depois o pool `opencode`; modelos de segurança/voz/visão/raciocínio puro são filtrados. Quando o OpenCode atinge cota ou falha, o roteador segue automaticamente para o OpenRouter.
+Cada fala usa uma sessão descartável com o agente `.opencode/agents/tribunal-speaker.md` (`steps: 1`, todas as permissões negadas), garantindo que o modelo produza apenas o texto do personagem. A rotação de modelos gratuitos é feita no app: modelos Nvidia e do pool `opencode` são **intercalados** e todos os 12 são tentados antes de devolver a chamada ao roteador — isso evita que uma janela da rotação fique presa só no bloco `opencode/*` quando ele está devolvendo texto vazio. Modelos de segurança/voz/visão/raciocínio puro são filtrados. Respostas com caracteres de outro alfabeto (CJK, cirílico etc.) são rejeitadas e giram para o próximo modelo; como rede de segurança, o sanitizador remove esses caracteres antes de salvar a fala. Quando o OpenCode atinge cota ou falha, o roteador segue automaticamente para o OpenRouter.
 
 > Mesmo com o agregador, as cotas continuam separadas por provedor. Se o OpenCode ficar indisponível de forma persistente, o usuário pode fornecer chaves individuais das IAs gratuitas (por exemplo `OPENROUTER_API_KEY`, `GEMINI_API_KEY`, `OLLAMA_API_KEY`) — a cadeia existente já contempla esse cenário.
 
@@ -82,6 +82,7 @@ Os modelos da cadeia gratuita vivem em `FREE_MODEL_CHAIN` em `server/ai/provider
 - `[AI/OpenCode] N modelos gratuitos no catálogo; M na rotação` — catálogo descoberto via `/api/model` (cache de 5 min).
 - `[AI/OpenCode] tentando <provider>/<modelo>` — modelo atual da rotação.
 - `[AI/OpenCode] resposta recebida de ...` — fala obtida com sucesso.
-- `[AI/OpenCode] <modelo> falhou: ...` — erro específico; o próximo modelo é tentado automaticamente.
+- `[AI/OpenCode] <modelo> falhou: ...` — erro específico; o próximo modelo é tentado automaticamente. Inclui texto vazio ou mistura de alfabetos.
+- `[AI Router] Fallback para <provedor>` — só aparece quando o próximo provedor da cadeia está realmente configurado.
 
 A senha do serviço local do OpenCode nunca é registrada em log.

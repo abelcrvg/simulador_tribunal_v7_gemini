@@ -30,6 +30,7 @@ import {
 } from "./ai/stf";
 import {
   ANTI_META_INSTRUCTION,
+  PORTUGUESE_ONLY_INSTRUCTION,
   sanitizeAIResponse,
 } from "./ai/speech-sanitizer";
 
@@ -2165,7 +2166,7 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}), REAGINDO DIRETAM
 
         const aiResponse = await invokeLLM({
           messages: [
-            { role: "system", content: `Você é um ${nextRole} experiente em um tribunal brasileiro. Fundamente sempre suas afirmações em leis e jurisprudência. ${ANTI_META_INSTRUCTION}` },
+            { role: "system", content: `Você é um ${nextRole} experiente em um tribunal brasileiro. Fundamente sempre suas afirmações em leis e jurisprudência. ${ANTI_META_INSTRUCTION} ${PORTUGUESE_ONLY_INSTRUCTION}` },
             { role: "user", content: aiPrompt }
           ],
         });
@@ -2870,7 +2871,7 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}). Lembre-se: APENA
 
         const aiResponse = await invokeLLM({
           messages: [
-            { role: "system", content: `Você é um ${nextRole} experiente em um tribunal brasileiro. ${ANTI_META_INSTRUCTION}` },
+            { role: "system", content: `Você é um ${nextRole} experiente em um tribunal brasileiro. ${ANTI_META_INSTRUCTION} ${PORTUGUESE_ONLY_INSTRUCTION}` },
             { role: "user", content: aiPrompt }
           ],
         });
@@ -2995,7 +2996,7 @@ Proclame:`;
           messages: [
             {
               role: "system",
-              content: `Você é o Presidente do Supremo Tribunal Federal proclamando o resultado de um julgamento colegiado. ${ANTI_META_INSTRUCTION}`,
+              content: `Você é o Presidente do Supremo Tribunal Federal proclamando o resultado de um julgamento colegiado. ${ANTI_META_INSTRUCTION} ${PORTUGUESE_ONLY_INSTRUCTION}`,
             },
             { role: "user", content: prompt },
           ],
