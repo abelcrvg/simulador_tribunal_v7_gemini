@@ -119,12 +119,12 @@ async function persist(mutation?: (s: Store) => void | Promise<void>) {
     }
   };
 
-  saveQueue = saveQueue.then(() => task()).catch((err) => {
+  const current = saveQueue.catch(() => {}).then(() => task());
+  saveQueue = current.catch((err) => {
     console.error(`[CRITICAL DB ERROR] Persist failed: ${err}`);
-    throw err;
   });
 
-  return saveQueue;
+  return current;
 }
 
 async function dbStore() { return await loadStore(); }
@@ -200,6 +200,7 @@ export async function updateSessionStatus(id: number, status: "em_andamento" | "
 export async function updateSessionJuryVoted(id: number, juriVotou: boolean) { const s=await dbStore(); const r=byId(s.sessions,id); if(r){r.juriVotou=juriVotou;r.updatedAt=now();await persist();} }
 export async function updateSessionDecision(id:number, decisionDetails:string, status?: "em_andamento"|"concluido"|"abandonado"|"sentenciado"|"em_recurso") { const s=await dbStore(); const r=byId(s.sessions,id); if(r){r.decisionDetails=decisionDetails;if(status)r.status=status;r.updatedAt=now();await persist();} }
 export async function getChildSessions(parentSessionId:number) { const s=await dbStore(); return filter(s.sessions,"parentSessionId",parentSessionId); }
+export async function getTrialSessions(trialId:number) { const s=await dbStore(); return filter(s.sessions,"trialId",trialId); }
 
 export async function createMessage(message: InsertMessage) { return (await insertOne("messages", message, {createdAt:now()})).id; }
 export async function getSessionMessages(sessionId: number) { const s=await dbStore(); return sortAsc(filter(s.messages,"sessionId",sessionId),"createdAt"); }
@@ -308,12 +309,14 @@ export async function getCampaignById(id:number){const s=await dbStore();return 
 export async function getAllCampaigns(){const s=await dbStore();return sortDesc(s.campaigns.filter(x=>x.isPublic===true),"createdAt");}
 export async function createCampaignProgress(p:InsertCampaignProgress){return (await insertOne("campaignProgress",p,{startedAt:now()})).id;}
 export async function getCampaignProgress(userId:number,campaignId:number){const s=await dbStore();return s.campaignProgress.find(x=>Number(x.userId)===userId&&Number(x.campaignId)===campaignId);}
+export async function getCampaignProgressById(id:number){const s=await dbStore();return byId(s.campaignProgress,id)||null;}
 export async function updateCampaignProgress(id:number,data:Partial<InsertCampaignProgress>){const s=await dbStore();const r=byId(s.campaignProgress,id);if(r){Object.assign(r,data);await persist();}}
 export async function getUserCampaigns(userId:number){const s=await dbStore();return sortDesc(filter(s.campaignProgress,"userId",userId),"startedAt");}
 export async function createVisualDocument(d:InsertVisualDocument){return (await insertOne("visualDocuments",d,{createdAt:now()})).id;}
 export async function getVisualDocuments(trialId:number){const s=await dbStore();return sortAsc(filter(s.visualDocuments,"trialId",trialId),"createdAt");}
 export async function createTrialEvent(e:InsertTrialEvent){return (await insertOne("trialEvents",e,{triggeredAt:now()})).id;}
 export async function getTrialEvents(sessionId:number){const s=await dbStore();return sortAsc(filter(s.trialEvents,"sessionId",sessionId),"triggeredAt");}
+export async function getTrialEventById(id:number){const s=await dbStore();return byId(s.trialEvents,id)||null;}
 export async function updateTrialEvent(id:number,data:Partial<InsertTrialEvent>){const s=await dbStore();const r=byId(s.trialEvents,id);if(r){Object.assign(r,data);await persist();}}
 export async function createCustomTrial(c:InsertCustomTrial){return (await insertOne("customTrials",c,{createdAt:now()})).id;}
 export async function getCustomTrialById(id:number){const s=await dbStore();return byId(s.customTrials,id);}

@@ -4,6 +4,7 @@ import { invokeLLM } from "./_core/llm";
 import { generateImage } from "./_core/imageGeneration";
 import { ENV } from "./_core/env";
 import * as db from "./db";
+import { requireOwnedSession, requireTrialAccess } from "./access-control";
 
 /**
  * Router para Eventos Aleatórios e Documentos Visuais
@@ -14,9 +15,8 @@ export const enhancementsRouter = router({
     // Gerar evento aleatório durante julgamento
     generate: protectedProcedure
       .input(z.object({ sessionId: z.number() }))
-      .mutation(async ({ input }) => {
-        const session = await db.getSessionById(input.sessionId);
-        if (!session) throw new Error("Sessão não encontrada");
+      .mutation(async ({ input, ctx }) => {
+        const session = await requireOwnedSession(input.sessionId, ctx.user.id);
 
         const trial = await db.getTrialById(session.trialId);
         if (!trial) throw new Error("Caso não encontrado");
@@ -109,14 +109,18 @@ Retorne um JSON com:
     // Listar eventos de uma sessão
     list: protectedProcedure
       .input(z.object({ sessionId: z.number() }))
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        await requireOwnedSession(input.sessionId, ctx.user.id);
         return await db.getTrialEvents(input.sessionId);
       }),
 
     // Resolver um evento
     resolve: protectedProcedure
       .input(z.object({ eventId: z.number() }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
+        const event = await db.getTrialEventById(input.eventId);
+        if (!event) throw new Error("Evento não encontrado");
+        await requireOwnedSession(Number(event.sessionId), ctx.user.id);
         await db.updateTrialEvent(input.eventId, {
           isResolved: true,
           resolvedAt: new Date(),
@@ -135,13 +139,12 @@ Retorne um JSON com:
           category: z.enum(["cena_crime", "planta_baixa", "laudo_pericial", "foto_prova"]),
         })
       )
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
         if (!ENV.imageGenerationEnabled) {
           throw new Error("Geração de imagens desativada (IMAGE_GENERATION_ENABLED)");
         }
 
-        const trial = await db.getTrialById(input.trialId);
-        if (!trial) throw new Error("Caso não encontrado");
+        const trial = await requireTrialAccess(input.trialId, ctx.user.id);
 
         let prompt = "";
         let title = "";
@@ -187,7 +190,8 @@ Retorne um JSON com:
     // Listar documentos visuais de um caso
     list: protectedProcedure
       .input(z.object({ trialId: z.number() }))
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        await requireTrialAccess(input.trialId, ctx.user.id);
         return await db.getVisualDocuments(input.trialId);
       }),
   }),

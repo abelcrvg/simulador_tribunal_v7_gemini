@@ -12,6 +12,7 @@ import { enhancementsRouter } from "./routers_enhancements";
 import { voiceRouter } from "./routers_voice";
 import { z } from "zod";
 import * as db from "./db";
+import { requireOwnedAppeal, requireOwnedSession, requireTrialAccess } from "./access-control";
 import { generateImage } from "./_core/imageGeneration";
 import {
   buildHearingDirectorPrompt,
@@ -1367,8 +1368,8 @@ export const appRouter = router({
     // Buscar cronologia e depoimentos policiais
     getTimeline: protectedProcedure
       .input(z.object({ trialId: z.number() }))
-      .query(async ({ input }) => {
-        const trial = await db.getTrialById(input.trialId);
+      .query(async ({ ctx, input }) => {
+        const trial = await requireTrialAccess(input.trialId, ctx.user.id);
         const policeReports = await db.getPoliceReportsByTrial(input.trialId);
         
         return {
@@ -1380,7 +1381,8 @@ export const appRouter = router({
     // Buscar histórico de audiências
     getHearings: protectedProcedure
       .input(z.object({ trialId: z.number() }))
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        await requireTrialAccess(input.trialId, ctx.user.id);
         return await db.getHearingsByTrial(input.trialId);
       }),
   }),
@@ -1465,8 +1467,8 @@ export const appRouter = router({
     // Buscar sessão por ID
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        return await db.getSessionById(input.id);
+      .query(async ({ ctx, input }) => {
+        return await requireOwnedSession(input.id, ctx.user.id);
       }),
 
     // Listar sessões do usuário
@@ -1481,7 +1483,8 @@ export const appRouter = router({
         status: z.enum(["em_andamento", "concluido", "abandonado"]),
         verdict: z.string().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
+        await requireOwnedSession(input.id, ctx.user.id);
         await db.updateSessionStatus(input.id, input.status, input.verdict);
         return { success: true };
       }),
@@ -1580,14 +1583,16 @@ Responda APENAS com o JSON, sem texto adicional:`;
     // Buscar sessão por ID (alias para getById)
     get: protectedProcedure
       .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        return await db.getSessionById(input.id);
+      .query(async ({ ctx, input }) => {
+        return await requireOwnedSession(input.id, ctx.user.id);
       }),
 
     // Buscar sessões filhas (instâncias superiores)
     getChildSessions: protectedProcedure
       .input(z.object({ parentSessionId: z.number() }))
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        const parent = await db.getSessionById(input.parentSessionId);
+        if (parent && parent.userId !== ctx.user.id) throw new Error("Acesso negado");
         return await db.getChildSessions(input.parentSessionId);
       }),
 
@@ -3062,7 +3067,8 @@ Proclame:`;
     // Listar provas de um caso
     list: protectedProcedure
       .input(z.object({ trialId: z.number() }))
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        await requireTrialAccess(input.trialId, ctx.user.id);
         return await db.getTrialEvidences(input.trialId);
       }),
   }),
@@ -3084,7 +3090,8 @@ Proclame:`;
     // Listar histórico do veículo de um caso
     list: protectedProcedure
       .input(z.object({ trialId: z.number() }))
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        await requireTrialAccess(input.trialId, ctx.user.id);
         return await db.getVehicleHistory(input.trialId);
       }),
   }),
@@ -3093,7 +3100,8 @@ Proclame:`;
     // Listar documentos de um caso
     list: protectedProcedure
       .input(z.object({ trialId: z.number() }))
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        await requireTrialAccess(input.trialId, ctx.user.id);
         return await db.getDocuments(input.trialId);
       }),
   }),
@@ -3102,7 +3110,8 @@ Proclame:`;
     // Listar votos do júri de uma sessão
     list: protectedProcedure
       .input(z.object({ sessionId: z.number() }))
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        await requireOwnedSession(input.sessionId, ctx.user.id);
         return await db.getJuryVotes(input.sessionId);
       }),
 
@@ -3159,6 +3168,7 @@ Proclame:`;
         razoes: z.string(), // Argumentação do recurso
       }))
       .mutation(async ({ input, ctx }) => {
+        await requireOwnedSession(input.sessionId, ctx.user.id);
         const appealId = await db.createAppeal({
           sessionId: input.sessionId,
           tipo: input.tipo,
@@ -3172,37 +3182,37 @@ Proclame:`;
     // Buscar recurso por sessionId
     get: protectedProcedure
       .input(z.object({ sessionId: z.number() }))
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        await requireOwnedSession(input.sessionId, ctx.user.id);
         return await db.getAppealBySessionId(input.sessionId);
       }),
 
     // Buscar recurso por appealId
     getById: protectedProcedure
       .input(z.object({ appealId: z.number() }))
-      .query(async ({ input }) => {
-        return await db.getAppealById(input.appealId);
+      .query(async ({ ctx, input }) => {
+        return await requireOwnedAppeal(input.appealId, ctx.user.id);
       }),
 
     // Buscar votos dos desembargadores
     getJudges: protectedProcedure
       .input(z.object({ appealId: z.number() }))
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        await requireOwnedAppeal(input.appealId, ctx.user.id);
         return await db.getAppellateJudges(input.appealId);
       }),
 
     // Julgar recurso (gerar votos dos 3 desembargadores)
     judge: protectedProcedure
       .input(z.object({ appealId: z.number() }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
         // Buscar recurso
-        const appeal = await db.getAppealById(input.appealId);
+        const appeal = await requireOwnedAppeal(input.appealId, ctx.user.id);
 
-        if (!appeal) throw new Error("Recurso não encontrado");
         if (appeal.status === "julgado") throw new Error("Recurso já foi julgado");
 
         // Buscar sessão e caso
-        const session = await db.getSessionById(appeal.sessionId);
-        if (!session) throw new Error("Sessão não encontrada");
+        const session = await requireOwnedSession(Number(appeal.sessionId), ctx.user.id);
 
         const trial = await db.getTrialById(session.trialId);
         if (!trial) throw new Error("Caso não encontrado");

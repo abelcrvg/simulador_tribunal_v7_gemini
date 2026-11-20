@@ -1,6 +1,6 @@
 # Simulador de Tribunal Virtual - TODO
 
-## Banco de Dados (15 tabelas)
+## Banco de Dados (20 tabelas)
 - [x] Criar schema com tabela users (já existe)
 - [x] Criar tabela trials (casos jurídicos)
 - [x] Criar tabela sessions (sessões de julgamento)
@@ -136,7 +136,7 @@
 - [ ] Criar testes de progressão de cargos
 - [ ] Criar testes de variedade de casos
 - [ ] Criar testes de multiplayer
-- [ ] Executar todos os testes (pnpm test)
+- [x] Executar todos os testes (`npm test`) — 90 testes em 14 arquivos (2026-11-20)
 
 ## Finalização
 - [ ] Verificar cores marrom/âmbar em toda interface
@@ -173,3 +173,13 @@
 - [x] **API Key da OpenAI não está funcionando**: Usuário configurou OPENAI_API_KEY mas o sistema não está concluindo a geração (investigar se há erro na chamada da API)
 
 - [x] **Salvar API key no banco de dados do usuário**: Implementar funcionalidade para salvar API key da OpenAI no banco de dados através da página de Configurações
+
+## 🐛 Correções aplicadas (2026-11-20)
+
+- [x] **Campanha avançava o caso errado**: `campaign.advanceCase` buscava `getCampaignProgress(0, 0)`; agora usa o `progressId` informado e valida a posse. `campaign.complete` também valida.
+- [x] **Fila de persistência travava após erro**: `saveQueue` voltava a ser uma promise rejeitada; agora uma falha é isolada e as gravações seguintes prosseguem.
+- [x] **Botão "Ver Decisão Final" sem ação**: passou a abrir o diálogo existente com o `FinalDecisionView`.
+- [x] **Acesso a dados de outras sessões (IDOR)**: checagem de posse centralizada em `server/access-control.ts` e aplicada a sessões, provas/documentos, recursos, eventos e documentos visuais.
+- [x] **Vazamento da verdade objetiva**: `customTrial.getById` (público) removia `objectiveTruth` antes de devolver o caso.
+- [x] **Testes sujavam o banco versionado**: `LOCAL_DB_PATH` agora aponta para arquivo temporário por worker do Vitest.
+- [ ] **Multiplayer**: fora de escopo nesta rodada (permanece em aberto, ver bugs reportados).

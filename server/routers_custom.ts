@@ -113,7 +113,16 @@ Retorne um JSON estruturado.`;
       if (!customTrial) throw new Error("Caso não encontrado");
 
       const trial = await db.getTrialById(customTrial.trialId);
-      return { ...customTrial, trial };
+      if (!trial) return { ...customTrial, trial: null };
+
+      const trialData = typeof trial.facts === 'object' && trial.facts !== null
+        ? { ...trial, facts: { ...trial.facts } }
+        : { ...trial, facts: { publicNarrative: trial.facts } };
+      if (trialData.facts && typeof trialData.facts === 'object') {
+        delete (trialData.facts as any).objectiveTruth;
+      }
+
+      return { ...customTrial, trial: trialData };
     }),
 
   // Incrementar contador de jogadas

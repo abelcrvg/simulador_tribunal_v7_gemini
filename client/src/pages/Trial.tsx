@@ -779,6 +779,7 @@ export default function Trial() {
   const [isSending, setIsSending] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showVoteTally, setShowVoteTally] = useState(false);
+  const [showFinalDecision, setShowFinalDecision] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: session, isLoading: sessionLoading } = trpc.session.getById.useQuery(
@@ -1062,20 +1063,17 @@ export default function Trial() {
                 <HearingHistoryView trialId={trial?.id || 0} />
               </DialogContent>
             </Dialog>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="justify-start gap-2 w-full">
-                  <Gavel className="h-4 w-4" /> Decisão Final
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] sm:max-h-[80vh]">
-                <DialogHeader>
-                  <DialogTitle>⚖️ Decisão Final do Julgamento</DialogTitle>
-                  <DialogDescription>Sentença fundamentada completa com veredicto</DialogDescription>
-                </DialogHeader>
-                <FinalDecisionView sessionId={sessionId} userRole={session?.userRole || ''} isSTF={isSTF} />
-              </DialogContent>
-            </Dialog>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="justify-start gap-2 w-full"
+              onClick={() => {
+                setIsMenuOpen(false);
+                setShowFinalDecision(true);
+              }}
+            >
+              <Gavel className="h-4 w-4" /> Decisão Final
+            </Button>
             {trial?.admiteJuri && (
               <Dialog>
                 <DialogTrigger asChild>
@@ -1173,6 +1171,16 @@ export default function Trial() {
           </div>
         </div>
       )}
+
+      <Dialog open={showFinalDecision} onOpenChange={setShowFinalDecision}>
+        <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] sm:max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>⚖️ Decisão Final do Julgamento</DialogTitle>
+            <DialogDescription>Sentença fundamentada completa com veredicto</DialogDescription>
+          </DialogHeader>
+          <FinalDecisionView sessionId={sessionId} userRole={session?.userRole || ''} isSTF={isSTF} />
+        </DialogContent>
+      </Dialog>
 
       {/* Barra de Ações Principais (Sempre Visível) */}
       <div className="bg-card border-b shrink-0 px-3 py-2">
@@ -1609,7 +1617,11 @@ export default function Trial() {
             {/* Continuar Julgamento Compacto */}
             <div className="flex flex-col gap-1">
               {session.verdict ? (
-                <Button variant="default" className="w-full h-9 gap-2 bg-green-600 hover:bg-green-700 text-sm">
+                <Button
+                  variant="default"
+                  className="w-full h-9 gap-2 bg-green-600 hover:bg-green-700 text-sm"
+                  onClick={() => setShowFinalDecision(true)}
+                >
                   <Gavel className="h-4 w-4" /> Ver Decisão Final
                 </Button>
               ) : (

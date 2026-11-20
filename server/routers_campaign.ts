@@ -157,9 +157,9 @@ Retorne um JSON com a estrutura:
         }),
       })
     )
-    .mutation(async ({ input }) => {
-      const progress = await db.getCampaignProgress(0, 0); // Buscar por ID
-      if (!progress) throw new Error("Progresso não encontrado");
+    .mutation(async ({ input, ctx }) => {
+      const progress = await db.getCampaignProgressById(input.progressId);
+      if (!progress || progress.userId !== ctx.user.id) throw new Error("Progresso não encontrado");
 
       const decisions = JSON.parse(progress.decisions || "[]");
       decisions.push(input.decision);
@@ -179,7 +179,10 @@ Retorne um JSON com a estrutura:
   // Completar campanha
   complete: protectedProcedure
     .input(z.object({ progressId: z.number() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      const progress = await db.getCampaignProgressById(input.progressId);
+      if (!progress || progress.userId !== ctx.user.id) throw new Error("Progresso não encontrado");
+
       await db.updateCampaignProgress(input.progressId, {
         status: "concluido",
         completedAt: new Date(),
