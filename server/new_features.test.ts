@@ -1,6 +1,135 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
+
+// Mock invokeLLM e generateImage para testes determinísticos sem depender de rede/quota
+vi.mock("./_core/llm", () => ({
+  invokeLLM: vi.fn().mockImplementation(async (params: any) => {
+    const userPrompt = params.messages?.find((m: any) => m.role === "user")?.content || "";
+
+    // 1. Caso de Campanha
+    if (typeof userPrompt === "string" && userPrompt.includes("narrativa jurídica conectada")) {
+      return {
+        choices: [
+          {
+            message: {
+              role: "assistant",
+              content: JSON.stringify({
+                mainStory: "Conspiração Corporativa e Fraude Tributária",
+                cases: [
+                  { caseNumber: 1, title: "Fraude Fiscal Inicial", description: "Sonegação", connection: "Início", consequences: "Investigação deflagrada" },
+                  { caseNumber: 2, title: "Lavagem de Capitais", description: "Ocultação", connection: "Meio", consequences: "Bloqueio de bens" },
+                  { caseNumber: 3, title: "Corrupção no Judiciário", description: "Suborno", connection: "Fim", consequences: "Sentença condenatória" },
+                ],
+              }),
+            },
+          },
+        ],
+      };
+    }
+
+    // 2. Caso Personalizado
+    if (typeof userPrompt === "string" && (userPrompt.includes("crie um caso jurídico completo") || userPrompt.includes("motorista"))) {
+      return {
+        choices: [
+          {
+            message: {
+              role: "assistant",
+              content: JSON.stringify({
+                title: "Atropelamento na Faixa de Pedestre",
+                area: "penal",
+                description: "Motorista em alta velocidade e ao celular atropelou vítima na faixa de pedestres.",
+                facts: "O acusado trafegava em via urbana desrespeitando a sinalização semafórica.",
+                legalBasis: "Art. 302 da Lei nº 9.503/1997 (Código de Trânsito Brasileiro)",
+                jurisprudence: "STJ - REsp 1.845.221/SP",
+                admiteJuri: false,
+                timeline: "15/03/2024: Ocorrência do sinistro",
+              }),
+            },
+          },
+        ],
+      };
+    }
+
+    // 3. Evento Aleatório
+    if (typeof userPrompt === "string" && userPrompt.includes("Gere um evento aleatório")) {
+      return {
+        choices: [
+          {
+            message: {
+              role: "assistant",
+              content: JSON.stringify({
+                title: "Testemunha Apresenta Gravação",
+                description: "Durante a sessão, a testemunha ocular revelou gravação inédita em áudio.",
+                impact: {
+                  type: "positivo",
+                  affectedParty: "defesa",
+                  details: "Comprova que o acusado não estava no local no momento exato dos fatos.",
+                },
+              }),
+            },
+          },
+        ],
+      };
+    }
+
+    // 4. Default: Geração de Casos e Provas do Trial
+    return {
+      choices: [
+        {
+          message: {
+            role: "assistant",
+            content: JSON.stringify({
+              title: "Homicídio Qualificado",
+              area: "penal",
+              description: "Homicídio ocorrido na região central após desavença.",
+              facts: {
+                publicNarrative: "Disparos efetuados em via pública na madrugada.",
+                objectiveTruth: "Houve legítima defesa após agressão física injusta.",
+              },
+              legalBasis: "Art. 121, § 2º, incisos II e IV do Código Penal",
+              jurisprudence: "STF - HC 123.456",
+              admiteJuri: true,
+              evidences: [
+                {
+                  type: "pericial",
+                  title: "Laudo Necroscópico",
+                  description: "Exame cadavérico do IML",
+                  details: "Disparo único no tórax",
+                },
+              ],
+              documents: [
+                {
+                  type: "boletim_ocorrencia",
+                  title: "BO nº 1234/2024",
+                  description: "Registro da Polícia Civil",
+                  content: "Registro formal da ocorrência na 1ª Delegacia de Polícia.",
+                  issueDate: "2024-01-15",
+                  issuer: "1ª Delegacia de Polícia",
+                  relevance: "alta",
+                },
+              ],
+              participants: [
+                {
+                  role: "juiz",
+                  name: "Dr. Marcelo Ramos",
+                  description: "Juiz Titular da Vara do Júri",
+                  personality: "Técnico, rigoroso e imparcial",
+                },
+              ],
+            }),
+          },
+        },
+      ],
+    };
+  }),
+}));
+
+vi.mock("./_core/imageGeneration", () => ({
+  generateImage: vi.fn().mockResolvedValue({
+    url: "https://example.com/mock-evidence-image.png",
+  }),
+}));
 
 type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
 
@@ -100,7 +229,7 @@ describe("Novas Funcionalidades", () => {
 
       // Gerar evento
       const event = await caller.enhancements.events.generate({
-        sessionId: session.sessionId,
+        sessionId: session.sessionId || session.id,
       });
 
       expect(event.eventId).toBeDefined();
@@ -108,7 +237,7 @@ describe("Novas Funcionalidades", () => {
       expect(event.event.title).toBeDefined();
       expect(event.event.description).toBeDefined();
       expect(event.event.impact).toBeDefined();
-    }, 60000);
+    }, 30000);
 
     it("deve listar eventos de uma sessão", async () => {
       const { ctx } = createAuthContext();
@@ -121,7 +250,7 @@ describe("Novas Funcionalidades", () => {
       });
 
       const events = await caller.enhancements.events.list({
-        sessionId: session.sessionId,
+        sessionId: session.sessionId || session.id,
       });
 
       expect(Array.isArray(events)).toBe(true);
@@ -145,7 +274,7 @@ describe("Novas Funcionalidades", () => {
       expect(doc.docId).toBeDefined();
       expect(doc.imageUrl).toBeDefined();
       expect(doc.title).toBeDefined();
-    }, 60000);
+    }, 30000);
 
     it("deve listar documentos visuais de um trial", async () => {
       const { ctx } = createAuthContext();

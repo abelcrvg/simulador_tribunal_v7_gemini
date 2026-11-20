@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Scale, Loader2, ArrowLeft, PlayCircle, CheckCircle, XCircle } from "lucide-react";
+import { Scale, Loader2, ArrowLeft, PlayCircle, CheckCircle, XCircle, Gavel, ArrowUpCircle } from "lucide-react";
 import { APP_TITLE, getLoginUrl } from "@/const";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -17,20 +17,30 @@ const roleLabels: Record<string, string> = {
 };
 
 const statusLabels: Record<string, { label: string; icon: any; variant: any }> = {
-  em_andamento: { 
-    label: "Em Andamento", 
-    icon: PlayCircle, 
-    variant: "default" as const 
+  em_andamento: {
+    label: "Em Andamento",
+    icon: PlayCircle,
+    variant: "default" as const
   },
-  concluido: { 
-    label: "Concluído", 
-    icon: CheckCircle, 
-    variant: "secondary" as const 
+  sentenciado: {
+    label: "Sentenciado",
+    icon: Gavel,
+    variant: "secondary" as const
   },
-  abandonado: { 
-    label: "Abandonado", 
-    icon: XCircle, 
-    variant: "destructive" as const 
+  em_recurso: {
+    label: "Em Recurso",
+    icon: ArrowUpCircle,
+    variant: "default" as const
+  },
+  concluido: {
+    label: "Concluído",
+    icon: CheckCircle,
+    variant: "secondary" as const
+  },
+  abandonado: {
+    label: "Abandonado",
+    icon: XCircle,
+    variant: "destructive" as const
   },
 };
 
@@ -118,7 +128,11 @@ export default function MySessions() {
           ) : (
             <div className="space-y-4">
               {sessions.map((session) => {
-                const statusInfo = statusLabels[session.status];
+                const statusInfo = statusLabels[session.status] || {
+                  label: "Desconhecido",
+                  icon: Scale,
+                  variant: "outline" as const
+                };
                 const StatusIcon = statusInfo.icon;
 
                 return (

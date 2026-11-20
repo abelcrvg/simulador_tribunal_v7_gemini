@@ -234,7 +234,8 @@ FORMATO JSON:
     await db.updateTrial(trialId, { timeline: timelineJson });
 
     // Salvar depoimentos policiais
-    const policeReportsList = timelineData.policeStatements.map((statement: any) => ({
+    const statements = Array.isArray(timelineData?.policeStatements) ? timelineData.policeStatements : [];
+    const policeReportsList = statements.map((statement: any) => ({
       trialId,
       personName: statement.personName,
       personRole: statement.personRole,

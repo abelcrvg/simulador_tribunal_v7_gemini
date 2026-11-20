@@ -88,17 +88,27 @@ async function loadStore(): Promise<Store> {
   return loading;
 }
 
-async function persist() {
+async function persist(mutation?: (s: Store) => void | Promise<void>) {
   if (!store) return;
-  const snapshot = JSON.stringify(store, (_key, value) => value instanceof Date ? value.toISOString() : value, 2);
-  saveQueue = saveQueue.then(async () => {
+
+  const task = async () => {
+    if (mutation) {
+      await mutation(store!);
+    }
+    const snapshot = JSON.stringify(store, (_key, value) => value instanceof Date ? value.toISOString() : value, 2);
     await mkdir(dirname(DB_PATH), { recursive: true });
-    const tmp = `${DB_PATH}.tmp`;
+    const tmp = `${DB_PATH}.${process.pid}.${Date.now()}.${Math.random().toString(36).slice(2)}.tmp`;
     await writeFile(tmp, snapshot, "utf8");
     const { rename } = await import("node:fs/promises");
     await rename(tmp, DB_PATH);
+  };
+
+  saveQueue = saveQueue.then(() => task()).catch((err) => {
+    console.error(`[CRITICAL DB ERROR] Persist failed: ${err}`);
+    throw err;
   });
-  await saveQueue;
+
+  return saveQueue;
 }
 
 async function dbStore() { return await loadStore(); }
@@ -123,9 +133,12 @@ function normalizeRecord(value: RecordData) {
 async function insertOne(table: TableName, value: RecordData, defaults: RecordData = {}) {
   const s = await dbStore();
   const record = normalizeRecord({ ...defaults, ...value });
-  if (record.id == null) record.id = nextId(s, table);
-  s[table].push(record);
-  await persist();
+
+  await persist(async (store) => {
+    if (record.id == null) record.id = nextId(store, table);
+    store[table].push(record);
+  });
+
   return record;
 }
 
@@ -157,6 +170,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 }
 
 export async function getUserByOpenId(openId: string) { const s = await dbStore(); return s.users.find(u => u.openId === openId); }
+export async function updateUserName(openId: string, name: string) { const s = await dbStore(); const u = s.users.find(x => x.openId === openId); if (u) { u.name = name; u.updatedAt = now(); await persist(); } }
 export async function updateUserApiKey(openId: string, apiKey: string | null) { const s = await dbStore(); const u = s.users.find(x => x.openId === openId); if (u) { u.openaiApiKey = apiKey; u.updatedAt = now(); await persist(); } }
 export async function getUserById(id: number) { const s = await dbStore(); return byId(s.users, id); }
 
@@ -166,9 +180,9 @@ export async function getTrialById(id: number) { const s = await dbStore(); retu
 export async function createSession(session: InsertSession) { return (await insertOne("sessions", session, { status: "em_andamento", juriVotou: false, instancia: "primeira", isMultiplayer: false, createdAt: now(), updatedAt: now() })).id; }
 export async function getSessionById(id: number) { const s = await dbStore(); return byId(s.sessions, id); }
 export async function getUserSessions(userId: number) { const s = await dbStore(); return sortDesc(filter(s.sessions, "userId", userId), "createdAt"); }
-export async function updateSessionStatus(id: number, status: "em_andamento" | "concluido" | "abandonado", verdict?: string) { const s = await dbStore(); const r = byId(s.sessions,id); if (!r) return; Object.assign(r,{status, ...(verdict !== undefined ? {verdict}:{}) ,updatedAt:now()}); await persist(); }
+export async function updateSessionStatus(id: number, status: "em_andamento" | "concluido" | "abandonado" | "sentenciado" | "em_recurso", verdict?: string) { const s = await dbStore(); const r = byId(s.sessions,id); if (!r) return; Object.assign(r,{status, ...(verdict !== undefined ? {verdict}:{}) ,updatedAt:now()}); await persist(); }
 export async function updateSessionJuryVoted(id: number, juriVotou: boolean) { const s=await dbStore(); const r=byId(s.sessions,id); if(r){r.juriVotou=juriVotou;r.updatedAt=now();await persist();} }
-export async function updateSessionDecision(id:number, decisionDetails:string, status?: "em_andamento"|"concluido"|"abandonado") { const s=await dbStore(); const r=byId(s.sessions,id); if(r){r.decisionDetails=decisionDetails;if(status)r.status=status;r.updatedAt=now();await persist();} }
+export async function updateSessionDecision(id:number, decisionDetails:string, status?: "em_andamento"|"concluido"|"abandonado"|"sentenciado"|"em_recurso") { const s=await dbStore(); const r=byId(s.sessions,id); if(r){r.decisionDetails=decisionDetails;if(status)r.status=status;r.updatedAt=now();await persist();} }
 export async function getChildSessions(parentSessionId:number) { const s=await dbStore(); return filter(s.sessions,"parentSessionId",parentSessionId); }
 
 export async function createMessage(message: InsertMessage) { return (await insertOne("messages", message, {createdAt:now()})).id; }
@@ -176,24 +190,90 @@ export async function getSessionMessages(sessionId: number) { const s=await dbSt
 
 export async function createEvidence(evidence: InsertEvidence) { return (await insertOne("evidences", evidence,{createdAt:now()})).id; }
 export async function getTrialEvidences(trialId: number) { const s=await dbStore(); return sortAsc(filter(s.evidences,"trialId",trialId),"createdAt"); }
-export async function createMultipleEvidences(list: InsertEvidence[]) { const out=[]; for(const x of list) out.push(await insertOne("evidences",x,{createdAt:now()})); return out; }
+export async function createMultipleEvidences(list: InsertEvidence[]) {
+  const out: any[] = [];
+  await persist(async (store) => {
+    for (const x of list) {
+      const record = normalizeRecord({ createdAt: now(), ...x });
+      if (record.id == null) record.id = nextId(store, "evidences");
+      store.evidences.push(record);
+      out.push(record);
+    }
+  });
+  return out;
+}
 
 export async function createParticipant(p: InsertParticipant) { return (await insertOne("participants",p,{isUser:false,createdAt:now()})).id; }
 export async function getSessionParticipants(sessionId:number){const s=await dbStore();return sortAsc(filter(s.participants,"sessionId",sessionId),"createdAt");}
-export async function createMultipleParticipants(list:InsertParticipant[]){const out=[];for(const x of list)out.push(await insertOne("participants",x,{isUser:false,createdAt:now()}));return out;}
+export async function createMultipleParticipants(list:InsertParticipant[]){
+  const out: any[] = [];
+  await persist(async (store) => {
+    for (const x of list) {
+      const record = normalizeRecord({ isUser: false, createdAt: now(), ...x });
+      if (record.id == null) record.id = nextId(store, "participants");
+      store.participants.push(record);
+      out.push(record);
+    }
+  });
+  return out;
+}
 
 export async function getVehicleHistory(trialId:number){const s=await dbStore();return sortAsc(filter(s.vehicleHistory,"trialId",trialId),"eventDate");}
-export async function createMultipleVehicleHistory(list:InsertVehicleHistory[]){const out=[];for(const x of list)out.push(await insertOne("vehicleHistory",x,{createdAt:now()}));return out;}
+export async function createMultipleVehicleHistory(list:InsertVehicleHistory[]){
+  const out: any[] = [];
+  await persist(async (store) => {
+    for (const x of list) {
+      const record = normalizeRecord({ createdAt: now(), ...x });
+      if (record.id == null) record.id = nextId(store, "vehicleHistory");
+      store.vehicleHistory.push(record);
+      out.push(record);
+    }
+  });
+  return out;
+}
 export async function getDocuments(trialId:number){const s=await dbStore();return sortDesc(filter(s.documents,"trialId",trialId),"relevance").sort((a,b)=>String(a.createdAt??"").localeCompare(String(b.createdAt??"")));}
-export async function createMultipleDocuments(list:InsertDocument[]){const out=[];for(const x of list)out.push(await insertOne("documents",x,{createdAt:now()}));return out;}
+export async function createMultipleDocuments(list:InsertDocument[]){
+  const out: any[] = [];
+  await persist(async (store) => {
+    for (const x of list) {
+      const record = normalizeRecord({ createdAt: now(), ...x });
+      if (record.id == null) record.id = nextId(store, "documents");
+      store.documents.push(record);
+      out.push(record);
+    }
+  });
+  return out;
+}
 
 export async function createJuryVote(v:InsertJuryVote){return (await insertOne("juryVotes",v,{createdAt:now()})).id;}
 export async function getJuryVotes(sessionId:number){const s=await dbStore();return filter(s.juryVotes,"sessionId",sessionId);}
 export async function createPoliceReport(r:InsertPoliceReport){return (await insertOne("policeReports",r,{createdAt:now()})).id;}
-export async function createMultiplePoliceReports(list:InsertPoliceReport[]){for(const x of list)await insertOne("policeReports",x,{createdAt:now()});}
+export async function createMultiplePoliceReports(list:InsertPoliceReport[]){
+  const out: any[] = [];
+  await persist(async (store) => {
+    for (const x of list) {
+      const record = normalizeRecord({ createdAt: now(), ...x });
+      if (record.id == null) record.id = nextId(store, "policeReports");
+      store.policeReports.push(record);
+      out.push(record);
+    }
+  });
+  return out;
+}
 export async function getPoliceReportsByTrial(trialId:number){const s=await dbStore();return filter(s.policeReports,"trialId",trialId);}
 export async function updateTrial(id:number,data:Partial<InsertTrial>){const s=await dbStore();const r=byId(s.trials,id);if(r){Object.assign(r,data);await persist();}}
-export async function createHearings(list:InsertHearing[]){for(const x of list)await insertOne("hearings",x,{createdAt:now()});}
+export async function createHearings(list:InsertHearing[]){
+  const out: any[] = [];
+  await persist(async (store) => {
+    for (const x of list) {
+      const record = normalizeRecord({ createdAt: now(), ...x });
+      if (record.id == null) record.id = nextId(store, "hearings");
+      store.hearings.push(record);
+      out.push(record);
+    }
+  });
+  return out;
+}
 export async function getHearingsByTrial(trialId:number){const s=await dbStore();return filter(s.hearings,"trialId",trialId);}
 
 export async function createRoom(hostUserId:number,maxPlayers=7,isPublic=false){const code=Math.random().toString(36).substring(2,8).toUpperCase();const r=await insertOne("rooms",{code,hostUserId,maxPlayers,isPublic,status:"aguardando",theme:"tribunal_moderno"},{createdAt:now()});return {id:r.id,code};}

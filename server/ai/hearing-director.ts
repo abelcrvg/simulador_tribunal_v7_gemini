@@ -55,9 +55,7 @@ function buildParticipantsContext(
       const description = normalizeText(participant.description);
       const personality = normalizeText(participant.personality);
 
-      const isUser =
-        participant.isUser === true ||
-        role === userRole;
+      const isUser = participant.isUser === true;
 
       return [
         `PAPEL: ${role}`,
@@ -146,6 +144,8 @@ export function buildHearingDirectorPrompt(
     ? `[${normalizeText(lastMessage.role)}] ${normalizeText(lastMessage.content)}`
     : "Nenhuma fala anterior.";
 
+  const isSTFSession = trial?.area === "stf_constitucional" || userRole === "ministro";
+
   return `
 Você é o DIRETOR DE AUDIÊNCIA de um simulador de tribunal brasileiro.
 
@@ -158,6 +158,22 @@ réu ou usuário.
 
 Sua função é observar o que aconteceu e decidir qual é o
 ACONTECIMENTO MAIS PLAUSÍVEL para fazer a audiência avançar.
+${isSTFSession ? `
+============================================================
+MODALIDADE: SESSÃO PLENÁRIA DO SUPREMO TRIBUNAL FEDERAL (STF)
+============================================================
+Esta sessão ocorre no PLENÁRIO DO STF (Julgamento Constitucional Colegiado).
+NÃO é uma audiência penal comum de 1ª instância (não há réu preso nem inquirição de testemunhas fáticas).
+
+Dinâmica Processual do Plenário do STF:
+1. Manifestações da Tribuna: O Procurador-Geral da República (PGR) e os Advogados Constitucionalistas realizam sustentação oral técnica sobre a Constituição Federal de 1988 (CF/88).
+2. Debates e Votos dos Ministros: Os Ministros dialogam entre si com alta erudição jurídica.
+   - Votos acompanhando o Relator ou abrindo divergência.
+   - Pedidos de Aparte ("Permite um aparte, eminente colega?").
+   - Pedidos de Vista ("Peço vista dos autos").
+   - Discussão sobre modulação de efeitos e fixação da tese de repercussão geral.
+3. O usuário é o participante ${normalizeText(userName)} (Papel: ${normalizeText(userRole)}). Quando houver oportunidade para ele votar ou debater, use a ação "passar_palavra" com targetRole: "${normalizeText(userRole)}".
+` : ""}
 
 ============================================================
 PRINCÍPIO CENTRAL
@@ -231,6 +247,8 @@ O participante controlado pelo usuário é:
 
 NOME: ${normalizeText(userName)}
 PAPEL: ${normalizeText(userRole)}
+
+NUNCA se refira ao usuário como "Usuário Local" ou "Usuário". Seu nome e título é ${normalizeText(userName)}.
 
 NUNCA invente uma fala do usuário.
 
@@ -475,21 +493,22 @@ Se não houver um acontecimento plausível, use:
 `;
 }
 function extractJsonObject(text: string): string | null {
-  const cleaned = text
-    .trim()
-    .replace(/^```json\s*/i, "")
-    .replace(/^```\s*/i, "")
-    .replace(/\s*```$/i, "")
-    .trim();
+  if (!text) return null;
+  let cleaned = text.trim();
+
+  // 1. Remover blocos de raciocínio de modelos reasoning (<think>...</think>)
+  cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+
+  // 2. Extrair bloco de código markdown se presente
+  const codeBlockMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  if (codeBlockMatch && codeBlockMatch[1]) {
+    cleaned = codeBlockMatch[1].trim();
+  }
 
   const firstBrace = cleaned.indexOf("{");
   const lastBrace = cleaned.lastIndexOf("}");
 
-  if (firstBrace === -1 || lastBrace === -1) {
-    return null;
-  }
-
-  if (lastBrace <= firstBrace) {
+  if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
     return null;
   }
 
@@ -499,18 +518,16 @@ function extractJsonObject(text: string): string | null {
 function cleanDecision(
   value: any
 ): HearingDirectorDecision {
-  const action = normalizeText(value?.action) as HearingAction;
+  let action = normalizeText(value?.action) as HearingAction;
 
   if (!VALID_ACTIONS.includes(action)) {
-    throw new Error(
-      `Ação inválida retornada pelo Diretor de audiência: ${action}`
-    );
+    action = "fala";
   }
 
-  const speakerRole =
+  let speakerRole =
     normalizeText(value?.speakerRole) || null;
 
-  const targetRole =
+  let targetRole =
     normalizeText(value?.targetRole) || null;
 
   const content =
@@ -527,21 +544,8 @@ function cleanDecision(
     };
   }
 
-  if (action === "encerramento" || action === "sentenca") {
-    return {
-      action,
-      speakerRole,
-      targetRole,
-      content:
-        content ||
-        "O estado processual indica que este acontecimento é apropriado.",
-    };
-  }
-
-  if (!speakerRole) {
-    throw new Error(
-      `O Diretor marcou a ação "${action}" sem informar speakerRole.`
-    );
+  if (action === "passar_palavra" && !targetRole && speakerRole) {
+    targetRole = speakerRole;
   }
 
   return {
@@ -550,7 +554,7 @@ function cleanDecision(
     targetRole,
     content:
       content ||
-      "O participante deve reagir de acordo com o contexto da audiência.",
+      "O participante deve manifestar-se de acordo com o contexto da audiência.",
   };
 }
 
@@ -625,26 +629,21 @@ export function parseHearingDirectorDecision(
 ): HearingDirectorDecision {
   const jsonText = extractJsonObject(content);
 
-  if (!jsonText) {
-    throw new Error(
-      "Não foi possível encontrar JSON na resposta do Diretor de audiência."
-    );
+  if (jsonText) {
+    try {
+      const parsed = JSON.parse(jsonText);
+      return cleanDecision(parsed);
+    } catch {
+      // Falha no parse estrito, recorrer ao fallback seguro
+    }
   }
 
-  let parsed: any;
-
-  try {
-    parsed = JSON.parse(jsonText);
-  } catch (error) {
-    throw new Error(
-      `JSON inválido retornado pelo Diretor de audiência: ${
-        error instanceof Error
-          ? error.message
-          : String(error)
-      }`
-    );
-  }
-
-  return cleanDecision(parsed);
+  console.warn("[HearingDirector] Não foi possível fazer parse estrito do JSON da IA. Usando decisão de prosseguimento padrão.");
+  return {
+    action: "fala",
+    speakerRole: null,
+    targetRole: null,
+    content: "Prosseguir com o julgamento.",
+  };
 }
 

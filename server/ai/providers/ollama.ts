@@ -139,9 +139,7 @@ ${JSON.stringify(schema)}
         status: response.status,
         message:
           `Ollama Cloud ${response.status}: ${body}`,
-        retryable:
-          response.status === 429 ||
-          response.status >= 500,
+        retryable: true,
       });
     }
 

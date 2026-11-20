@@ -15,7 +15,57 @@ import { generateImage } from "./_core/imageGeneration";
 import {
   buildHearingDirectorPrompt,
   parseHearingDirectorDecision,
+  type HearingDirectorDecision,
 } from "./ai/hearing-director";
+
+// Função auxiliar para higienizar respostas da IA (cortar múltiplos papéis e menções ao usuário)
+function sanitizeAIResponse(
+  aiContent: string,
+  userRole: string,
+  userParticipantName: string
+): string {
+  let content = aiContent.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+  const multipleRolesPattern = /^\s*(Juiz|Promotor|Advogado|Defensor|Testemunha|Perito|Jurado|Réu|Vítima)\s*:/gim;
+  const lines = content.split('\n');
+  const roleLines: number[] = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].match(multipleRolesPattern)) {
+      roleLines.push(i);
+    }
+  }
+  
+  if (roleLines.length > 1) {
+    console.log(`[AVISO] IA tentou incluir falas de múltiplos personagens. Cortando a partir da linha ${roleLines[1]}...`);
+    const cutLines = lines.slice(0, roleLines[1]);
+    
+    if (roleLines[0] === 0) {
+      const firstLine = lines[0];
+      const colonIndex = firstLine.indexOf(':');
+      if (colonIndex > 0) {
+        cutLines[0] = firstLine.substring(colonIndex + 1).trim();
+      }
+    }
+    content = cutLines.join('\n').trim();
+  }
+  
+  const userRoleMentions = userRole === "ministro"
+    ? [userParticipantName]
+    : [userRole, userRole.replace('_', ' '), userParticipantName];
+  
+  const mentionsUserRole = userRoleMentions.some(mention => 
+    content.toLowerCase().includes(mention.toLowerCase() + ':')
+  );
+  
+  if (mentionsUserRole) {
+    console.log(`[AVISO] IA incluiu prefixo do usuário. Higienizando mensagem...`);
+    for (const mention of userRoleMentions) {
+      content = content.replace(new RegExp(`^\\s*${mention}\\s*:[\\s\\S]*$`, 'gim'), '').trim();
+    }
+  }
+
+  return content;
+}
 
 // Função para gerar documentos visuais em background (não bloqueia)
 async function generateVisualDocumentsInBackground(trialId: number, trial: any) {
@@ -32,7 +82,7 @@ async function generateVisualDocumentsInBackground(trialId: number, trial: any) 
       switch (category) {
         case "cena_crime":
           title = "Foto da Cena do Crime";
-          prompt = `Crie uma imagem realista da cena do crime para o caso: ${trial.title}. Fatos: ${trial.facts.substring(0, 500)}. Estilo: fotografia forense, evidências marcadas, iluminação profissional.`;
+          prompt = `Crie uma imagem realista da cena do crime para o caso: ${trial.title}. Fatos: ${typeof trial.facts === 'object' ? trial.facts.publicNarrative : trial.facts}. Estilo: fotografia forense, evidências marcadas, iluminação profissional.`;
           break;
         case "foto_prova":
           title = "Fotografia de Prova Material";
@@ -365,12 +415,117 @@ export async function generateParticipantsForTrial(trialId: number, userRole: st
   return generateParticipantsForSession(0, userRole, trial);
 }
 
-async function generateParticipantsForSession(sessionId: number, userRole: string, caseData: any) {
+async function generateParticipantsForSession(sessionId: number, userRole: string, caseData: any, userParticipantName: string = "Usuário") {
+  const isSTF = caseData.area === "stf_constitucional" || userRole === "ministro";
+  const difficulty = caseData.difficulty || "medio";
+
+  if (isSTF) {
+    const userRoleNotice = userRole === "ministro"
+      ? `O usuário humano é um dos MINISTROS do Plenário com o nome "${userParticipantName}". Gere os DEMAIS 4 a 5 Ministros da Suprema Corte (incluindo o Ministro Presidente e demais Vogais/Relator com nomes fictícios distintos de "${userParticipantName}").`
+      : `O usuário humano participará como ${userRole.toUpperCase()} com o nome "${userParticipantName}".`;
+
+    const promptSTF = `Gere os participantes de uma Sessão Plenária do SUPREMO TRIBUNAL FEDERAL (STF) para o seguinte caso constitucional:
+
+CASO: ${caseData.title}
+DIFICULDADE: ${difficulty.toUpperCase()}
+
+${userRoleNotice}
+
+COMPOSIÇÃO DO PLENÁRIO DO STF (PERSONAGENS DE IA):
+1. MINISTROS DO SUPREMO TRIBUNAL FEDERAL (Gere 4 a 5 Ministros com linhas hermenêuticas distintas):
+   - Ministro(a) Presidente do STF (coordena os trabalhos, concede apartes e proclama os resultados)
+   - Ministro(a) Relator (responsável pelo relatório e voto condutor, caso o usuário não seja o relator)
+   - Ministro(a) Vogal Garantista / Constitucionalista Estrito (ênfase em direitos individuais e garantias constitucionais)
+   - Ministro(a) Vogal Pragmático / Consequencialista (ênfase em repercussão econômica, financeira e estabilidade)
+   - Ministro(a) Vogal Progressista / Ativista (interpretação evolutiva e proteção aos direitos humanos)
+   Todos com role "ministro" e nomes próprios completos realistas de ministros da alta corte (ex: "Ministro Roberto Álvares", "Ministra Cármen Mendonça", "Ministro Luiz Faria").
+2. PROCURADOR-GERAL DA REPÚBLICA (PGR):
+   - Atuação técnica pelo Ministério Público da União perante o STF (role: "promotor").
+3. ADVOGADO(A) DA TRIBUNA / REQUERENTE:
+   - Advogado constitucionalista experiente sustentando da tribuna (role: "advogado_defesa").
+4. ADVOGADO-GERAL DA UNIÃO (AGU) OU ADVOGADO DO REQUERIDO:
+   - Defendendo a lei ou ato administrativo questionado perante o Plenário (role: "assistente_acusacao").
+
+IMPORTANTE:
+- NUNCA use o nome "${userParticipantName}" para os participantes gerados.
+- NUNCA use placeholders como "[nome fictício]" e NUNCA use termos genéricos como "Usuário Local" ou "Usuário". Use SEMPRE nomes próprios realistas completos.
+- Inclua nas descrições o cargo formal e perfil dogmático.
+- Personalidades devem detalhar o tom em plenário, estilo oratório e postura em apartes.
+
+FORMATO DE RESPOSTA (JSON):
+{
+  "participants": [
+    {
+      "role": "ministro" ou "promotor" ou "advogado_defesa" ou "assistente_acusacao",
+      "name": "Nome completo",
+      "description": "Cargo e perfil dogmático",
+      "personality": "Personalidade e corrente de pensamento jurídico"
+    }
+  ]
+}`;
+
+    try {
+      const response = await invokeLLM({
+        messages: [
+          { role: "system", content: "Você é um especialista em Direito Constitucional brasileiro que gera personagens de alta corte para simulações do STF." },
+          { role: "user", content: promptSTF }
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "participantes_stf",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                participants: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      role: { type: "string" },
+                      name: { type: "string" },
+                      description: { type: "string" },
+                      personality: { type: "string" },
+                    },
+                    required: ["role", "name", "description", "personality"],
+                    additionalProperties: false,
+                  },
+                },
+              },
+              required: ["participants"],
+              additionalProperties: false,
+            },
+          },
+        },
+      });
+
+      const content = response.choices[0].message.content;
+      if (typeof content !== 'string') return;
+      const participantsData = JSON.parse(content);
+
+      const participantsList = participantsData.participants.map((p: any) => ({
+        sessionId,
+        role: p.role,
+        name: p.name,
+        description: p.description,
+        personality: p.personality,
+        isUser: false,
+      }));
+
+      console.log(`[INFO STF] Criando ${participantsList.length} participantes do Plenário do STF`);
+      await db.createMultipleParticipants(participantsList);
+      return;
+    } catch (error) {
+      console.error("Erro ao gerar participantes do STF:", error);
+      return;
+    }
+  }
+
   const roles = ["juiz", "advogado_defesa", "promotor", "testemunha", "perito", "jurado"];
   const aiRoles = roles.filter(role => role !== userRole);
 
   // Determinar quantidade de participantes baseado na dificuldade
-  const difficulty = caseData.difficulty || "medio";
   let numReus = 1;
   let numVitimas = 1;
   let numTestemunhas = 1;
@@ -643,9 +798,21 @@ FORMATO DE RESPOSTA (JSON):
 
 // Função exportada para gerar trial (usado pelo multiplayer)
 export async function generateTrialWithAI(area?: string, difficulty?: string, userId?: number) {
-  const areas = ["penal", "homicidio", "feminicidio", "latrocinio", "roubo", "furto", "estupro", "sequestro", "extorsao", "trafico_drogas", "corrupcao", "estelionato", "fraude", "apropriacao_indebita", "difamacao", "caluna", "injuria", "lesao_corporal", "criminal", "cdc", "trabalhista", "civil", "veiculos_sinistros", "tributario", "ambiental", "empresarial", "previdenciario", "familia", "administrativo"];
+  const areas = ["penal", "homicidio", "feminicidio", "latrocinio", "roubo", "furto", "estupro", "sequestro", "extorsao", "trafico_drogas", "corrupcao", "estelionato", "fraude", "apropriacao_indebita", "difamacao", "caluna", "injuria", "lesao_corporal", "criminal", "cdc", "trabalhista", "civil", "veiculos_sinistros", "tributario", "ambiental", "empresarial", "previdenciario", "familia", "administrativo", "stf_constitucional"];
   const selectedArea = area || areas[Math.floor(Math.random() * areas.length)];
   const selectedDifficulty = difficulty || "medio";
+  const isSTF = selectedArea === "stf_constitucional";
+
+  const stfInstructions = `
+ATENÇÃO - CASO ESPECIAL: PLENÁRIO DO SUPREMO TRIBUNAL FEDERAL (STF).
+O caso DEVE ser uma matéria de competência do STF brasileiro, como:
+- Controle Concentrado de Constitucionalidade (ADI, ADPF ou ADC) discutindo a constitucionalidade de uma lei ou ato normativo federal/estadual;
+- OU Ação Penal Originária contra autoridade com foro por prerrogativa de função perante o STF;
+- OU Recurso Extraordinário com Repercussão Geral de grande impacto jurídico, político e social.
+A fundamentação jurídica DEVE citar explicitamente artigos da Constituição Federal de 1988 (CF/88), princípios constitucionais (dignidade humana, separação dos poderes, federalismo, proporcionalidade, devido processo legal, etc.) e precedentes históricos do STF.
+O caso NÃO admite júri popular (admiteJuri DEVE ser false).
+O debate será travado pelos 11 Ministros do Plenário, com sustentações orais do Procurador-Geral da República (PGR) e da advocacia constitucional.
+`;
 
   const difficultyInstructions = {
     facil: "Gere um caso SIMPLES com fatos claros, poucas provas, e argumentos diretos. Ideal para iniciantes.",
@@ -660,14 +827,17 @@ Você é um especialista em Direito brasileiro com 20 anos de experiência. Gere
 AREA DO DIREITO: ${selectedArea.toUpperCase()}
 DIFICULDADE: ${selectedDifficulty.toUpperCase()}
 
-${difficultyInstructions[selectedDifficulty as keyof typeof difficultyInstructions]}
+${isSTF ? stfInstructions : difficultyInstructions[selectedDifficulty as keyof typeof difficultyInstructions]}
 
 FORMATO DE RESPOSTA (JSON):
 {
   "title": "Título curto e descritivo do caso (máximo 100 caracteres)",
   "area": "${selectedArea}",
   "description": "Resumo executivo do caso em 2-3 parágrafos",
-  "facts": "Descricao detalhada dos fatos em ordem cronologica",
+  "facts": {
+    "publicNarrative": "Versão dos fatos que é de conhecimento público ou aceita pelas partes inicialmente",
+    "objectiveTruth": "A VERDADE ABSOLUTA e OCULTA dos fatos. Detalhe exatamente o que aconteceu, quem mentiu, quem é culpado, a intenção real e detalhes que NÃO estão na narrativa pública. Esta seção é secreta e serve apenas para guiar a IA no comportamento dos personagens."
+  },
   "legalBasis": "Fundamentacao legal completa",
   "jurisprudence": "Jurisprudencia relevante",
   "admiteJuri": true ou false
@@ -690,7 +860,15 @@ FORMATO DE RESPOSTA (JSON):
             title: { type: "string", description: "Título do caso" },
             area: { type: "string", description: "Área do direito" },
             description: { type: "string", description: "Resumo do caso" },
-            facts: { type: "string", description: "Fatos detalhados" },
+            facts: {
+              type: "object",
+              properties: {
+                publicNarrative: { type: "string", description: "Narrativa pública dos fatos" },
+                objectiveTruth: { type: "string", description: "Verdade objetiva e oculta" },
+              },
+              required: ["publicNarrative", "objectiveTruth"],
+              additionalProperties: false,
+            },
             legalBasis: { type: "string", description: "Fundamentação legal" },
             jurisprudence: { type: "string", description: "Jurisprudência" },
             admiteJuri: { type: "boolean", description: "Se o caso admite júri popular" },
@@ -711,40 +889,32 @@ FORMATO DE RESPOSTA (JSON):
     title: caseData.title,
     area: caseData.area,
     description: caseData.description,
-    facts: caseData.facts,
+    facts: typeof caseData.facts === 'string' ? { publicNarrative: caseData.facts, objectiveTruth: caseData.facts } : caseData.facts,
     legalBasis: caseData.legalBasis,
     jurisprudence: caseData.jurisprudence,
-    admiteJuri: caseData.admiteJuri,
+    admiteJuri: isSTF ? false : Boolean(caseData.admiteJuri),
     difficulty: selectedDifficulty as "facil" | "medio" | "dificil",
   });
 
-  // Gerar provas para o caso
-  await generateEvidencesForTrial(trialId, caseData);
+  // Gerar provas, documentos, cronologia e audiências em paralelo para máxima velocidade
+  const secondaryTasks: Promise<any>[] = [
+    generateEvidencesForTrial(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar provas:", err)),
+    generateDocumentsForTrial(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar documentos:", err)),
+    generateTimelineAndPoliceReports(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar cronologia:", err)),
+    generateHearingsForTrial(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar histórico de audiências:", err)),
+  ];
 
-  // Gerar documentos para investigação
-  await generateDocumentsForTrial(trialId, caseData);
-
-  // Gerar histórico do veículo se for caso de veículos/sinistros
   if (caseData.area === "veiculos_sinistros") {
-    await generateVehicleHistoryForTrial(trialId, caseData);
+    secondaryTasks.push(
+      generateVehicleHistoryForTrial(trialId, caseData).catch(err => console.error("[AVISO] Falha ao gerar histórico do veículo:", err))
+    );
   }
 
-  // Gerar cronologia para TODOS os casos
-  try {
-    await generateTimelineAndPoliceReports(trialId, caseData);
-  } catch (error) {
-    console.error("[AVISO] Falha ao gerar cronologia, mas caso foi criado:", error);
-  }
-
-  // Gerar histórico de audiências anteriores
-  try {
-    await generateHearingsForTrial(trialId, caseData);
-  } catch (error) {
-    console.error("[AVISO] Falha ao gerar histórico de audiências, mas caso foi criado:", error);
-  }
+  await Promise.allSettled(secondaryTasks);
 
   return {
     id: trialId,
+    trialId,
     ...caseData,
   };
 }
@@ -870,6 +1040,28 @@ function normalizeParticipantText(value: unknown): string {
   return String(value ?? "").trim();
 }
 
+function filterKnowledge(participant: any, trialFacts: any): string {
+  if (!trialFacts) return "Fatos não disponíveis.";
+
+  const role = normalizeParticipantText(participant?.role);
+  const publicNarrative = typeof trialFacts.publicNarrative === 'string'
+    ? trialFacts.publicNarrative
+    : (typeof trialFacts === 'string' ? trialFacts : "");
+
+  const objectiveTruth = typeof trialFacts.objectiveTruth === 'string'
+    ? trialFacts.objectiveTruth
+    : (typeof trialFacts === 'string' ? trialFacts : "");
+
+  // O Juiz, Promotor e Advogado de Defesa NÃO têm acesso automático à verdade objetiva.
+  const knowsTruth = !["juiz", "promotor", "advogado_defesa", "defensor_publico", "assistente_acusacao"].includes(role);
+
+  if (knowsTruth) {
+    return `[VERDADE OBJETIVA - Conhecimento do Personagem]: ${objectiveTruth}\n\n[NARRATIVA PÚBLICA]: ${publicNarrative}`;
+  }
+
+  return `[NARRATIVA PÚBLICA]: ${publicNarrative}`;
+}
+
 function buildParticipantBehaviorContext(
   participant: any,
   messageHistory: any[],
@@ -878,6 +1070,7 @@ function buildParticipantBehaviorContext(
 ): string {
   const participantName =
     normalizeParticipantText(participant?.name) || "Participante";
+
 
   const role =
     normalizeParticipantText(participant?.role) || "participante";
@@ -893,9 +1086,16 @@ function buildParticipantBehaviorContext(
   // Somente falas atribuídas a este personagem.
   // Isso cria uma memória específica do participante sem confundir
   // declarações dos demais personagens com aquilo que ele próprio disse.
+
+  const trialFacts = typeof trial?.facts === 'string'
+    ? { publicNarrative: trial.facts, objectiveTruth: trial.facts }
+    : trial?.facts;
+
+  const factsContext = filterKnowledge(participant, trialFacts);
   const ownMessages = messageHistory
     .filter(
       (message: any) =>
+        participant?.role &&
         message.role === participant.role &&
         message.isAI === true
     )
@@ -993,7 +1193,7 @@ pode interpretá-las de maneira diferente ou até desconhecer alguma delas.
 Título: ${normalizeParticipantText(trial?.title)}
 Área: ${normalizeParticipantText(trial?.area)}
 Descrição: ${normalizeParticipantText(trial?.description)}
-Fatos: ${normalizeParticipantText(trial?.facts)}
+Fatos: ${factsContext}
 `;
 }
 
@@ -1079,7 +1279,7 @@ export const appRouter = router({
     // Gerar um caso jurídico aleatório
     generate: protectedProcedure
       .input(z.object({
-        area: z.enum(["penal", "homicidio", "feminicidio", "latrocinio", "roubo", "furto", "estupro", "sequestro", "extorsao", "trafico_drogas", "corrupcao", "estelionato", "fraude", "apropriacao_indebita", "difamacao", "caluna", "injuria", "lesao_corporal", "criminal", "cdc", "trabalhista", "civil", "veiculos_sinistros", "tributario", "ambiental", "empresarial", "previdenciario", "familia", "administrativo"]).optional(),
+        area: z.enum(["penal", "homicidio", "feminicidio", "latrocinio", "roubo", "furto", "estupro", "sequestro", "extorsao", "trafico_drogas", "corrupcao", "estelionato", "fraude", "apropriacao_indebita", "difamacao", "caluna", "injuria", "lesao_corporal", "criminal", "cdc", "trabalhista", "civil", "veiculos_sinistros", "tributario", "ambiental", "empresarial", "previdenciario", "familia", "administrativo", "stf_constitucional"]).optional(),
         difficulty: z.enum(["facil", "medio", "dificil"]).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -1090,7 +1290,20 @@ export const appRouter = router({
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
-        return await db.getTrialById(input.id);
+        const trial = await db.getTrialById(input.id);
+        if (!trial) return null;
+
+        // Removemos a verdade objetiva antes de enviar para o cliente para evitar vazamento de conhecimento
+        const trialData = typeof trial.facts === 'object'
+          ? { ...trial, facts: { ...trial.facts } }
+          : { ...trial, facts: { publicNarrative: trial.facts, objectiveTruth: trial.facts } };
+
+        const publicTrialData = { ...trialData };
+        if (typeof publicTrialData.facts === 'object') {
+          delete (publicTrialData.facts as any).objectiveTruth;
+        }
+
+        return publicTrialData as any;
       }),
 
     // Buscar cronologia e depoimentos policiais
@@ -1119,21 +1332,51 @@ export const appRouter = router({
     create: protectedProcedure
       .input(z.object({
         trialId: z.number(),
-        userRole: z.enum(["juiz", "advogado_defesa", "defensor_publico", "promotor", "assistente_acusacao", "reu", "vitima", "testemunha", "perito", "jurado"]),
+        userRole: z.enum([
+          "juiz", "advogado_defesa", "defensor_publico", "promotor", "assistente_acusacao",
+          "reu", "vitima", "testemunha", "perito", "jurado", "ministro", "desembargador",
+          "procurador_justica", "subprocurador_geral"
+        ]),
+        userName: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const trial = await db.getTrialById(input.trialId);
+        const isSTF = trial?.area === "stf_constitucional" || input.userRole === "ministro";
+        const instancia = isSTF ? "terceira" : "primeira";
+
+        // Determinar o nome do usuário participante
+        let effectiveUserName = input.userName?.trim();
+        if (effectiveUserName) {
+          if (ctx.user.openId) {
+            await db.updateUserName(ctx.user.openId, effectiveUserName);
+          }
+        } else {
+          if (ctx.user.name && ctx.user.name !== "Usuário Local" && ctx.user.name !== "local-dev-user") {
+            effectiveUserName = ctx.user.name;
+          } else {
+            effectiveUserName = input.userRole === "ministro"
+              ? "Ministro (Você)"
+              : (input.userRole === "juiz" ? "Dr. Juiz de Direito" : "Participante");
+          }
+        }
+
         const sessionId = await db.createSession({
           userId: ctx.user.id,
           trialId: input.trialId,
           userRole: input.userRole,
+          instancia,
           status: "em_andamento",
         });
 
         // Criar mensagem inicial do sistema
+        const roleDisplay = input.userRole === "ministro" ? "Ministro do Supremo Tribunal Federal" : input.userRole.replace("_", " ");
         await db.createMessage({
           sessionId,
           role: "sistema",
-          content: `Bem-vindo ao julgamento! Você foi designado como **${input.userRole.replace("_", " ")}**. O julgamento começará em breve.`,
+          senderName: "Tribunal",
+          content: isSTF
+            ? `🏛️ **Sessão Plenária do Supremo Tribunal Federal (STF)** aberta! Você participa como **${effectiveUserName}** (${roleDisplay}). Os autos estão em pauta para julgamento colegiado perante os 11 Ministros da Suprema Corte.`
+            : `Bem-vindo ao julgamento! Você foi designado como **${effectiveUserName}** (${roleDisplay}). O julgamento começará em breve.`,
           isAI: true,
         });
 
@@ -1141,17 +1384,14 @@ export const appRouter = router({
         await db.createParticipant({
           sessionId,
           role: input.userRole,
-          name: ctx.user.name || "Usuário",
-          description: "Participante principal",
+          name: effectiveUserName,
+          description: input.userRole === "ministro" ? "Ministro da Suprema Corte" : "Participante principal",
           isUser: true,
         });
 
         // Gerar participantes IA
-        const trial = await db.getTrialById(input.trialId);
         if (trial) {
-          await generateParticipantsForSession(sessionId, input.userRole, trial);
-          
-          // Votos do júri só serão gerados quando o juiz solicitar (não automaticamente)
+          await generateParticipantsForSession(sessionId, input.userRole, trial, effectiveUserName);
           
           // Gerar documentos visuais em background (não bloqueia o início da sessão)
           generateVisualDocumentsInBackground(input.trialId, trial).catch(err => {
@@ -1159,7 +1399,7 @@ export const appRouter = router({
           });
         }
 
-        return { id: sessionId };
+        return { id: sessionId, sessionId };
       }),
 
     // Buscar sessão por ID
@@ -1216,7 +1456,7 @@ export const appRouter = router({
 Título: ${trial.title}
 Área: ${trial.area}
 Descrição: ${trial.description}
-Fatos: ${trial.facts}
+Fatos: ${typeof trial.facts === 'object' ? trial.facts.publicNarrative : trial.facts}
 Fundamentação Legal: ${trial.legalBasis}
 Jurisprudência: ${trial.jurisprudence}
 
@@ -1309,6 +1549,13 @@ Responda APENAS com o JSON, sem texto adicional:`;
         if (!trial) throw new Error("Caso não encontrado");
 
         const allMessages = await db.getSessionMessages(input.sessionId);
+
+        // Verificar se houve interação real na audiência (ignorando mensagens de sistema)
+        const realInteractions = allMessages.filter(m => m.role !== 'sistema');
+        if (realInteractions.length === 0) {
+          throw new Error("É necessário realizar a audiência e haver interações entre as partes antes de proferir a sentença final.");
+        }
+
         const evidences = await db.getTrialEvidences(trial.id);
         const documents = await db.getDocuments(trial.id);
         const juryVotes = await db.getJuryVotes(input.sessionId);
@@ -1325,7 +1572,7 @@ Responda APENAS com o JSON, sem texto adicional:`;
 Título: ${trial.title}
 Área: ${trial.area}
 Descrição: ${trial.description}
-Fatos: ${trial.facts}
+Fatos: ${typeof trial.facts === 'object' ? trial.facts.publicNarrative : trial.facts}
 Fundamentação Legal: ${trial.legalBasis}
 Jurisprudência: ${trial.jurisprudence}
 Admite Júri: ${trial.admiteJuri ? 'Sim' : 'Não'}
@@ -1415,7 +1662,7 @@ FORMATO JSON:`;
         const decision = JSON.parse(decisionContent);
 
         // Salvar decisão na sessão
-        await db.updateSessionDecision(input.sessionId, JSON.stringify(decision), "concluido");
+        await db.updateSessionDecision(input.sessionId, JSON.stringify(decision), "sentenciado");
 
         // Adicionar mensagem do sistema orientando os próximos passos
         let proximosPassos = "⚖️ **SENTENÇA PROFERIDA COM SUCESSO!**\n\n";
@@ -1455,10 +1702,15 @@ FORMATO JSON:`;
         if (!session) throw new Error("Sessão não encontrada");
         if (session.userId !== ctx.user.id) throw new Error("Acesso negado");
 
+        const sessionParticipants = await db.getSessionParticipants(input.sessionId);
+        const userParticipant = sessionParticipants.find(p => p.isUser);
+        const userSenderName = userParticipant?.name || ctx.user.name || "Você";
+
         // Salvar mensagem do usuário
         await db.createMessage({
           sessionId: input.sessionId,
           role: session.userRole,
+          senderName: userSenderName,
           content: input.content,
           isAI: false,
         });
@@ -1528,63 +1780,145 @@ Decida AGORA:`;
         // Buscar histórico de mensagens
         const messageHistory = await db.getSessionMessages(input.sessionId);
 
-        // Buscar participantes da sessão
-        const participants = await db.getSessionParticipants(input.sessionId);
+        // Reutilizar participantes já carregados (sessionParticipants, linha 1705)
+        const participants = sessionParticipants;
         const aiParticipants = participants.filter(p => !p.isUser);
 
         // Analisar contexto para decidir QUEM deve falar
         const lastMessages = messageHistory.slice(-5); // Últimas 5 mensagens
         const userMessage = input.content.toLowerCase();
         
+        const isSTF = trial.area === 'stf_constitucional' || session.userRole === 'ministro' || session.instancia === 'terceira';
+
         // Detectar se é pergunta direta a alguém.
         // Primeiro tentamos identificar o participante pelo NOME.
         // Exemplo: "Marcos, o senhor conhecia..." -> testemunha.
         let targetRole: string | null =
           resolveParticipantRole(userMessage, participants);
 
-        // Se não encontrou pelo nome, procurar pelo papel.
+        // Se não encontrou pelo nome, procurar pelo papel / contexto.
         if (!targetRole) {
-          if (
-            userMessage.includes('juiz') ||
-            userMessage.includes('meritíssimo') ||
-            userMessage.includes('excelência')
-          ) {
-            targetRole = 'juiz';
-          } else if (
-            userMessage.includes('promotor') ||
-            userMessage.includes('acusação') ||
-            userMessage.includes('ministério público')
-          ) {
-            targetRole = 'promotor';
-          } else if (
-            userMessage.includes('defesa') ||
-            userMessage.includes('advogado')
-          ) {
-            targetRole = 'advogado_defesa';
-          } else if (userMessage.includes('testemunha')) {
-            targetRole = 'testemunha';
-          } else if (
-            userMessage.includes('perito') ||
-            userMessage.includes('perícia')
-          ) {
-            targetRole = 'perito';
-          } else if (
-            userMessage.includes('réu') ||
-            userMessage.includes('reu') ||
-            userMessage.includes('acusado')
-          ) {
-            targetRole = 'reu';
-          } else if (
-            userMessage.includes('vítima') ||
-            userMessage.includes('vitima') ||
-            userMessage.includes('ofendido')
-          ) {
-            targetRole = 'vitima';
+          if (isSTF) {
+            if (
+              userMessage.includes('pgr') ||
+              userMessage.includes('procurador-geral') ||
+              userMessage.includes('procurador geral') ||
+              userMessage.includes('procurador') ||
+              userMessage.includes('ministério público')
+            ) {
+              targetRole = 'promotor';
+            } else if (
+              userMessage.includes('tribuna') ||
+              userMessage.includes('advogado') ||
+              userMessage.includes('advogada') ||
+              userMessage.includes('requerente') ||
+              userMessage.includes('defesa')
+            ) {
+              targetRole = 'advogado_defesa';
+            } else if (
+              userMessage.includes('agu') ||
+              userMessage.includes('advocacia-geral') ||
+              userMessage.includes('advocacia geral') ||
+              userMessage.includes('requerido') ||
+              userMessage.includes('união')
+            ) {
+              targetRole = 'assistente_acusacao';
+            } else if (
+              userMessage.includes('presidente') ||
+              userMessage.includes('relator') ||
+              userMessage.includes('relatora') ||
+              userMessage.includes('ministro') ||
+              userMessage.includes('ministra') ||
+              userMessage.includes('colega') ||
+              userMessage.includes('vogal') ||
+              userMessage.includes('vista') ||
+              userMessage.includes('aparte') ||
+              userMessage.includes('voto') ||
+              userMessage.includes('divergência') ||
+              userMessage.includes('tese')
+            ) {
+              targetRole = 'ministro';
+            }
+          } else {
+            if (
+              userMessage.includes('juiz') ||
+              userMessage.includes('meritíssimo') ||
+              userMessage.includes('excelência')
+            ) {
+              targetRole = 'juiz';
+            } else if (
+              userMessage.includes('promotor') ||
+              userMessage.includes('acusação') ||
+              userMessage.includes('ministério público')
+            ) {
+              targetRole = 'promotor';
+            } else if (
+              userMessage.includes('defesa') ||
+              userMessage.includes('advogado') ||
+              userMessage.includes('advogada')
+            ) {
+              targetRole = 'advogado_defesa';
+            } else if (userMessage.includes('testemunha')) {
+              targetRole = 'testemunha';
+            } else if (
+              userMessage.includes('perito') ||
+              userMessage.includes('perícia')
+            ) {
+              targetRole = 'perito';
+            } else if (
+              userMessage.includes('réu') ||
+              userMessage.includes('reu') ||
+              userMessage.includes('acusado')
+            ) {
+              targetRole = 'reu';
+            } else if (
+              userMessage.includes('vítima') ||
+              userMessage.includes('vitima') ||
+              userMessage.includes('ofendido')
+            ) {
+              targetRole = 'vitima';
+            }
           }
         }
 
-        // IA decide quem fala baseado no contexto.
-        let nextRole: string = targetRole || 'juiz';
+        // Selecionar o participante de IA adequado que responderá
+        if (aiParticipants.length === 0) {
+          throw new Error("Nenhum participante de IA encontrado nesta sessão.");
+        }
+
+        let speakingParticipant: any = null;
+
+        if (targetRole) {
+          // Se o usuário direcionou a fala para um papel:
+          speakingParticipant = aiParticipants.find(p => p.role === targetRole);
+          if (!speakingParticipant && isSTF && targetRole === 'ministro') {
+            speakingParticipant = aiParticipants.find(p => p.role === 'ministro');
+          }
+        }
+
+        // Se não encontrou ou não direcionou, escolher o interlocutor natural:
+        if (!speakingParticipant) {
+          if (isSTF) {
+            // No STF: se o usuário é ministro, outro ministro da corte (ou PGR/tribuna) responde
+            const outroMinistro = aiParticipants.find(p => p.role === 'ministro');
+            speakingParticipant = outroMinistro || aiParticipants[0];
+          } else if (session.userRole === 'juiz') {
+            // Se o usuário é o Juiz, a resposta vem do Promotor ou da Defesa
+            const promotor = aiParticipants.find(p => p.role === 'promotor');
+            const defesa = aiParticipants.find(p => p.role === 'advogado_defesa');
+            speakingParticipant = promotor || defesa || aiParticipants[0];
+          } else if (session.userRole === 'desembargador') {
+            const outroDes = aiParticipants.find(p => p.role === 'desembargador');
+            speakingParticipant = outroDes || aiParticipants[0];
+          } else {
+            // Partes normais têm sua manifestação acolhida/conduzida pelo Juiz
+            const juiz = aiParticipants.find(p => p.role === 'juiz');
+            speakingParticipant = juiz || aiParticipants[0];
+          }
+        }
+
+        const nextRole: string = speakingParticipant.role;
+        const speakerName = speakingParticipant.name || "Participante";
 
         // Construir contexto para a IA
         const conversationContext = messageHistory
@@ -1598,27 +1932,8 @@ Decida AGORA:`;
         
         let behaviorNote = "";
         if (hasInappropriateLanguage || isDisrespectful) {
-          behaviorNote = "\n\n**ALERTA**: O usuário usou linguagem inapropriada. Como JUIZ, faça uma advertência breve e educada, depois continue o julgamento normalmente.";
-          nextRole = "juiz"; // Forçar juiz a responder em caso de desacato
+          behaviorNote = `\n\n**ALERTA**: O usuário usou linguagem inapropriada. Faça uma advertência breve e educada com autoridade, depois continue os trabalhos normalmente.`;
         }
-        // REMOVIDO: NÃO punir mensagens curtas - usuário pode participar livremente
-        
-        // VERIFICACAO CRITICA: NAO PERMITIR QUE IA FALE PELO PAPEL DO USUARIO
-        console.log(`[DEBUG message.send] nextRole: ${nextRole}, userRole: ${session.userRole}`);
-        if (nextRole === session.userRole) {
-          console.log(
-            `[DEBUG message.send] Próximo papel é o usuário (${session.userRole}). Não gerar fala automática.`
-          );
-
-          return {
-            role: session.userRole,
-            content: null,
-          };
-        }
-        
-        // Buscar nome REAL do participante que vai falar
-        const speakingParticipant = participants.find(p => p.role === nextRole && !p.isUser);
-        const speakerName = speakingParticipant?.name || "[Nome não encontrado]";
 
         const evidences = await db.getTrialEvidences(session.trialId);
 
@@ -1637,7 +1952,6 @@ Decida AGORA:`;
         ).join('\n');
 
         // Identificar o participante do usuário
-        const userParticipant = participants.find(p => p.isUser);
         const userParticipantName = userParticipant?.name || "Usuário";
         
         // Prompt COMPLETAMENTE NOVO para debate REAL
@@ -1654,7 +1968,7 @@ ${participantsList}
 Título: ${trial.title}
 Área: ${trial.area}
 Descrição: ${trial.description}
-Fatos: ${trial.facts}
+Fatos: ${typeof trial.facts === 'object' ? trial.facts.publicNarrative : trial.facts}
 Fundamentação Legal: ${trial.legalBasis}
 Jurisprudência: ${trial.jurisprudence}
 
@@ -1775,6 +2089,10 @@ ${nextRole === 'jurado' ? `**JURADO POPULAR:**
    - Exemplo CORRETO: "Aguardo a manifestação do promotor sobre este ponto."
    - Exemplo ERRADO: "Promotor: Eu concordo com isso. Juiz: Muito bem."
 
+10. **TRATAMENTO DO PARTICIPANTE USUÁRIO**
+   - O participante controlado pelo usuário é: "${userParticipantName}" (${session.userRole.toUpperCase()}).
+   - NUNCA se refira a ele como "Usuário Local" ou "Usuário". Trate-o com o devido decoro pelo seu nome formal: "${userParticipantName}".
+
 Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}), REAGINDO DIRETAMENTE à última mensagem. Lembre-se: APENAS SUA FALA, NÃO fale por outros personagens:`;
 
         const aiResponse = await invokeLLM({
@@ -1784,59 +2102,15 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}), REAGINDO DIRETAM
           ],
         });
 
-        let aiContent = aiResponse.choices[0].message.content;
-        if (typeof aiContent !== 'string') throw new Error('Invalid AI response format');
-        
-        // VALIDAÇÃO CRÍTICA: Detectar se a IA está tentando falar por múltiplos personagens
-        // IMPORTANTE: Apenas cortar se houver LINHA INICIANDO com "Papel:" (diálogo direto)
-        // NÃO cortar se for apenas menção no meio do texto (ex: "o Juiz decidiu...")
-        const multipleRolesPattern = /^\s*(Juiz|Promotor|Advogado|Defensor|Testemunha|Perito|Jurado|Réu|Vítima)\s*:/gim;
-        const lines = aiContent.split('\n');
-        const roleLines = [];
-        
-        for (let i = 0; i < lines.length; i++) {
-          if (lines[i].match(multipleRolesPattern)) {
-            roleLines.push(i);
-          }
-        }
-        
-        // Se houver MAIS DE UMA linha começando com "Papel:", cortar a partir da segunda
-        if (roleLines.length > 1) {
-          console.log(`[AVISO] IA tentou incluir falas de múltiplos personagens. Cortando a partir da linha ${roleLines[1]}...`);
-          const cutLines = lines.slice(0, roleLines[1]);
-          aiContent = cutLines.join('\n').trim();
-          
-          // Se a primeira linha era um "Papel:", remover esse prefixo
-          if (roleLines[0] === 0) {
-            const firstLine = lines[0];
-            const colonIndex = firstLine.indexOf(':');
-            if (colonIndex > 0) {
-              cutLines[0] = firstLine.substring(colonIndex + 1).trim();
-              aiContent = cutLines.join('\n').trim();
-            }
-          }
-        }
-        
-        // VALIDAÇÃO EXTRA: Verificar se a IA mencionou o papel do usuário
-        const userRoleMentions = [
-          session.userRole,
-          session.userRole.replace('_', ' '),
-          userParticipantName
-        ];
-        
-        const mentionsUserRole = userRoleMentions.some(mention => 
-          aiContent.toLowerCase().includes(mention.toLowerCase() + ':')
-        );
-        
-        if (mentionsUserRole) {
-          console.log(`[ERRO CRÍTICO] IA tentou falar pelo usuário! Bloqueando mensagem.`);
-          throw new Error(`A IA tentou responder pelo papel do usuário (${session.userRole}). Por favor, tente novamente.`);
-        }
+        const rawAiContent = aiResponse.choices[0]?.message?.content;
+        if (typeof rawAiContent !== 'string') throw new Error('Invalid AI response format');
+        const aiContent = sanitizeAIResponse(rawAiContent, session.userRole, userParticipantName);
 
         // Salvar resposta da IA
         await db.createMessage({
           sessionId: input.sessionId,
           role: nextRole,
+          senderName: speakerName,
           content: aiContent,
           isAI: true,
         });
@@ -1962,7 +2236,7 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}), REAGINDO DIRETAM
 Título: ${trial.title}
 Área: ${trial.area}
 Descrição: ${trial.description}
-Fatos: ${trial.facts}
+Fatos: ${typeof trial.facts === 'object' ? trial.facts.publicNarrative : trial.facts}
 
 === SEU PERFIL E PERSONALIDADE ===
 Nome: ${targetParticipant.name}
@@ -2134,7 +2408,46 @@ Responda AGORA:`;
         // CORREÇÃO CRÍTICA: Filtrar mensagens do sistema para verificar se há conteúdo real
         const realMessages = messageHistory.filter(m => m.role !== "sistema");
         if (realMessages.length === 0) {
-          throw new Error("Nenhuma mensagem foi enviada ainda. Envie sua primeira mensagem para iniciar o julgamento.");
+          const trial = await db.getTrialById(session.trialId);
+          const isSTF = trial?.area === "stf_constitucional" || session.userRole === "ministro" || session.instancia === "terceira";
+          const sessionParticipants = await db.getSessionParticipants(input.sessionId);
+
+          if (isSTF) {
+            const openerRole = "ministro";
+            const aiMinisters = sessionParticipants.filter(p => !p.isUser && p.role === "ministro");
+            const presidente = aiMinisters.find(p => p.name.includes("Presidente")) || aiMinisters[0];
+            const openerName = presidente?.name || "Ministro Presidente";
+            const openingText = `Declaro aberta a Sessão Plenária do Supremo Tribunal Federal. Em julgamento os autos de "${trial?.title || "ação constitucional"}". Concedo a palavra ao eminente Ministro Relator para a leitura circunstanciada do relatório e resumo da controvérsia.`;
+            const created = await db.createMessage({
+              sessionId: input.sessionId,
+              role: openerRole,
+              senderName: openerName,
+              content: openingText,
+              isAI: true,
+            });
+            return {
+              role: openerRole,
+              content: openingText,
+              messageId: created.id,
+            };
+          } else {
+            const openerRole = session.userRole === "juiz" ? "promotor" : "juiz";
+            const openerPart = sessionParticipants.find(p => !p.isUser && p.role === openerRole);
+            const openerName = openerPart?.name || (openerRole === "juiz" ? "Juiz de Direito" : "Promotor de Justiça");
+            const openingText = `Declaro aberta a audiência de instrução e julgamento do caso "${trial?.title || "em pauta"}". Constate-se a presença das partes, seus procuradores e testemunhas. Passo a palavra para o início dos trabalhos.`;
+            const created = await db.createMessage({
+              sessionId: input.sessionId,
+              role: openerRole,
+              senderName: openerName,
+              content: openingText,
+              isAI: true,
+            });
+            return {
+              role: openerRole,
+              content: openingText,
+              messageId: created.id,
+            };
+          }
         }
 
         // Buscar informações do caso
@@ -2151,111 +2464,156 @@ Responda AGORA:`;
 
         const evidences = await db.getTrialEvidences(session.trialId);
 
+        const isSTF = trial?.area === "stf_constitucional" || session.userRole === "ministro" || session.instancia === "terceira";
+        const aiParticipants = participants.filter(p => !p.isUser);
+        const userParticipant = participants.find(p => p.isUser);
+
+        if (aiParticipants.length === 0) {
+          throw new Error("Nenhum participante de IA encontrado nesta sessão.");
+        }
+
         const directorPrompt = buildHearingDirectorPrompt({
           trial,
           participants,
           messages: messageHistory,
           evidences,
           userRole: session.userRole,
-          userName: participants.find(p => p.isUser)?.name || "Usuário",
+          userName: userParticipant?.name || "Usuário",
         });
 
-        const directorResponse = await invokeLLM({
-          messages: [
-            {
-              role: "system",
-              content: "Você é o diretor de uma audiência judicial brasileira. Decida o próximo acontecimento com base no contexto.",
+        let directorDecision: HearingDirectorDecision;
+        try {
+          const directorResponse = await invokeLLM({
+            messages: [
+              {
+                role: "system",
+                content: "Você é o diretor de uma audiência judicial brasileira. Decida o próximo acontecimento com base no contexto. Responda estritamente em JSON.",
+              },
+              { role: "user", content: directorPrompt },
+            ],
+            response_format: {
+              type: "json_schema",
+              json_schema: {
+                name: "decisao_diretor",
+                strict: true,
+                schema: {
+                  type: "object",
+                  properties: {
+                    action: {
+                      type: "string",
+                      enum: [
+                        "fala",
+                        "pergunta",
+                        "objecao",
+                        "interrupcao",
+                        "reacao",
+                        "passar_palavra",
+                        "silencio",
+                        "encerramento",
+                        "sentenca",
+                      ],
+                    },
+                    speakerRole: { type: "string" },
+                    targetRole: { type: "string" },
+                    content: { type: "string" },
+                  },
+                  required: ["action", "speakerRole", "targetRole", "content"],
+                  additionalProperties: false,
+                },
+              },
             },
-            { role: "user", content: directorPrompt },
-          ],
-        });
+          });
 
-        const directorContent =
-          typeof directorResponse.choices[0].message.content === "string"
-            ? directorResponse.choices[0].message.content
-            : directorResponse.choices[0].message.content
-                .filter((item: any) => item?.type === "text")
-                .map((item: any) => item?.text ?? "")
-                .join("\n");
+          const directorRaw = directorResponse?.choices?.[0]?.message?.content;
+          const directorContent =
+            typeof directorRaw === "string"
+              ? directorRaw
+              : Array.isArray(directorRaw)
+                ? directorRaw
+                    .filter((item: any) => item?.type === "text")
+                    .map((item: any) => item?.text ?? "")
+                    .join("\n")
+                : String(directorRaw ?? "");
 
-        const directorDecision =
-          parseHearingDirectorDecision(directorContent);
+          directorDecision = parseHearingDirectorDecision(directorContent);
+        } catch (error) {
+          console.warn("[continuar] Falha ao consultar Diretor de Audiência, usando fallback:", error);
+          directorDecision = {
+            action: "fala",
+            speakerRole: null,
+            targetRole: null,
+            content: "Prosseguir com o julgamento.",
+          };
+        }
 
         console.log(
           `[DEBUG Diretor] ação=${directorDecision.action}, speaker=${directorDecision.speakerRole || "nenhum"}, target=${directorDecision.targetRole || "nenhum"}`
         );
 
         if (directorDecision.action === "silencio") {
-          console.log("[DEBUG Diretor] Nenhum novo acontecimento plausível.");
-          return { role: null, content: null };
+          console.log("[DEBUG Diretor] Silêncio temporário no tribunal.");
         }
 
-        // ============================================================
-        // AUTONOMIA DO USUÁRIO
-        // ============================================================
-        //
-        // "usuario" indica apenas que o Diretor considera plausível
-        // uma manifestação do usuário neste momento.
-        //
-        // O usuário NÃO é obrigado a falar.
-        // Não criamos uma fala artificial de outro personagem.
-        // Não interrompemos a audiência obrigatoriamente.
-        //
-        // Se o usuário não falar e clicar novamente em Continuar,
-        // o Diretor poderá escolher outro acontecimento.
-        // ============================================================
+        const candidateTarget = directorDecision.action === "passar_palavra"
+          ? (directorDecision.targetRole || directorDecision.speakerRole)
+          : (directorDecision.speakerRole || directorDecision.targetRole);
 
-        const nextRole = directorDecision.speakerRole;
-
-        if (!nextRole) {
-          throw new Error("O Diretor não informou quem executará a ação.");
-        }
-
-        const speakingParticipant = participants.find(
-          p => p.role === nextRole && !p.isUser
+        // Verificar se a palavra foi expressamente concedida ao usuário humano:
+        const userExplicitlyTargeted = directorDecision.action === "passar_palavra" && (
+          candidateTarget === "usuario" ||
+          (userParticipant && candidateTarget === userParticipant.name) ||
+          (!isSTF && candidateTarget === session.userRole)
         );
 
+        if (userExplicitlyTargeted) {
+          console.log(`[DEBUG Diretor] Palavra concedida ao usuário (${session.userRole}). Aguardando manifestação voluntária.`);
+          return {
+            role: session.userRole,
+            content: null,
+            waitingForUser: true,
+            voluntaryUserOpportunity: true,
+          };
+        }
+
+        // Selecionar o participante de IA que se manifestará:
+        let speakingParticipant: any = null;
+
+        if (candidateTarget && candidateTarget !== "usuario") {
+          // Busca participante de IA pelo papel
+          speakingParticipant = aiParticipants.find(p => p.role === candidateTarget);
+          // Ou pelo nome
+          if (!speakingParticipant) {
+            speakingParticipant = aiParticipants.find(p =>
+              p.name.toLowerCase().includes(candidateTarget.toLowerCase())
+            );
+          }
+        }
+
+        // Fallback: se não encontrou ou o papel indicado é o do usuário e não há múltiplos participantes com esse papel:
         if (!speakingParticipant) {
-          throw new Error(`O Diretor escolheu um participante inválido: ${nextRole}`);
+          if (isSTF) {
+            // No STF, priorizar Ministros de IA (Relator, Presidente, Vogal), PGR ou Advogado da Tribuna
+            const aiMinisters = aiParticipants.filter(p => p.role === "ministro");
+            const relator = aiMinisters.find(p => p.name.toLowerCase().includes('relator'));
+            speakingParticipant = relator || (aiMinisters.length > 0
+              ? aiMinisters[Math.floor(Math.random() * aiMinisters.length)]
+              : aiParticipants[0]);
+          } else if (session.userRole === "juiz") {
+            // Em 1ª instância, se o usuário é Juiz, quem deve falar é o Promotor ou a Defesa
+            const promotor = aiParticipants.find(p => p.role === "promotor");
+            const defesa = aiParticipants.find(p => p.role === "advogado_defesa");
+            speakingParticipant = promotor || defesa || aiParticipants[0];
+          } else {
+            // Caso padrão: o Juiz de IA conduz a audiência
+            const juiz = aiParticipants.find(p => p.role === "juiz");
+            speakingParticipant = juiz || aiParticipants[0];
+          }
         }
 
-        if (speakingParticipant.role === session.userRole || speakingParticipant.isUser) {
-          console.log(
-            `[DEBUG Diretor] O usuário foi selecionado como participante do evento. A IA não falará por ele.`
-          );
+        const nextRole = speakingParticipant.role;
+        const speakerName = speakingParticipant.name || "Participante";
 
-          return {
-            role: session.userRole,
-            content: null,
-            waitingForUser: false,
-            voluntaryUserOpportunity: true,
-          };
-        }
-
-        console.log(
-          `[DEBUG continuar] Próximo acontecimento: ${directorDecision.action}`
-        );
-        console.log(
-          `[DEBUG continuar] Personagem escolhido pelo Diretor: ${nextRole}`
-        );
-
-        // VERIFICACAO CRITICA: NAO PERMITIR QUE IA FALE PELO PAPEL DO USUARIO
-        console.log(`[DEBUG continuar] nextRole: ${nextRole}, userRole: ${session.userRole}`);
-        if (nextRole === session.userRole) {
-          console.log(
-            `[DEBUG continuar] O Diretor selecionou o usuário. Nenhuma fala será inventada.`
-          );
-
-          return {
-            role: session.userRole,
-            content: null,
-            waitingForUser: false,
-            voluntaryUserOpportunity: true,
-          };
-        }
-
-        // Buscar nome REAL do participante que vai falar
-        const speakerName = speakingParticipant?.name || "[Nome não encontrado]";
+        console.log(`[DEBUG continuar] Personagem IA selecionado: ${speakerName} (${nextRole})`);
 
 
         const participantBehaviorContext =
@@ -2273,7 +2631,6 @@ Responda AGORA:`;
         ).join('\n');
         
         // Identificar o participante do usuário
-        const userParticipant = participants.find(p => p.isUser);
         const userParticipantName = userParticipant?.name || "Usuário";
 
         // Gerar resposta da IA (reutilizar lógica do message.send)
@@ -2284,13 +2641,13 @@ Responda AGORA:`;
 
         // DETECTAR SE O JULGAMENTO DEVE SER CONCLUÍDO
         const shouldConclude = session.status === 'concluido' || 
-                              realMessages.length > 15 && // Pelo menos 15 mensagens trocadas
-                              (lastMessage.content.toLowerCase().includes('encerrar') ||
+                              (realMessages.length > 15 && (
+                               lastMessage.content.toLowerCase().includes('encerrar') ||
                                lastMessage.content.toLowerCase().includes('concluir') ||
                                lastMessage.content.toLowerCase().includes('sentenca') ||
                                lastMessage.content.toLowerCase().includes('sentença') ||
                                lastMessage.content.toLowerCase().includes('veredicto') ||
-                               lastMessage.content.toLowerCase().includes('decisão final'));
+                               lastMessage.content.toLowerCase().includes('decisão final')));
 
         let aiPrompt = '';
         
@@ -2302,7 +2659,7 @@ Responda AGORA:`;
 Título: ${trial.title}
 Área: ${trial.area}
 Descrição: ${trial.description}
-Fatos: ${trial.facts}
+Fatos: ${typeof trial.facts === 'object' ? trial.facts.publicNarrative : trial.facts}
 
 === HISTÓRICO COMPLETO DO JULGAMENTO ===
 ${conversationContext}
@@ -2364,7 +2721,7 @@ ${participantsList}
 Título: ${trial.title}
 Área: ${trial.area}
 Descrição: ${trial.description}
-Fatos: ${trial.facts}
+Fatos: ${typeof trial.facts === 'object' ? trial.facts.publicNarrative : trial.facts}
 
 === HISTÓRICO COMPLETO DO JULGAMENTO ===
 ${conversationContext}
@@ -2405,56 +2762,11 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}). Lembre-se: APENA
           ],
         });
 
-        let aiContent = aiResponse.choices[0].message.content;
-        if (typeof aiContent !== 'string') {
+        const rawAiContent = aiResponse.choices[0]?.message?.content;
+        if (typeof rawAiContent !== 'string') {
           throw new Error("Resposta inválida da IA");
         }
-        
-        // VALIDAÇÃO CRÍTICA: Detectar se a IA está tentando falar por múltiplos personagens
-        // IMPORTANTE: Apenas cortar se houver LINHA INICIANDO com "Papel:" (diálogo direto)
-        // NÃO cortar se for apenas menção no meio do texto (ex: "o Juiz decidiu...")
-        const multipleRolesPattern = /^\s*(Juiz|Promotor|Advogado|Defensor|Testemunha|Perito|Jurado|Réu|Vítima)\s*:/gim;
-        const lines = aiContent.split('\n');
-        const roleLines = [];
-        
-        for (let i = 0; i < lines.length; i++) {
-          if (lines[i].match(multipleRolesPattern)) {
-            roleLines.push(i);
-          }
-        }
-        
-        // Se houver MAIS DE UMA linha começando com "Papel:", cortar a partir da segunda
-        if (roleLines.length > 1) {
-          console.log(`[AVISO continuar] IA tentou incluir falas de múltiplos personagens. Cortando a partir da linha ${roleLines[1]}...`);
-          const cutLines = lines.slice(0, roleLines[1]);
-          aiContent = cutLines.join('\n').trim();
-          
-          // Se a primeira linha era um "Papel:", remover esse prefixo
-          if (roleLines[0] === 0) {
-            const firstLine = lines[0];
-            const colonIndex = firstLine.indexOf(':');
-            if (colonIndex > 0) {
-              cutLines[0] = firstLine.substring(colonIndex + 1).trim();
-              aiContent = cutLines.join('\n').trim();
-            }
-          }
-        }
-        
-        // VALIDAÇÃO EXTRA: Verificar se a IA mencionou o papel do usuário
-        const userRoleMentions = [
-          session.userRole,
-          session.userRole.replace('_', ' '),
-          userParticipantName
-        ];
-        
-        const mentionsUserRole = userRoleMentions.some(mention => 
-          aiContent.toLowerCase().includes(mention.toLowerCase() + ':')
-        );
-        
-        if (mentionsUserRole) {
-          console.log(`[ERRO CRÍTICO continuar] IA tentou falar pelo usuário! Bloqueando mensagem.`);
-          throw new Error(`A IA tentou responder pelo papel do usuário (${session.userRole}). Por favor, tente novamente.`);
-        }
+        const aiContent = sanitizeAIResponse(rawAiContent, session.userRole, userParticipantName);
 
         // PROTEÇÃO CONTRA DUPLICAÇÃO: Verificar se última mensagem é idêntica
         const lastMessageInDb = messageHistory[messageHistory.length - 1];
@@ -2858,7 +3170,7 @@ A ementa deve ser concisa (3-5 linhas), técnica e seguir o padrão dos tribunai
           
           await db.createMessage({
             sessionId: newSessionId!, role: "sistema",
-            content: `**${instanciaNome} - ${tribunalNome.toUpperCase()}**\n\nO recurso de ${appeal.tipo} foi **${decisaoFinal.toUpperCase()}** pelos ${julgadoresNome}.\n\n**Ementa do Acórdão:**\n${ementa}\n\n**Votos:**\n${votos.map(v => `- **${v.nome}** (${v.cargo}): ${v.voto.toUpperCase()}\n  ${v.fundamentacao.substring(0, 200)}...`).join("\n\n")}\n\n---\n\nO julgamento agora prossegue em ${proximaInstancia} instância com os ${julgadoresNome}. Você continua como **${session.userRole}**.`,
+            content: `**${instanciaNome} - ${tribunalNome.toUpperCase()}**\n\nO recurso de ${appeal.tipo} foi **${decisaoFinal.toUpperCase()}** pelos ${julgadoresNome}.\n\n**Ementa do Acórdão:**\n${ementa}\n\n**Votos:**\n${votos.map(v => `- **${v.nome}** (${v.cargo}): ${v.voto.toUpperCase()}\n  ${v.fundamentacao}`).join("\n\n")}\n\n---\n\nO julgamento agora prossegue em ${proximaInstancia} instância com os ${julgadoresNome}. Você continua como **${session.userRole}**.`,
             isAI: true,
           });
         }
@@ -2898,10 +3210,11 @@ A ementa deve ser concisa (3-5 linhas), técnica e seguir o padrão dos tribunai
         if (!room) throw new Error('Sala não encontrada');
         if (room.status !== 'aguardando') throw new Error('Sala já iniciou ou foi concluída');
         
-        const players = await db.getRoomPlayers(room.id);
-        if (players.length >= room.maxPlayers) throw new Error('Sala está cheia');
+        const currentPlayers = await db.getRoomPlayers(room.id);
+        if (currentPlayers.length >= room.maxPlayers) throw new Error('Sala está cheia');
         
         await db.addPlayerToRoom(room.id, ctx.user.id, ctx.user.name || 'Jogador');
+        const players = await db.getRoomPlayers(room.id);
         return { room, players };
       }),
 

@@ -3,13 +3,14 @@ import { manusProvider } from "./providers/manus";
 import { geminiProvider } from "./providers/gemini";
 import { ollamaProvider } from "./providers/ollama";
 import { openAIProvider } from "./providers/openai";
+import { openRouterProvider } from "./providers/openrouter";
 import type { AIProvider, AIProviderId, AIRequest, AIResponse } from "./types";
 
-const providers: AIProvider[] = [ollamaProvider, geminiProvider, openAIProvider, manusProvider];
+const providers: AIProvider[] = [openRouterProvider, geminiProvider, ollamaProvider, openAIProvider, manusProvider];
 
 function preferredProvider(): AIProviderId | "auto" {
   const value = process.env.AI_PROVIDER?.trim().toLowerCase();
-  if (value === "gemini" || value === "openai" || value === "manus") return value;
+  if (value === "openrouter" || value === "ollama" || value === "gemini" || value === "openai" || value === "manus") return value;
   return "auto";
 }
 
@@ -49,9 +50,12 @@ export async function invokeWithAIRouter(params: AIRequest): Promise<AIResponse>
       });
 
       errors.push(`${provider.name}: ${providerError.message}`);
-      console.error(`[AI Router] ${provider.name} falhou`, providerError);
+      console.error(`[AI Router] ${provider.name} falhou: ${providerError.message}`);
 
-      if (!providerError.retryable) throw providerError;
+      const nextProvider = candidates[candidates.indexOf(provider) + 1];
+      if (nextProvider) {
+        console.log(`[AI Router] Fallback para ${nextProvider.name}`);
+      }
     }
   }
 
@@ -60,6 +64,6 @@ export async function invokeWithAIRouter(params: AIRequest): Promise<AIResponse>
   }
 
   throw new Error(
-    "Nenhum provedor de IA está configurado. Configure GEMINI_API_KEY, OPENAI_API_KEY ou BUILT_IN_FORGE_API_KEY.",
+    "Nenhum provedor de IA está configurado. Configure OPENROUTER_API_KEY, OLLAMA_API_KEY, GEMINI_API_KEY, OPENAI_API_KEY ou BUILT_IN_FORGE_API_KEY.",
   );
 }

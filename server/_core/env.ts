@@ -1,6 +1,8 @@
 import "dotenv/config";
 
 export const ENV = {
+  openRouterApiKey: process.env.OPENROUTER_API_KEY ?? "",
+  openRouterModel: process.env.OPENROUTER_MODEL ?? "nvidia/nemotron-3.5-lightning:free",
   ollamaBaseUrl: process.env.OLLAMA_BASE_URL ?? "https://ollama.com",
   ollamaApiKey: process.env.OLLAMA_API_KEY ?? "",
   ollamaModel: process.env.OLLAMA_MODEL ?? "gemma4:31b-cloud",
@@ -16,6 +18,6 @@ export const ENV = {
   localAuth: process.env.LOCAL_AUTH === "true",
   openAIModel: process.env.OPENAI_MODEL ?? "gpt-4o",
   geminiApiKey: process.env.GEMINI_API_KEY ?? "",
-  geminiModel: process.env.GEMINI_MODEL ?? "gemini-3.6-flash",
+  geminiModel: process.env.GEMINI_MODEL ?? "gemini-3.5-flash-lite",
   manusModel: process.env.MANUS_MODEL ?? "gemini-2.5-flash",
 };

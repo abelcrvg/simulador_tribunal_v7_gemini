@@ -7,7 +7,7 @@ import type {
   OutputSchema,
 } from "../_core/llm";
 
-export type AIProviderId = "gemini" | "openai" | "manus";
+export type AIProviderId = "openrouter" | "ollama" | "gemini" | "openai" | "manus";
 
 export type AIRequest = InvokeParams;
 export type AIResponse = InvokeResult;

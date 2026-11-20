@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Scale, Loader2, ArrowLeft, Send, Info, FileText, Users, Car, FileStack, Gavel, MessageSquareText, Hammer, PlayCircle, Clock, ChevronRight } from "lucide-react";
+import { Scale, Loader2, ArrowLeft, Send, Info, FileText, Users, Car, FileStack, Gavel, MessageSquareText, Hammer, PlayCircle, Clock, ChevronRight, Menu } from "lucide-react";
 import { APP_TITLE, getLoginUrl } from "@/const";
 import { Link, useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -20,7 +20,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import HearingHistoryView from "@/components/HearingHistoryView";
 import FinalDecisionView from "@/components/FinalDecisionView";
 import { ThemeSelector } from "@/components/ThemeSelector";
-import VoiceRecorder from "@/components/VoiceRecorder";
+
 
 // Componente auxiliar para solicitar votação do júri
 function SolicitarVotacaoButton({ sessionId }: { sessionId: number }) {
@@ -35,9 +35,9 @@ function SolicitarVotacaoButton({ sessionId }: { sessionId: number }) {
   });
 
   return (
-    <Button 
-      variant="default" 
-      size="sm" 
+    <Button
+      variant="default"
+      size="sm"
       className="gap-2 min-h-[44px] text-sm md:text-base px-4 bg-amber-600 hover:bg-amber-700"
       onClick={() => solicitarVotacao.mutate({ sessionId })}
       disabled={solicitarVotacao.isPending}
@@ -56,7 +56,7 @@ function InterporRecursoForm({ sessionId }: { sessionId: number }) {
   const [tipo, setTipo] = useState<"apelacao" | "agravo" | "embargos">("apelacao");
   const [razoes, setRazoes] = useState("");
   const [recorrente, setRecorrente] = useState("");
-  
+
   const interporRecurso = trpc.appeal.create.useMutation({
     onSuccess: () => {
       alert('✅ Recurso interposto com sucesso! Aguarde o julgamento do tribunal.');
@@ -84,8 +84,8 @@ function InterporRecursoForm({ sessionId }: { sessionId: number }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-semibold mb-2">Quem está recorrendo?</label>
-        <select 
-          value={recorrente} 
+        <select
+          value={recorrente}
           onChange={(e) => setRecorrente(e.target.value)}
           className="w-full p-2 border rounded"
           required
@@ -98,8 +98,8 @@ function InterporRecursoForm({ sessionId }: { sessionId: number }) {
 
       <div>
         <label className="block text-sm font-semibold mb-2">Tipo de Recurso</label>
-        <select 
-          value={tipo} 
+        <select
+          value={tipo}
           onChange={(e) => setTipo(e.target.value as any)}
           className="w-full p-2 border rounded"
         >
@@ -130,9 +130,9 @@ function InterporRecursoForm({ sessionId }: { sessionId: number }) {
         </p>
       </div>
 
-      <Button 
-        type="submit" 
-        className="w-full" 
+      <Button
+        type="submit"
+        className="w-full"
         disabled={interporRecurso.isPending}
       >
         {interporRecurso.isPending ? (
@@ -152,7 +152,7 @@ function AcordaoView({ sessionId }: { sessionId: number }) {
     { appealId: appeal?.id || 0 },
     { enabled: !!appeal?.id }
   );
-  
+
   const julgarRecurso = trpc.appeal.judge.useMutation({
     onSuccess: (data) => {
       if (data.newSessionId) {
@@ -181,7 +181,7 @@ function AcordaoView({ sessionId }: { sessionId: number }) {
   }
 
   return (
-    <ScrollArea className="max-h-[60vh] pr-4">
+    <ScrollArea className="max-h-[80vh] pr-4">
       <div className="space-y-6">
         {/* Informações do Recurso */}
         <div className="bg-orange-50 dark:bg-orange-950/30 p-4 rounded-lg border-l-4 border-orange-500">
@@ -201,7 +201,7 @@ function AcordaoView({ sessionId }: { sessionId: number }) {
 
         {/* Botão para Julgar Recurso (se ainda não foi julgado) */}
         {appeal.status === "pendente" && (
-          <Button 
+          <Button
             onClick={() => julgarRecurso.mutate({ appealId: appeal.id })}
             className="w-full bg-blue-600 hover:bg-blue-700"
             disabled={julgarRecurso.isPending}
@@ -239,7 +239,36 @@ function AcordaoView({ sessionId }: { sessionId: number }) {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm font-semibold text-muted-foreground mb-2">Fundamentação:</p>
-                    <p className="text-sm whitespace-pre-wrap">{judge.fundamentacao}</p>
+                    <div className="space-y-3">
+                      <p className="text-sm whitespace-pre-wrap line-clamp-3">{judge.fundamentacao}</p>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-primary hover:text-primary-foreground hover:bg-primary">
+                            Ver Fundamentação Completa
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="w-[95vw] max-w-3xl max-h-[85vh] sm:max-h-[80vh]">
+                          <DialogHeader>
+                            <DialogTitle>{judge.nome}</DialogTitle>
+                            <DialogDescription className="flex items-center gap-2">
+                              {judge.cargo} •
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                judge.voto === 'manter' ? 'bg-green-100 text-green-800' :
+                                judge.voto === 'reformar' ? 'bg-orange-100 text-orange-800' :
+                                'bg-red-100 text-red-800'
+                              }`}>
+                                {judge.voto.toUpperCase()}
+                              </span>
+                            </DialogDescription>
+                          </DialogHeader>
+                          <ScrollArea className="max-h-[60vh] pr-4">
+                            <div className="bg-muted/50 p-4 rounded-lg border">
+                              <pre className="text-sm whitespace-pre-wrap font-sans">{judge.fundamentacao}</pre>
+                            </div>
+                          </ScrollArea>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -383,16 +412,14 @@ function DocumentosVisuaisGallery({ trialId }: { trialId: number }) {
 
 // Componente para mostrar link para sessão de instância superior
 function InstanciaSuperiorLink({ sessionId }: { sessionId: number }) {
-  // Sempre chamar hooks na mesma ordem, sem condições
-  const { data: session } = trpc.session.get.useQuery({ id: sessionId });
+  const { data: session } = trpc.session.getById.useQuery({ id: sessionId });
   const { data: childSessions } = trpc.session.getChildSessions.useQuery(
     { parentSessionId: sessionId },
     { enabled: !!sessionId }
   );
-  
-  // Retornar null após todos os hooks serem chamados
+
   if (!session || !childSessions || childSessions.length === 0) return null;
-  
+
   return (
     <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border-2 border-blue-500">
       <h4 className="font-semibold text-lg mb-3 text-blue-600 dark:text-blue-400">
@@ -426,18 +453,12 @@ function InstanciaSuperiorLink({ sessionId }: { sessionId: number }) {
 
 // Componente para mostrar resumo da instância anterior
 function ResumoInstanciaAnterior({ appealId, instancia }: { appealId: number; instancia: string }) {
-  const { data: appeal, isLoading } = trpc.appeal.get.useQuery(
-    { sessionId: 0 }, // Não usado, vamos buscar por appealId diretamente
-    { enabled: false }
-  );
-
-  // Buscar recurso por ID usando uma query customizada
   const { data: appealData } = trpc.appeal.getById.useQuery(
     { appealId },
     { enabled: !!appealId }
   );
 
-  if (isLoading || !appealData) {
+  if (!appealData) {
     return null;
   }
 
@@ -461,7 +482,7 @@ function ResumoInstanciaAnterior({ appealId, instancia }: { appealId: number; in
           <p className="text-sm font-semibold text-muted-foreground mb-1">Decisão Anterior:</p>
           <p className="text-sm font-bold">{decisaoLabel[appealData.decisao as keyof typeof decisaoLabel]}</p>
         </div>
-        
+
         <div>
           <p className="text-sm font-semibold text-muted-foreground mb-1">Tipo de Recurso:</p>
           <p className="text-sm">{appealData.tipo.charAt(0).toUpperCase() + appealData.tipo.slice(1)}</p>
@@ -471,7 +492,7 @@ function ResumoInstanciaAnterior({ appealId, instancia }: { appealId: number; in
           <p className="text-sm font-semibold text-muted-foreground mb-1">Recorrente:</p>
           <p className="text-sm">{appealData.recorrente.charAt(0).toUpperCase() + appealData.recorrente.slice(1)}</p>
         </div>
-        
+
         <div>
           <p className="text-sm font-semibold text-muted-foreground mb-2">Razões do Recurso:</p>
           <p className="text-sm bg-white dark:bg-gray-800 p-3 rounded-lg border border-blue-200 dark:border-blue-800 whitespace-pre-wrap">
@@ -627,13 +648,12 @@ const roleLabels: Record<string, string> = {
   perito: "Perito",
   jurado: "Jurado Popular",
   desembargador: "Desembargador",
-  ministro: "Ministro",
+  ministro: "Ministro do STF",
   procurador_justica: "Procurador de Justiça",
   subprocurador_geral: "Subprocurador-Geral",
   sistema: "Sistema",
 };
 
-// Cores e estilos únicos para cada papel
 const roleStyles: Record<string, { bg: string; border: string; text: string; badge: string }> = {
   juiz: {
     bg: "bg-amber-50 dark:bg-amber-950",
@@ -669,7 +689,7 @@ const roleStyles: Record<string, { bg: string; border: string; text: string; bad
     bg: "bg-purple-50 dark:bg-purple-950",
     border: "border-purple-300 dark:border-purple-700",
     text: "text-purple-900 dark:text-purple-100",
-    badge: "bg-purple-200 dark:bg-purple-800 text-purple-900 dark:text-purple-100",
+    badge: "bg-purple-200 dark:bg-purple-950 text-purple-900 dark:text-purple-100",
   },
   vitima: {
     bg: "bg-pink-50 dark:bg-pink-950",
@@ -733,13 +753,17 @@ export default function Trial() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [, navigate] = useLocation();
   const [message, setMessage] = useState("");
-  const [voiceMode, setVoiceMode] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: session, isLoading: sessionLoading } = trpc.session.getById.useQuery(
     { id: sessionId },
-    { enabled: !!sessionId && isAuthenticated }
+    {
+      enabled: !!sessionId && isAuthenticated,
+      refetchInterval: (query) =>
+        query.state.data?.status === 'em_andamento' ? 5000 : false,
+    }
   );
 
   const { data: trial, isLoading: trialLoading } = trpc.trial.getById.useQuery(
@@ -749,9 +773,9 @@ export default function Trial() {
 
   const { data: messages, refetch: refetchMessages } = trpc.message.list.useQuery(
     { sessionId },
-    { 
+    {
       enabled: !!sessionId && isAuthenticated,
-      refetchInterval: false, // Usuário controla ritmo com botão "Continuar Julgamento"
+      refetchInterval: false,
     }
   );
 
@@ -801,7 +825,7 @@ export default function Trial() {
 
   const handleSendMessage = async () => {
     if (!message.trim() || isSending) return;
-    
+
     setIsSending(true);
     sendMutation.mutate({
       sessionId,
@@ -830,23 +854,20 @@ export default function Trial() {
       console.error("Erro ao continuar julgamento:", error);
       const errorMessage = error.message || "Erro ao continuar julgamento. Tente novamente.";
       alert(errorMessage);
-      refetchMessages(); // Atualizar mensagens mesmo em caso de erro
+      refetchMessages();
     },
   });
 
-  // Debounce para evitar cliques múltiplos rápidos
   const [isDebouncing, setIsDebouncing] = useState(false);
-  
+
   const handleContinuarJulgamento = () => {
     if (isDebouncing || continuarJulgamento.isPending) {
-      console.log("[DEBUG] Clique ignorado - debounce ativo ou requisição em andamento");
       return;
     }
-    
+
     setIsDebouncing(true);
     continuarJulgamento.mutate({ sessionId });
-    
-    // Liberar após 2 segundos
+
     setTimeout(() => {
       setIsDebouncing(false);
     }, 2000);
@@ -907,689 +928,531 @@ export default function Trial() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Scale className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-            <div>
+    <div className="h-[100dvh] flex flex-col overflow-hidden">
+      {/* Header Compacto */}
+      <header className="border-b bg-card shrink-0 p-3">
+        <div className="container mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Scale className="h-5 w-5 text-primary shrink-0" />
+            <div className="truncate">
               <div className="flex items-center gap-2">
-                <h1 className="text-lg sm:text-xl font-bold">{APP_TITLE}</h1>
-                {/* Badge de Instância */}
-                {session.instancia === 'segunda' && (
-                  <span className="px-2 py-0.5 text-xs font-bold bg-blue-500 text-white rounded-full">
-                    2ª Instância
-                  </span>
-                )}
-                {session.instancia === 'terceira' && (
-                  <span className="px-2 py-0.5 text-xs font-bold bg-purple-500 text-white rounded-full">
-                    3ª Instância
-                  </span>
-                )}
-                {(!session.instancia || session.instancia === 'primeira') && (
-                  <span className="px-2 py-0.5 text-xs font-bold bg-green-500 text-white rounded-full">
-                    1ª Instância
-                  </span>
-                )}
+                <h1 className="text-sm sm:text-base font-bold truncate">{APP_TITLE}</h1>
+                <span className={`px-2 py-0.5 text-[10px] font-bold text-white rounded-full ${
+                  session.instancia === 'terceira' || trial?.area === 'stf_constitucional'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 shadow-sm'
+                    : session.instancia === 'segunda'
+                    ? 'bg-blue-500'
+                    : 'bg-green-600'
+                }`}>
+                  {session.instancia === 'terceira' || trial?.area === 'stf_constitucional'
+                    ? '🏛️ STF Plenário'
+                    : session.instancia === 'segunda'
+                    ? '2ª Instância'
+                    : '1ª Instância'}
+                </span>
               </div>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Você é: <span className="font-semibold text-foreground">{roleLabels[session.userRole]}</span>
+              <p className="text-[10px] text-muted-foreground truncate">
+                Você: <span className="font-semibold text-foreground">{roleLabels[session.userRole]}</span>
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 md:gap-2 items-center">
+          <div className="flex items-center gap-2">
             <ThemeSelector />
-            
-            {/* Botão Ver Documentos Visuais */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <Menu className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Menu Secundário (Drawer/Dropdown) */}
+      {isMenuOpen && (
+        <div className="absolute top-12 right-3 z-50 w-64 bg-card border rounded-lg shadow-xl p-4 space-y-3 animate-in slide-in-from-top-2">
+          <div className="text-xs font-bold text-muted-foreground uppercase mb-2">Opções do Julgamento</div>
+          <div className="grid grid-cols-1 gap-2">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 min-h-[44px] text-sm md:text-base px-4">
-                  <FileStack className="h-4 w-4" /> <span className="hidden sm:inline">Ver Documentos</span><span className="sm:hidden">Docs</span>
+                <Button variant="ghost" size="sm" className="justify-start gap-2 w-full">
+                  <FileStack className="h-4 w-4" /> Documentos
                 </Button>
               </DialogTrigger>
               <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] sm:max-h-[80vh]">
                 <DialogHeader>
                   <DialogTitle>Documentos Visuais do Caso</DialogTitle>
-                  <DialogDescription>
-                    Fotos, plantas baixas, laudos e outros documentos gerados por IA
-                  </DialogDescription>
+                  <DialogDescription>Fotos, plantas baixas, laudos e outros documentos gerados por IA</DialogDescription>
                 </DialogHeader>
                 <ScrollArea className="max-h-[60vh] pr-4">
                   <DocumentosVisuaisGallery trialId={trial.id} />
                 </ScrollArea>
               </DialogContent>
             </Dialog>
-            
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 min-h-[44px] text-sm md:text-base px-4">
-                  <Info className="h-4 w-4" /> <span className="hidden sm:inline">Detalhes do Caso</span><span className="sm:hidden">Detalhes</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="w-[95vw] max-w-3xl max-h-[85vh] sm:max-h-[80vh]">
-                <DialogHeader>
-                  <DialogTitle>{trial.title}</DialogTitle>
-                  <DialogDescription className="uppercase text-xs font-semibold">
-                    {trial.area}
-                  </DialogDescription>
-                </DialogHeader>
-                <ScrollArea className="max-h-[60vh] pr-4">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold mb-2">Descrição do Caso</h4>
-                      <Streamdown>{trial.description}</Streamdown>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-semibold mb-2">Fatos</h4>
-                      <Streamdown>{trial.facts}</Streamdown>
-                    </div>
-
-                    <div>
-                      <h4 className="font-semibold mb-2">Fundamentação Legal</h4>
-                      <Streamdown>{trial.legalBasis}</Streamdown>
-                    </div>
-
-                    {trial.jurisprudence && (
-                      <div>
-                        <h4 className="font-semibold mb-2">Jurisprudência</h4>
-                        <Streamdown>{trial.jurisprudence}</Streamdown>
-                      </div>
-                    )}
-                  </div>
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
-
-            {/* Botão de Provas */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 min-h-[44px] text-sm md:text-base px-4">
-                  <FileText className="h-4 w-4" /> Provas
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="w-[95vw] max-w-3xl max-h-[85vh] sm:max-h-[80vh]">
-                <DialogHeader>
-                  <DialogTitle>Provas do Caso</DialogTitle>
-                  <DialogDescription>
-                    Documentos, testemunhos e outras evidências apresentadas
-                  </DialogDescription>
-                </DialogHeader>
-                <ScrollArea className="max-h-[60vh] pr-4">
-                  {evidences && evidences.length > 0 ? (
-                    <div className="space-y-4">
-                      {evidences.map((evidence, idx) => (
-                        <Card key={evidence.id}>
-                          <CardHeader>
-                            <CardTitle className="text-base flex items-center gap-2">
-                              <span className="text-sm font-mono bg-primary/10 text-primary px-2 py-1 rounded">
-                                Prova {idx + 1}
-                              </span>
-                              {evidence.title}
-                            </CardTitle>
-                            <CardDescription className="uppercase text-xs">
-                              Tipo: {evidence.type}
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent className="space-y-3">
-                            <div>
-                              <h5 className="font-semibold text-sm mb-1">Descrição</h5>
-                              <p className="text-sm text-muted-foreground">{evidence.description}</p>
-                            </div>
-                            {evidence.details && (
-                              <div>
-                                <h5 className="font-semibold text-sm mb-1">Detalhes Técnicos</h5>
-                                <Streamdown>{evidence.details}</Streamdown>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-center text-muted-foreground py-8">
-                      Nenhuma prova disponível para este caso.
-                    </p>
-                  )}
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
-
-            {/* Botão de Participantes */}
-            <Dialog>
-              <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2 min-h-[44px] text-sm md:text-base px-4">
-                    <Users className="h-4 w-4" /> <span className="hidden sm:inline">Participantes</span><span className="sm:hidden">Pessoas</span>
-                  </Button>
-              </DialogTrigger>
-              <DialogContent className="w-[95vw] max-w-2xl max-h-[85vh] sm:max-h-[80vh]">
-                <DialogHeader>
-                  <DialogTitle>Participantes do Tribunal</DialogTitle>
-                  <DialogDescription>
-                    Pessoas envolvidas nesta sessão de julgamento
-                  </DialogDescription>
-                </DialogHeader>
-                <ScrollArea className="max-h-[60vh] pr-4">
-                  {participants && participants.length > 0 ? (
-                    <div className="space-y-3">
-                      {participants.map((participant) => (
-                        <Card key={participant.id} className={participant.isUser ? "border-primary" : ""}>
-                          <CardHeader className="pb-3">
-                            <div className="flex items-center justify-between">
-                              <CardTitle className="text-base">{participant.name}</CardTitle>
-                              {participant.isUser ? (
-                                <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">
-                                  Você
-                                </span>
-                              ) : (
-                                <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">
-                                  IA
-                                </span>
-                              )}
-                            </div>
-                            <CardDescription className="text-xs uppercase font-semibold">
-                              {roleLabels[participant.role] || participant.role}
-                            </CardDescription>
-                          </CardHeader>
-                          {participant.description && (
-                            <CardContent className="pt-0">
-                              <p className="text-sm text-muted-foreground">{participant.description}</p>
-                            </CardContent>
-                          )}
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-center text-muted-foreground py-8">
-                      Carregando participantes...
-                    </p>
-                  )}
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
-
-            {/* Botão de Documentos */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 min-h-[44px] text-sm md:text-base px-4">
-                  <FileStack className="h-4 w-4" /> <span className="hidden sm:inline">Documentos</span><span className="sm:hidden">Docs</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] sm:max-h-[80vh]">
-                <DialogHeader>
-                  <DialogTitle>Documentos do Caso</DialogTitle>
-                  <DialogDescription>
-                    Contratos, laudos, certidões, boletins e outros documentos para investigação
-                  </DialogDescription>
-                </DialogHeader>
-                <ScrollArea className="max-h-[60vh] pr-4">
-                  {documents && documents.length > 0 ? (
-                    <div className="space-y-4">
-                      {documents.map((doc: any, index: number) => (
-                        <Card key={doc.id} className="border-2">
-                          <CardHeader className="pb-3">
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex-1">
-                                <CardTitle className="text-base md:text-lg">
-                                  {index + 1}. {doc.title}
-                                </CardTitle>
-                                <CardDescription className="mt-1 text-xs md:text-sm">
-                                  <span className="font-semibold">Tipo:</span> {doc.type} | <span className="font-semibold">Emitido por:</span> {doc.issuer} | <span className="font-semibold">Data:</span> {new Date(doc.issueDate).toLocaleDateString('pt-BR')}
-                                </CardDescription>
-                              </div>
-                              <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                doc.relevance === 'alta' ? 'bg-red-100 text-red-800' :
-                                doc.relevance === 'media' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-gray-100 text-gray-800'
-                              }`}>
-                                {doc.relevance === 'alta' ? 'Alta' : doc.relevance === 'media' ? 'Média' : 'Baixa'} Relevância
-                              </span>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="space-y-3">
-                            <div>
-                              <p className="text-sm font-semibold text-muted-foreground mb-1">Descrição:</p>
-                              <p className="text-sm">{doc.description}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-muted-foreground mb-2">Conteúdo Completo do Documento:</p>
-                              <div className="bg-muted/50 p-4 rounded-lg border">
-                                <pre className="text-xs md:text-sm whitespace-pre-wrap font-mono">{doc.content}</pre>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-center text-muted-foreground py-8">Nenhum documento disponível para este caso.</p>
-                  )}
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
-
-            {/* Botão de Histórico do Veículo (apenas para casos de veículos/sinistros) */}
-            {trial?.area === "veiculos_sinistros" && (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2 min-h-[44px] text-sm md:text-base px-4">
-                    <Car className="h-4 w-4" /> <span className="hidden sm:inline">Histórico do Veículo</span><span className="sm:hidden">Histórico</span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] sm:max-h-[80vh]">
-                  <DialogHeader>
-                    <DialogTitle>Histórico Completo do Veículo</DialogTitle>
-                    <DialogDescription>
-                      Manutenções, perícias, trocas de peças e eventos relacionados ao veículo
-                    </DialogDescription>
-                  </DialogHeader>
-                  <ScrollArea className="max-h-[60vh] pr-4">
-                    {vehicleHistory && vehicleHistory.length > 0 ? (
-                      <div className="space-y-4">
-                        {vehicleHistory.map((event, idx) => (
-                          <Card key={event.id} className="border-l-4 border-l-primary">
-                            <CardHeader className="pb-3">
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                  <CardTitle className="text-base flex items-center gap-2">
-                                    <span className="text-sm font-mono bg-primary/10 text-primary px-2 py-1 rounded">
-                                      {new Date(event.eventDate).toLocaleDateString('pt-BR')}
-                                    </span>
-                                    <span className="capitalize">{event.eventType.replace('_', ' ')}</span>
-                                  </CardTitle>
-                                  <CardDescription className="text-xs mt-1">
-                                    {event.location} • {event.mileage?.toLocaleString('pt-BR')} km
-                                  </CardDescription>
-                                </div>
-                                <span className="text-sm font-semibold text-primary">
-                                  {event.cost}
-                                </span>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="space-y-2">
-                              <div>
-                                <h5 className="font-semibold text-sm mb-1">Descrição</h5>
-                                <p className="text-sm text-muted-foreground">{event.description}</p>
-                              </div>
-                              {event.parts && (
-                                <div>
-                                  <h5 className="font-semibold text-sm mb-1">Peças Envolvidas</h5>
-                                  <p className="text-sm text-muted-foreground">{event.parts}</p>
-                                </div>
-                              )}
-                              {event.technician && (
-                                <div>
-                                  <h5 className="font-semibold text-sm mb-1">Responsável</h5>
-                                  <p className="text-sm text-muted-foreground">{event.technician}</p>
-                                </div>
-                              )}
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-center text-muted-foreground py-8">
-                        Carregando histórico do veículo...
-                      </p>
-                    )}
-                  </ScrollArea>
-                </DialogContent>
-              </Dialog>
-            )}
-
-            {/* Botão de Solicitar Votação do Júri (apenas para juiz em casos que admitem júri) */}
-            {session?.userRole === 'juiz' && trial?.admiteJuri && !session?.juriVotou && (
-              <SolicitarVotacaoButton sessionId={sessionId} />
-            )}
-
-            {/* Botão de Histórico de Audiências */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 min-h-[44px] text-sm md:text-base px-4">
-                  <Clock className="h-4 w-4" /> <span className="hidden sm:inline">Histórico de Audiências</span><span className="sm:hidden">Audiências</span>
+                <Button variant="ghost" size="sm" className="justify-start gap-2 w-full">
+                  <Clock className="h-4 w-4" /> Histórico de Audiências
                 </Button>
               </DialogTrigger>
               <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] sm:max-h-[80vh]">
                 <DialogHeader>
                   <DialogTitle>📅 Histórico de Audiências</DialogTitle>
-                  <DialogDescription>
-                    Audiências anteriores realizadas neste caso, incluindo resumos e decisões intermediárias
-                  </DialogDescription>
+                  <DialogDescription>Audiências anteriores realizadas neste caso</DialogDescription>
                 </DialogHeader>
                 <HearingHistoryView trialId={trial?.id || 0} />
               </DialogContent>
             </Dialog>
-
-            {/* Botão de Decisão Final */}
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 min-h-[44px] text-sm md:text-base px-4">
-                  <Gavel className="h-4 w-4" /> <span className="hidden sm:inline">Decisão Final</span><span className="sm:hidden">Decisão</span>
+                <Button variant="ghost" size="sm" className="justify-start gap-2 w-full">
+                  <Gavel className="h-4 w-4" /> Decisão Final
                 </Button>
               </DialogTrigger>
               <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] sm:max-h-[80vh]">
                 <DialogHeader>
                   <DialogTitle>⚖️ Decisão Final do Julgamento</DialogTitle>
-                  <DialogDescription>
-                    Sentença fundamentada completa com veredicto, valores de indenização e recursos cabíveis
-                  </DialogDescription>
+                  <DialogDescription>Sentença fundamentada completa com veredicto</DialogDescription>
                 </DialogHeader>
                 <FinalDecisionView sessionId={sessionId} userRole={session?.userRole || ''} />
               </DialogContent>
             </Dialog>
-
-            {/* Botão de Votos do Júri (só aparece se o caso admite júri) */}
             {trial?.admiteJuri && (
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 min-h-[44px] text-sm md:text-base px-4">
-                  <Gavel className="h-4 w-4" /> <span className="hidden sm:inline">Votos do Júri</span><span className="sm:hidden">Júri</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] sm:max-h-[80vh]">
-                <DialogHeader>
-                  <DialogTitle>Votos do Júri Popular</DialogTitle>
-                  <DialogDescription>
-                    Opiniões fundamentadas de cada jurado sobre o caso
-                  </DialogDescription>
-                </DialogHeader>
-                <ScrollArea className="max-h-[60vh] pr-4">
-                  {juryVotes && juryVotes.length > 0 ? (
-                    <div className="space-y-4">
-                      {juryVotes.map((vote: any, index: number) => (
-                        <Card key={vote.id} className="border-2">
-                          <CardHeader className="pb-3">
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex-1">
-                                <CardTitle className="text-base md:text-lg">
-                                  {index + 1}. {vote.jurorName}
-                                </CardTitle>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="justify-start gap-2 w-full">
+                    <Gavel className="h-4 w-4" /> Votos do Júri
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] sm:max-h-[80vh]">
+                  <DialogHeader>
+                    <DialogTitle>Votos do Júri Popular</DialogTitle>
+                    <DialogDescription>Opiniões fundamentadas de cada jurado</DialogDescription>
+                  </DialogHeader>
+                  <ScrollArea className="max-h-[60vh] pr-4">
+                    {juryVotes && juryVotes.length > 0 ? (
+                      <div className="space-y-4">
+                        {juryVotes.map((vote: any, index: number) => (
+                          <Card key={vote.id} className="border-2">
+                            <CardHeader className="pb-3">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1">
+                                  <CardTitle className="text-base md:text-lg">
+                                    {index + 1}. {vote.jurorName}
+                                  </CardTitle>
+                                </div>
+                                <span className={`px-3 py-1 rounded-full text-xs md:text-sm font-bold ${
+                                  vote.vote === 'culpado' ? 'bg-red-100 text-red-800' :
+                                  vote.vote === 'inocente' ? 'bg-green-100 text-green-800' :
+                                  'bg-blue-100 text-blue-800'
+                                }`}>
+                                  {vote.vote === 'culpado' ? 'CULPADO' : vote.vote === 'inocente' ? 'INOCENTE' : 'ABSOLVIÇÃO'}
+                                </span>
                               </div>
-                              <span className={`px-3 py-1 rounded-full text-xs md:text-sm font-bold ${
-                                vote.vote === 'culpado' ? 'bg-red-100 text-red-800' :
-                                vote.vote === 'inocente' ? 'bg-green-100 text-green-800' :
-                                'bg-blue-100 text-blue-800'
-                              }`}>
-                                {vote.vote === 'culpado' ? 'CULPADO' : vote.vote === 'inocente' ? 'INOCENTE' : 'ABSOLVIÇÃO'}
-                              </span>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-sm font-semibold text-muted-foreground mb-2">Opinião:</p>
-                            <p className="text-sm whitespace-pre-wrap">{vote.opinion}</p>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-center text-muted-foreground py-8">Nenhum voto disponível para este caso.</p>
-                  )}
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
+                            </CardHeader>
+                            <CardContent>
+                              <p className="text-sm font-semibold text-muted-foreground mb-2">Opinião:</p>
+                              <p className="text-sm whitespace-pre-wrap">{vote.opinion}</p>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-center text-muted-foreground py-8">Nenhum voto disponível.</p>
+                    )}
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
             )}
-
-            {/* Botão de Interpor Recurso */}
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="default" size="sm" className="gap-2 min-h-[44px] text-sm md:text-base px-4 bg-orange-600 hover:bg-orange-700">
-                  <Hammer className="h-4 w-4" /> <span className="hidden sm:inline">Interpor Recurso</span><span className="sm:hidden">Recurso</span>
+                <Button variant="ghost" size="sm" className="justify-start gap-2 w-full">
+                  <Hammer className="h-4 w-4" /> Interpor Recurso
                 </Button>
               </DialogTrigger>
               <DialogContent className="w-[95vw] max-w-3xl max-h-[85vh] sm:max-h-[80vh]">
                 <DialogHeader>
-                  <DialogTitle>⚖️ Interpor Recurso - Segunda Instância</DialogTitle>
-                  <DialogDescription>
-                    Apresente suas razões para que o Tribunal de Justiça analise questões de direito
-                  </DialogDescription>
+                  <DialogTitle>⚖️ Interpor Recurso</DialogTitle>
+                  <DialogDescription>Apresente suas razões para a segunda instância</DialogDescription>
                 </DialogHeader>
                 <InterporRecursoForm sessionId={sessionId} />
               </DialogContent>
             </Dialog>
-
-            {/* Botão de Ver Acórdão */}
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="default" size="sm" className="gap-2 min-h-[44px] text-sm md:text-base px-4 bg-blue-600 hover:bg-blue-700">
-                  <Gavel className="h-4 w-4" /> <span className="hidden sm:inline">Ver Acórdão</span><span className="sm:hidden">Acórdão</span>
+                <Button variant="ghost" size="sm" className="justify-start gap-2 w-full">
+                  <Gavel className="h-4 w-4" /> Ver Acórdão
                 </Button>
               </DialogTrigger>
               <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] sm:max-h-[80vh]">
                 <DialogHeader>
                   <DialogTitle>⚖️ Acórdão - Tribunal de Justiça</DialogTitle>
-                  <DialogDescription>
-                    Decisão colegiada dos desembargadores sobre o recurso interposto
-                  </DialogDescription>
+                  <DialogDescription>Decisão colegiada dos desembargadores</DialogDescription>
                 </DialogHeader>
                 <AcordaoView sessionId={sessionId} />
               </DialogContent>
             </Dialog>
-
-            {/* Link para Instância Superior (se existir) */}
-            <InstanciaSuperiorLink sessionId={sessionId} />
-
-            {/* Botão de Solicitar Feedback */}
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="default" size="sm" className="gap-2 min-h-[44px] text-sm md:text-base px-4 bg-green-600 hover:bg-green-700">
-                  <MessageSquareText className="h-4 w-4" /> <span className="hidden sm:inline">Solicitar Feedback</span><span className="sm:hidden">Feedback</span>
+                <Button variant="ghost" size="sm" className="justify-start gap-2 w-full">
+                  <MessageSquareText className="h-4 w-4" /> Solicitar Feedback
                 </Button>
               </DialogTrigger>
               <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] sm:max-h-[80vh]">
                 <DialogHeader>
-                  <DialogTitle>🎯 Feedback da Sua Performance</DialogTitle>
-                  <DialogDescription>
-                    Análise detalhada da sua atuação como {roleLabels[session.userRole]}
-                  </DialogDescription>
+                  <DialogTitle>🎯 Feedback Performance</DialogTitle>
+                  <DialogDescription>Análise detalhada da sua atuação</DialogDescription>
                 </DialogHeader>
                 <FeedbackContent sessionId={sessionId} />
               </DialogContent>
             </Dialog>
-            
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="gap-2 min-h-[44px] px-4">
-                <ArrowLeft className="h-4 w-4" /> Sair
-              </Button>
-            </Link>
+            <div className="pt-2 border-t">
+              <Link href="/" className="block text-center text-xs text-destructive hover:underline">
+                Sair da Sessão
+              </Link>
+            </div>
           </div>
         </div>
-      </header>
+      )}
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col bg-muted/30">
-        <div className="container flex-1 flex flex-col py-6 max-w-5xl">
-          <Card className="flex-1 flex flex-col">
-            <CardHeader>
-              <CardTitle>Sessão de Julgamento</CardTitle>
-              <CardDescription>{trial.title}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col gap-4 min-h-0">
-              {/* Resumo do Caso Anterior (apenas para instâncias superiores) */}
-              {(session.instancia === 'segunda' || session.instancia === 'terceira') && session.appealId && (
-                <ResumoInstanciaAnterior appealId={session.appealId} instancia={session.instancia} />
-              )}
-              {/* Messages Area */}
-              <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
-                <div className="space-y-4">
-                  {messages?.map((msg) => {
-                    const isUser = !msg.isAI;
-                    const isSystem = msg.role === "sistema";
-                    
-                    // Buscar nome do participante
-                    const participant = participants?.find(p => p.role === msg.role);
-                    const displayName = participant?.name 
-                      ? `${participant.name} [${roleLabels[msg.role] || msg.role}]`
-                      : (roleLabels[msg.role] || msg.role);
-                    
-                    // Obter estilos do papel
-                    const styles = roleStyles[msg.role] || roleStyles.sistema;
-                    
-                    return (
-                      <div
-                        key={msg.id}
-                        className={`flex ${isUser ? "justify-end" : "justify-start"}`}
-                      >
-                        <div
-                          className={`max-w-[80%] rounded-lg border ${
-                            isSystem
-                              ? "bg-muted text-muted-foreground text-center w-full max-w-full border-muted"
-                              : isUser
-                              ? "bg-primary text-primary-foreground border-primary"
-                              : `${styles.bg} ${styles.border} ${styles.text}`
-                          }`}
-                        >
-                          {!isSystem && (
-                            <div className={`font-semibold text-xs mb-2 px-4 py-2 rounded-t-md ${
-                              isUser
-                                ? "bg-primary/80"
-                                : styles.badge
-                            }`}>
-                              {displayName}
-                              {msg.isAI && (
-                                <span className="text-xs opacity-70 font-normal ml-1">(IA)</span>
-                              )}
+      {/* Barra de Ações Principais (Sempre Visível) */}
+      <div className="bg-card border-b shrink-0 px-3 py-2">
+        <div className="container mx-auto flex justify-center gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 gap-2 text-xs px-3">
+                <FileText className="h-3 w-3" /> Provas
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="w-[95vw] max-w-3xl max-h-[85vh] sm:max-h-[80vh]">
+              <DialogHeader>
+                <DialogTitle>Provas do Caso</DialogTitle>
+                <DialogDescription>Documentos e evidências apresentadas</DialogDescription>
+              </DialogHeader>
+              <ScrollArea className="max-h-[60vh] pr-4">
+                {evidences && evidences.length > 0 ? (
+                  <div className="space-y-4">
+                    {evidences.map((evidence, idx) => (
+                      <Card key={evidence.id}>
+                        <CardHeader>
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <span className="text-sm font-mono bg-primary/10 text-primary px-2 py-1 rounded">
+                              Prova {idx + 1}
+                            </span>
+                            {evidence.title}
+                          </CardTitle>
+                          <CardDescription className="uppercase text-xs">
+                            Tipo: {evidence.type}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div>
+                            <h5 className="font-semibold text-sm mb-1">Descrição</h5>
+                            <p className="text-sm text-muted-foreground">{evidence.description}</p>
+                          </div>
+                          {evidence.details && (
+                            <div>
+                              <h5 className="font-semibold text-sm mb-1">Detalhes Técnicos</h5>
+                              <Streamdown>{evidence.details}</Streamdown>
                             </div>
                           )}
-                          <div className={`prose prose-sm max-w-none dark:prose-invert px-4 ${
-                            isSystem ? "" : "pb-3"
-                          }`}>
-                            <Streamdown>{msg.content}</Streamdown>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  
-                  {isSending && (
-                    <div className="flex justify-start">
-                      <div className="bg-card border rounded-lg p-4 flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span className="text-sm text-muted-foreground">
-                          Aguardando resposta...
-                        </span>
-                      </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground py-8">Nenhuma prova disponível.</p>
+                )}
+              </ScrollArea>
+            </DialogContent>
+          </Dialog>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 gap-2 text-xs px-3">
+                <Info className="h-3 w-3" /> Detalhes
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="w-[95vw] max-w-3xl max-h-[85vh] sm:max-h-[80vh]">
+              <DialogHeader>
+                <DialogTitle>{trial.title}</DialogTitle>
+                <DialogDescription className="uppercase text-xs font-semibold">
+                  {trial.area}
+                </DialogDescription>
+              </DialogHeader>
+              <ScrollArea className="max-h-[60vh] pr-4">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">Descrição do Caso</h4>
+                    <Streamdown>{trial.description}</Streamdown>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Fatos</h4>
+                    <Streamdown>{trial.facts}</Streamdown>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Fundamentação Legal</h4>
+                    <Streamdown>{trial.legalBasis}</Streamdown>
+                  </div>
+                  {trial.jurisprudence && (
+                    <div>
+                      <h4 className="font-semibold mb-2">Jurisprudência</h4>
+                      <Streamdown>{trial.jurisprudence}</Streamdown>
                     </div>
                   )}
                 </div>
               </ScrollArea>
+            </DialogContent>
+          </Dialog>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 gap-2 text-xs px-3">
+                <Users className="h-3 w-3" /> Pessoas
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="w-[95vw] max-w-2xl max-h-[85vh] sm:max-h-[80vh]">
+              <DialogHeader>
+                <DialogTitle>Participantes do Tribunal</DialogTitle>
+                <DialogDescription>Pessoas envolvidas nesta sessão</DialogDescription>
+              </DialogHeader>
+              <ScrollArea className="max-h-[60vh] pr-4">
+                {participants && participants.length > 0 ? (
+                  <div className="space-y-3">
+                    {participants.map((participant) => (
+                      <Card key={participant.id} className={participant.isUser ? "border-primary" : ""}>
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-base">{participant.name}</CardTitle>
+                            {participant.isUser ? (
+                              <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">Você</span>
+                            ) : (
+                              <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">IA</span>
+                            )}
+                          </div>
+                          <CardDescription className="text-xs uppercase font-semibold">
+                            {roleLabels[participant.role] || participant.role}
+                          </CardDescription>
+                        </CardHeader>
+                        {participant.description && (
+                          <CardContent className="pt-0">
+                            <p className="text-sm text-muted-foreground">{participant.description}</p>
+                          </CardContent>
+                        )}
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground py-8">Carregando participantes...</p>
+                )}
+              </ScrollArea>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
 
-              {/* Indicador de Turnos Visuais */}
-              <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-3 text-center">
-                <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
-                  {isSending ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Aguardando resposta da IA...
-                    </span>
-                  ) : (
-                    <span>
-                      ✓ É sua vez de falar como <strong>{roleLabels[session.userRole]}</strong>
-                    </span>
-                  )}
-                </p>
+      {/* Main Content Area */}
+      <main className="flex-1 min-h-0 overflow-hidden bg-muted/30 relative">
+        <div className="h-full flex flex-col max-w-5xl mx-auto">
+          {/* Resumo do Caso Anterior (apenas para instâncias superiores) */}
+          {(session.instancia === 'segunda' || session.instancia === 'terceira') && session.appealId && (
+            <div className="shrink-0 p-3">
+              <ResumoInstanciaAnterior appealId={session.appealId} instancia={session.instancia} />
+            </div>
+          )}
+
+          {/* Placar e Contexto do Plenário do STF */}
+          {(session.instancia === 'terceira' || trial?.area === 'stf_constitucional') && (
+            <div className="shrink-0 bg-gradient-to-r from-purple-900/15 via-indigo-900/10 to-purple-900/15 border-b border-purple-200 dark:border-purple-800/50 px-3 py-2 flex items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-1.5 font-semibold text-purple-950 dark:text-purple-200">
+                <Scale className="h-4 w-4 text-purple-600 dark:text-purple-400 shrink-0" />
+                <span className="truncate">Supremo Tribunal Federal • Sessão Plenária</span>
               </div>
-
-              {/* Toggle Texto/Voz */}
-              <div className="flex items-center justify-between bg-muted/50 rounded-lg p-3">
-                <span className="text-sm font-medium">Modo de Entrada:</span>
-                <div className="flex gap-2">
-                  <Button
-                    variant={voiceMode ? "outline" : "default"}
-                    size="sm"
-                    onClick={() => setVoiceMode(false)}
-                  >
-                    📝 Texto
-                  </Button>
-                  <Button
-                    variant={voiceMode ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setVoiceMode(true)}
-                  >
-                    🎤️ Voz
-                  </Button>
-                </div>
+              <div className="flex items-center gap-2 text-[11px] text-purple-800 dark:text-purple-300">
+                <span className="bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full font-mono font-medium">11 Ministros</span>
+                <span className="hidden sm:inline">PGR na Tribuna</span>
               </div>
+            </div>
+          )}
 
-              {/* Input Area */}
-              {voiceMode ? (
-                <div className="flex justify-center py-4">
-                  <VoiceRecorder
-                    sessionId={session.id}
-                    onMessageSent={() => {
-                      window.location.reload();
-                    }}
-                  />
+          {/* Messages Area - OCUPA O RESTO DA TELA */}
+          <ScrollArea className="flex-1 min-h-0 pr-4" ref={scrollRef}>
+            <div className="space-y-4 p-3 pb-24">
+              {messages?.map((msg) => {
+                const isUser = !msg.isAI;
+                const isSystem = msg.role === "sistema";
+                const participant = participants?.find(p => p.role === msg.role);
+                const displayName = participant?.name
+                  ? `${participant.name} [${roleLabels[msg.role] || msg.role}]`
+                  : (roleLabels[msg.role] || msg.role);
+                const styles = roleStyles[msg.role] || roleStyles.sistema;
+
+                return (
+                  <div key={msg.id} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[85%] rounded-lg border ${
+                      isSystem
+                        ? "bg-muted text-muted-foreground text-center w-full max-w-full border-muted"
+                        : isUser
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : `${styles.bg} ${styles.border} ${styles.text}`
+                    }`}>
+                      {!isSystem && (
+                        <div className={`font-semibold text-xs mb-2 px-4 py-2 rounded-t-md ${
+                          isUser ? "bg-primary/80" : styles.badge
+                        }`}>
+                          {displayName}
+                          {msg.isAI && <span className="text-xs opacity-70 font-normal ml-1">(IA)</span>}
+                        </div>
+                      )}
+                      <div className={`prose prose-sm max-w-none dark:prose-invert px-4 whitespace-pre-wrap break-words ${
+                        isSystem ? "" : "pb-3"
+                      }`}>
+                        <Streamdown>{msg.content}</Streamdown>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {isSending && (
+                <div className="flex justify-start">
+                  <div className="bg-card border rounded-lg p-4 flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm text-muted-foreground">Aguardando resposta...</span>
+                  </div>
                 </div>
-              ) : (
-              <div className="flex flex-wrap gap-2 md:gap-2 items-center">
-                <Textarea
-                  placeholder={`Digite sua mensagem como ${roleLabels[session.userRole]}...`}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={isSending}
-                  className="min-h-[80px] resize-none"
-                />
+              )}
+            </div>
+          </ScrollArea>
+
+          {/* Composer Area - FIXO NA BASE */}
+          <div className="shrink-0 p-3 bg-card border-t space-y-3">
+            {/* Turn Indicator Compacto */}
+            <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-2 text-center">
+              <p className="text-xs font-semibold text-amber-900 dark:text-amber-100">
+                {isSending ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="h-3 w-3 animate-spin" /> IA respondendo...
+                  </span>
+                ) : (
+                  <span>✓ Sua vez: <strong>{roleLabels[session.userRole]}</strong></span>
+                )}
+              </p>
+            </div>
+
+            {/* Ações Rápidas de Plenário / Ministro */}
+            {(session.userRole === "ministro" || trial?.area === "stf_constitucional") ? (
+              <div className="flex gap-1.5 overflow-x-auto pb-1 text-xs">
                 <Button
-                  onClick={handleSendMessage}
-                  disabled={!message.trim() || isSending}
-                  size="icon"
-                  className="h-[60px] w-[50px] sm:h-[80px] sm:w-[80px] shrink-0"
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-[11px] px-2.5 py-0 border-violet-400 dark:border-violet-700 bg-violet-50/60 dark:bg-violet-950/40 hover:bg-violet-100 dark:hover:bg-violet-900 shrink-0 font-medium"
+                  onClick={() => setMessage((prev) => prev ? `[PEDIDO DE APARTE]: Permite um breve aparte, Excelência? ${prev}` : `[PEDIDO DE APARTE]: Permite um breve aparte, eminente colega? `)}
                 >
-                  {isSending ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <Send className="h-5 w-5" />
-                  )}
+                  ✋ Pedir Aparte
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-[11px] px-2.5 py-0 border-violet-400 dark:border-violet-700 bg-violet-50/60 dark:bg-violet-950/40 hover:bg-violet-100 dark:hover:bg-violet-900 shrink-0 font-medium"
+                  onClick={() => setMessage(`[PEDIDO DE VISTA]: Peço vista dos autos para exame mais aprofundado da matéria constitucional.`)}
+                >
+                  📖 Pedir Vista
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-[11px] px-2.5 py-0 border-emerald-400 dark:border-emerald-700 bg-emerald-50/60 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900 shrink-0 font-medium"
+                  onClick={() => setMessage((prev) => `[VOTO]: Acompanho integralmente o voto condutor do eminente Ministro Relator. ${prev}`)}
+                >
+                  ✅ Acompanhar Relator
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-[11px] px-2.5 py-0 border-rose-400 dark:border-rose-700 bg-rose-50/60 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900 shrink-0 font-medium"
+                  onClick={() => setMessage((prev) => `[DIVERGÊNCIA]: Peço vênia ao eminente Relator para inaugurar a divergência, no sentido de... ${prev}`)}
+                >
+                  ⚖️ Abrir Divergência
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-[11px] px-2.5 py-0 border-amber-400 dark:border-amber-700 bg-amber-50/60 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900 shrink-0 font-medium"
+                  onClick={() => setMessage((prev) => `[PROPOSTA DE TESE]: Proponho a fixação da seguinte tese com repercussão geral: "${prev}"`)}
+                >
+                  📜 Propor Tese
                 </Button>
               </div>
-              )}
-
-              <div className="flex flex-col gap-2">
-                {session.status === 'concluido' && session.verdict ? (
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="default" className="w-full gap-2 bg-green-600 hover:bg-green-700">
-                        <Gavel className="h-4 w-4" /> Ver Decisão Final
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] sm:max-h-[80vh]">
-                      <DialogHeader>
-                        <DialogTitle>⚖️ Sentença Final</DialogTitle>
-                        <DialogDescription>
-                          Decisão proferida pelo juiz
-                        </DialogDescription>
-                      </DialogHeader>
-                      <ScrollArea className="max-h-[60vh] pr-4">
-                        <div className="prose prose-sm max-w-none">
-                          <Streamdown>{session.verdict}</Streamdown>
-                        </div>
-                      </ScrollArea>
-                    </DialogContent>
-                  </Dialog>
-                ) : (
-                  <>
-                    <Button
-                      onClick={handleContinuarJulgamento}
-                      disabled={continuarJulgamento.isPending || isDebouncing}
-                      variant="outline"
-                      className="w-full gap-2"
-                    >
-                      {continuarJulgamento.isPending ? (
-                        <><Loader2 className="h-4 w-4 animate-spin" /> Gerando resposta...</>
-                      ) : (
-                        <><PlayCircle className="h-4 w-4" /> Continuar Julgamento</>
-                      )}
-                    </Button>
-                    <p className="text-xs text-muted-foreground text-center">
-                      Pressione Enter para enviar, Shift+Enter para nova linha
-                    </p>
-                  </>
-                )}
+            ) : (
+              <div className="flex gap-1.5 overflow-x-auto pb-1 text-xs">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-[11px] px-2.5 py-0 shrink-0"
+                  onClick={() => setMessage((prev) => prev ? `Objeção, Excelência! ${prev}` : `Objeção, Excelência! `)}
+                >
+                  ⚡ Objeção, Excelência!
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-[11px] px-2.5 py-0 shrink-0"
+                  onClick={() => setMessage((prev) => prev ? `Pela ordem, Excelência: ${prev}` : `Pela ordem, Excelência: `)}
+                >
+                  📢 Pela Ordem
+                </Button>
               </div>
-            </CardContent>
-          </Card>
+            )}
+
+            {/* Composer Compacto */}
+            <div className="flex gap-2 items-end">
+              <Textarea
+                placeholder={`Mensagem como ${roleLabels[session.userRole]}...`}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isSending}
+                className="flex-1 min-h-[48px] max-h-[120px] resize-none py-2 text-sm"
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={!message.trim() || isSending}
+                size="icon"
+                className="h-[48px] w-[48px] shrink-0"
+              >
+                {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+              </Button>
+            </div>
+
+            {/* Continuar Julgamento Compacto */}
+            <div className="flex flex-col gap-1">
+              {session.verdict ? (
+                <Button variant="default" className="w-full h-9 gap-2 bg-green-600 hover:bg-green-700 text-sm">
+                  <Gavel className="h-4 w-4" /> Ver Decisão Final
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleContinuarJulgamento}
+                  disabled={continuarJulgamento.isPending || isDebouncing}
+                  variant="outline"
+                  className="w-full h-9 gap-2 text-sm"
+                >
+                  {continuarJulgamento.isPending ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Gerando...</>
+                  ) : (
+                    <><PlayCircle className="h-4 w-4" /> Continuar Julgamento</>
+                  )}
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       </main>
     </div>

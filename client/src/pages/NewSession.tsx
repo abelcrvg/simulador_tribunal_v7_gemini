@@ -17,9 +17,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type Role = "juiz" | "advogado_defesa" | "promotor" | "testemunha" | "perito" | "jurado" | "reu" | "vitima" | "assistente_acusacao" | "defensor_publico";
+type Role = "juiz" | "advogado_defesa" | "promotor" | "testemunha" | "perito" | "jurado" | "reu" | "vitima" | "assistente_acusacao" | "defensor_publico" | "ministro";
 
 const roles: { value: Role; label: string; description: string }[] = [
+  { value: "ministro", label: "🏛️ Ministro do STF", description: "Debata no Plenário da Suprema Corte: intervenha com apartes, peça vista e profira seu voto constitucional" },
   { value: "juiz", label: "Juiz", description: "Conduza a sessão e tome decisões imparciais" },
   { value: "advogado_defesa", label: "Advogado de Defesa", description: "Defenda o réu com argumentos sólidos" },
   { value: "defensor_publico", label: "Defensor Público", description: "Defenda o réu gratuitamente pelo Estado" },
@@ -33,6 +34,7 @@ const roles: { value: Role; label: string; description: string }[] = [
 ];
 
 const areas = [
+  { value: "stf_constitucional", label: "🏛️ STF - Plenário Constitucional (Supremo Tribunal Federal)" },
   { value: "penal", label: "Direito Penal (Geral)" },
   { value: "homicidio", label: "Homicídio" },
   { value: "feminicidio", label: "Feminicídio" },
@@ -94,6 +96,9 @@ export default function NewSession() {
   const generateMutation = trpc.trial.generate.useMutation({
     onSuccess: (data) => {
       setGeneratedTrial(data);
+      if (data.area === "stf_constitucional") {
+        setSelectedRole("ministro");
+      }
       setStep("role");
     },
     onError: (error) => {
@@ -312,6 +317,20 @@ export default function NewSession() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {generatedTrial.area === "stf_constitucional" && (
+                    <div className="bg-purple-50 dark:bg-purple-950/40 border-2 border-purple-300 dark:border-purple-700 rounded-lg p-4 flex items-start gap-3">
+                      <Scale className="h-6 w-6 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
+                      <div className="text-sm">
+                        <p className="font-bold text-purple-900 dark:text-purple-100 text-base">
+                          🏛️ Julgamento no Plenário do Supremo Tribunal Federal
+                        </p>
+                        <p className="text-purple-800 dark:text-purple-200 mt-1 leading-relaxed">
+                          Este caso será julgado diretamente no Plenário do STF perante os 11 Ministros da Suprema Corte. Como Ministro, você debaterá teses com os outros ministros, ouvirá sustentações orais do Procurador-Geral da República (PGR) e advogados da tribuna, podendo fazer apartes, pedir vista dos autos e proferir seu voto constitucional com fixação de tese de repercussão geral.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   <RadioGroup value={selectedRole} onValueChange={(v) => setSelectedRole(v as Role)}>
                     <div className="space-y-3">
                       {roles.map((role) => (

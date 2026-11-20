@@ -9,7 +9,7 @@ import type {
 } from "../../_core/llm";
 
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
-const DEFAULT_MODEL = "gemini-3.6-flash";
+const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 const MAX_RETRIES = 3;
 
 function sleep(ms: number) {
