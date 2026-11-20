@@ -163,6 +163,27 @@ export function initializeSocketIO(httpServer: HTTPServer) {
       }
     });
 
+    // Acompanhar uma sessão de julgamento em tempo real
+    socket.on('join-session', async (data: { sessionId: number; userId: number }) => {
+      try {
+        const session = await db.getSessionById(data.sessionId);
+        if (!session || session.userId !== data.userId) {
+          socket.emit('error', { message: 'Sessão não encontrada ou acesso negado' });
+          return;
+        }
+
+        socket.join(`session-${data.sessionId}`);
+        socket.emit('session-joined', { sessionId: data.sessionId });
+      } catch (error) {
+        console.error('[Socket.IO] Erro ao entrar na sessão:', error);
+        socket.emit('error', { message: 'Erro ao acompanhar a sessão' });
+      }
+    });
+
+    socket.on('leave-session', (data: { sessionId: number }) => {
+      socket.leave(`session-${data.sessionId}`);
+    });
+
     // Desconexão
     socket.on('disconnect', () => {
       console.log(`[Socket.IO] Cliente desconectado: ${socket.id}`);

@@ -21,6 +21,18 @@ vi.mock("./_core/llm", () => {
         return { choices: [{ message: { content: JSON.stringify({
           veredicto: "culpado",
           sentencaFundamentada: "RELATÓRIO. O Ministério Público denunciou o réu pelo crime descrito na denúncia. FUNDAMENTAÇÃO. A prova oral e documental colhida em audiência demonstra a autoria e a materialidade. DISPOSITIVO. Julgo procedente a ação penal.",
+          relatorio: "O Ministério Público denunciou o réu pelo crime descrito na denúncia.",
+          fundamentacao: "A prova oral e documental demonstra autoria e materialidade.",
+          dispositivo: "Julgo procedente a ação penal.",
+          dosimetria: {
+            penaBase: "4 anos",
+            agravantes: "Nenhuma",
+            atenuantes: "Confissão espontânea",
+            causasAumento: "Nenhuma",
+            causasReducao: "Nenhuma",
+            regime: "Semiaberto",
+            substituicao: "Não cabível",
+          },
           valoresIndenizacao: null,
           prazosPagamento: null,
           statusCumprimento: "pendente",
@@ -59,7 +71,7 @@ vi.mock("./_core/llm", () => {
 
       if (userContent.includes("Gere provas realistas e detalhadas")) {
         return { choices: [{ message: { content: JSON.stringify({
-          evidences: [{ title: "Laudo Necroscópico", description: "Exame do IML", type: "pericial", details: "Ferimento por arma branca" }],
+          evidences: [{ title: "Laudo Necroscópico", description: "Exame do IML", type: "pericial", details: "Ferimento por arma branca", origem: "IML", dataColeta: "15/03/2024", custodia: "Recebido pelo juízo em 16/03/2024, sem quebra de lacre." }],
         }) } }] };
       }
 
@@ -186,12 +198,34 @@ describe("⚖️ Fluxo Tribunal — Integração Completa via tRPC", () => {
     expect(reais.some((m: any) => m.isAI === true)).toBe(true);
   }, 10000);
 
+  it("4.1. Deve registrar origem da prova e confronto nos autos e na audiência", async () => {
+    const db = await import("./db");
+    const evidences = await db.getTrialEvidences(trialId);
+    expect(evidences.length).toBeGreaterThan(0);
+    expect(evidences[0].origem).toBe("IML");
+    expect(evidences[0].custodia).toContain("sem quebra de lacre");
+
+    const caller = appRouter.createCaller(createContext().ctx);
+    const atualizada: any = await caller.evidence.confrontar({
+      evidenceId: evidences[0].id,
+      sessionId,
+      texto: "O laudo registra horário diverso do depoimento da testemunha.",
+    });
+
+    expect(atualizada.confrontacoes).toHaveLength(1);
+    const messages = await db.getSessionMessages(sessionId);
+    expect(messages.some((m: any) => String(m.content).includes("CONFRONTO DE PROVA"))).toBe(true);
+  }, 10000);
+
   it("5. Deve proferir sentença final e registrar no status da sessão", async () => {
     const caller = appRouter.createCaller(createContext().ctx);
 
     const decision: any = await caller.session.generateFinalDecision({ sessionId });
     expect(decision.veredicto).toBe("culpado");
     expect(decision.sentencaFundamentada).toContain("DISPOSITIVO");
+    expect(decision.relatorio).toContain("denunciou");
+    expect(decision.dispositivo).toContain("Julgo procedente");
+    expect(decision.dosimetria.regime).toBe("Semiaberto");
 
     const db = await import("./db");
     const session = await db.getSessionById(sessionId);

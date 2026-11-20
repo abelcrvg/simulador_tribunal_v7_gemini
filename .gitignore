@@ -49,6 +49,9 @@ pids
 # Arquivos temporários do banco JSON local
 data/*.tmp
 
+# Banco de runtime (gerado a partir de data/seed.local.json)
+data/tribunal-runtime.json
+
 # Coverage directory used by tools like istanbul
 coverage/
 *.lcov

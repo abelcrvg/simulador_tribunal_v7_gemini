@@ -70,6 +70,11 @@ export type STFVote = {
   position: STFPosition;
   origin: "voto" | "divergencia" | "inferido";
   excerpt: string;
+  office?: STFOffice | null;
+  tese?: string | null;
+  vista?: boolean;
+  divergencia?: boolean;
+  messageId?: number;
 };
 
 const PROCEDENTE_PATTERN = /\bprocedênc|\bprocedent|inconstitucional|\bacolh|\bdefer|\banul|\bderrub|\bviol(i|a|ou|ando)?\s+\S*\s+constitucional/i;
@@ -94,6 +99,55 @@ function inferPosition(text: string): STFPosition {
   return "indefinido";
 }
 
+const VISTA_PATTERN = /\bpe(?:ç|c)o\s+vista|\bvista\s+dos\s+autos\b/i;
+const TESE_PATTERN = /(?:\[\s*TESE\s*\]|\btese\s*:\s*)([^\n]+)/i;
+
+export function createSTFVoteFromSpeech(params: {
+  speech: string;
+  participant: { name?: string | null; description?: string | null; isUser?: boolean | null };
+  messageId?: number;
+}): STFVote | null {
+  const content = String(params.speech || "");
+  const hasVoteMarker = /\[\s*VOTO\s*\]|^\s*voto\s*:/i.test(content);
+  const hasDivergence = /\[\s*DIVERGÊNCIA\s*\]|\[\s*DIVERGENCIA\s*\]/i.test(content);
+  const vista = VISTA_PATTERN.test(content);
+  const position = inferPosition(content);
+
+  if (!hasVoteMarker && !hasDivergence && !vista && position === "indefinido") {
+    return null;
+  }
+
+  const teseMatch = content.match(TESE_PATTERN);
+
+  return {
+    ministerName: String(params.participant.name || "").trim() || "Ministro",
+    isUser: Boolean(params.participant.isUser),
+    position,
+    origin: hasDivergence ? "divergencia" : hasVoteMarker ? "voto" : "inferido",
+    excerpt: content.slice(0, 240),
+    office: stfOfficeOf(params.participant),
+    tese: teseMatch ? teseMatch[1].trim().slice(0, 300) : null,
+    vista,
+    divergencia: hasDivergence,
+    messageId: params.messageId,
+  };
+}
+
+export function mergeSTFVotes(
+  structured: STFVote[],
+  inferred: STFVote[],
+): STFVote[] {
+  const merged = [...structured];
+  const known = new Set(structured.map(v => v.ministerName));
+  for (const vote of inferred) {
+    if (!known.has(vote.ministerName)) {
+      merged.push(vote);
+      known.add(vote.ministerName);
+    }
+  }
+  return merged;
+}
+
 /**
  * Apura os votos a partir das falas dos ministros. Marcadores explícitos
  * ([VOTO], [DIVERGÊNCIA]) têm prioridade; na falta deles, infere pela linguagem.
@@ -101,6 +155,7 @@ function inferPosition(text: string): STFPosition {
 export function collectSTFVotes(
   messages: Array<{ role?: string; content?: string | null; isAI?: boolean | null; senderName?: string | null }>,
   participants: Array<{ name?: string; isUser?: boolean | null; role?: string }>,
+  structuredVotes: STFVote[] = [],
 ): STFVote[] {
   const ministers = participants.filter(p => p.role === "ministro");
   const votes: STFVote[] = [];
@@ -154,7 +209,7 @@ export function collectSTFVotes(
     });
   }
 
-  return votes;
+  return mergeSTFVotes(structuredVotes, votes);
 }
 
 export function tallySTFVotes(votes: STFVote[]) {

@@ -4,6 +4,14 @@ import { invokeLLM } from "./_core/llm";
 import { transcribeAudio } from "./_core/voiceTranscription";
 import { storagePut } from "./storage";
 import * as db from "./db";
+import { broadcastSessionMessage } from "./_core/message-events";
+
+async function createBroadcastVoiceMessage(message: any) {
+  const id = await db.createMessage(message);
+  const created = await db.getMessageById(id);
+  if (created) broadcastSessionMessage(message.sessionId, created);
+  return id;
+}
 
 /**
  * Router para sistema de voz (debate por áudio)
@@ -51,7 +59,7 @@ export const voiceRouter = router({
       const userMessage = transcription.text;
 
       // 3. Salvar mensagem do usuário com audioUrl
-      const userMessageId = await db.createMessage({
+      const userMessageId = await createBroadcastVoiceMessage({
         sessionId: input.sessionId,
         role: session.userRole,
         content: userMessage,
@@ -109,7 +117,7 @@ Seja conciso (máximo 3 parágrafos).`;
       const aiAudioUrl = null; // TODO: Implementar TTS quando disponível
 
       // 6. Salvar resposta da IA
-      const aiMessageId = await db.createMessage({
+      const aiMessageId = await createBroadcastVoiceMessage({
         sessionId: input.sessionId,
         role: respondent.role,
         content: aiResponse,

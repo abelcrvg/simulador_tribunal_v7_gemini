@@ -21,6 +21,7 @@ import {
 } from "./ai/hearing-director";
 import {
   collectSTFVotes,
+  createSTFVoteFromSpeech,
   findSTFOffice,
   STF_FALLBACK_MINISTERS,
   STF_MAJORITY,
@@ -34,6 +35,14 @@ import {
   PORTUGUESE_ONLY_INSTRUCTION,
   sanitizeAIResponse,
 } from "./ai/speech-sanitizer";
+import { broadcastSessionMessage } from "./_core/message-events";
+
+async function createBroadcastMessage(message: any) {
+  const id = await db.createMessage(message);
+  const created = await db.getMessageById(id);
+  if (created) broadcastSessionMessage(message.sessionId, created);
+  return id;
+}
 
 // Função auxiliar para higienizar respostas da IA (cortar múltiplos papéis e menções ao usuário)
 // Função para gerar documentos visuais em background (não bloqueia)
@@ -115,7 +124,10 @@ FORMATO DE RESPOSTA (JSON):
       "type": "tipo da prova (documental, testemunhal, pericial, material, fotografica)",
       "title": "Título curto da prova",
       "description": "Descrição detalhada da prova",
-      "details": "Detalhes específicos e técnicos da prova"
+      "details": "Detalhes específicos e técnicos da prova",
+      "origem": "Quem ou onde encontrou/coletou a prova (órgão, perito, testemunha)",
+      "dataColeta": "Data em que a prova foi coletada (DD/MM/AAAA)",
+      "custodia": "Resumo da cadeia de custódia: quem recebeu, onde ficou guardada, se houve quebra"
     }
   ]
 }`;
@@ -143,8 +155,11 @@ FORMATO DE RESPOSTA (JSON):
                     title: { type: "string" },
                     description: { type: "string" },
                     details: { type: "string" },
+                    origem: { type: "string" },
+                    dataColeta: { type: "string" },
+                    custodia: { type: "string" },
                   },
-                  required: ["type", "title", "description", "details"],
+                  required: ["type", "title", "description", "details", "origem", "dataColeta", "custodia"],
                   additionalProperties: false,
                 },
               },
@@ -166,6 +181,9 @@ FORMATO DE RESPOSTA (JSON):
       title: ev.title,
       description: ev.description,
       details: ev.details,
+      origem: ev.origem || null,
+      dataColeta: ev.dataColeta || null,
+      custodia: ev.custodia || null,
       imageUrl: null,
     }));
 
@@ -1430,7 +1448,7 @@ export const appRouter = router({
 
         // Criar mensagem inicial do sistema
         const roleDisplay = input.userRole === "ministro" ? "Ministro Relator do Supremo Tribunal Federal" : input.userRole.replace("_", " ");
-        await db.createMessage({
+        await createBroadcastMessage({
           sessionId,
           role: "sistema",
           senderName: "Tribunal",
@@ -1627,7 +1645,15 @@ Responda APENAS com o JSON, sem texto adicional:`;
 
         // Construir contexto completo
         const fullConversation = allMessages.map(m => `**${m.role}**: ${m.content}`).join("\n\n");
-        const evidencesList = evidences.map(e => `- ${e.title}: ${e.description}`).join("\n");
+        const evidencesList = evidences.map(e => {
+          const confrontos = Array.isArray(e.confrontacoes)
+            ? e.confrontacoes.map((c: any) => ` [${c.autor || "parte"}: ${c.texto}]`).join("")
+            : "";
+          return `- ${e.title}: ${e.description}` +
+            `${e.origem ? ` (origem: ${e.origem})` : ""}` +
+            `${e.custodia ? ` (custódia: ${e.custodia})` : ""}` +
+            confrontos;
+        }).join("\n");
         const documentsList = documents.map(d => `- ${d.title} (${d.type}): ${d.description}`).join("\n");
         const juryVotesList = juryVotes.map(v => `- ${v.jurorName}: ${v.vote} - ${v.opinion}`).join("\n\n");
 
@@ -1661,12 +1687,16 @@ Gere uma SENTENÇA COMPLETA em formato JSON com:
    - Relatório (resumo do caso)
    - Fundamentação (análise das provas, argumentos, leis aplicáveis)
    - Dispositivo (decisão final)
-3. **valoresIndenizacao**: { "danosMorais": number, "danosMateriais": number, "total": number } (em R$, ou null se não aplicável)
-4. **prazosPagamento**: "Descrição dos prazos" (ou null)
-5. **statusCumprimento**: "pendente", "em_andamento", "cumprido"
-6. **recursosCabiveis**: ["apelacao", "agravo", "embargos"] (lista de recursos possíveis)
-7. **fundamentacaoLegal**: ["Art. X do Código Y", "Art. Z da Lei W"] (artigos citados)
-8. **observacoes**: "Observações adicionais" (ou null)
+3. **relatorio**: Resumo do caso em um parágrafo (quem processa quem, o que se pede).
+4. **fundamentacao**: Análise das provas e dos argumentos, com destaque para contradições confrontadas em audiência.
+5. **dispositivo**: A decisão final em uma frase, com o que foi julgado procedente/improcedente.
+6. **dosimetria**: Para casos criminais, objeto com penaBase, agravantes, atenuantes, causasAumento, causasReducao, regime e substituicao (texto curto para cada campo). Para casos cíveis, use null.
+7. **valoresIndenizacao**: { "danosMorais": number, "danosMateriais": number, "total": number } (em R$, ou null se não aplicável)
+8. **prazosPagamento**: "Descrição dos prazos" (ou null)
+9. **statusCumprimento**: "pendente", "em_andamento", "cumprido"
+10. **recursosCabiveis**: ["apelacao", "agravo", "embargos"] (lista de recursos possíveis)
+11. **fundamentacaoLegal**: ["Art. X do Código Y", "Art. Z da Lei W"] (artigos citados)
+12. **observacoes**: "Observações adicionais" (ou null)
 
 **IMPORTANTE:**
 - A sentença deve ser COERENTE com o que foi discutido no julgamento
@@ -1692,6 +1722,23 @@ FORMATO JSON:`;
                 properties: {
                   veredicto: { type: "string" },
                   sentencaFundamentada: { type: "string" },
+                  relatorio: { type: ["string", "null"] },
+                  fundamentacao: { type: ["string", "null"] },
+                  dispositivo: { type: ["string", "null"] },
+                  dosimetria: {
+                    type: ["object", "null"],
+                    properties: {
+                      penaBase: { type: "string" },
+                      agravantes: { type: "string" },
+                      atenuantes: { type: "string" },
+                      causasAumento: { type: "string" },
+                      causasReducao: { type: "string" },
+                      regime: { type: "string" },
+                      substituicao: { type: "string" },
+                    },
+                    required: ["penaBase", "agravantes", "atenuantes", "causasAumento", "causasReducao", "regime", "substituicao"],
+                    additionalProperties: false,
+                  },
                   valoresIndenizacao: {
                     type: ["object", "null"],
                     properties: {
@@ -1744,7 +1791,7 @@ FORMATO JSON:`;
         proximosPassos += "3️⃣ **Interpor Recurso** (opcional): Se desejar explorar instâncias superiores, você ou as partes podem interpor recurso\n\n";
         proximosPassos += "🎓 O feedback incluirá análise da sua fundamentação legal, imparcialidade, e sugestões de melhoria!";
         
-        await db.createMessage({
+        await createBroadcastMessage({
           sessionId: input.sessionId,
           role: "sistema",
           content: proximosPassos,
@@ -1772,13 +1819,23 @@ FORMATO JSON:`;
         const userSenderName = userParticipant?.name || ctx.user.name || "Você";
 
         // Salvar mensagem do usuário
-        await db.createMessage({
+        const userMessageId = await createBroadcastMessage({
           sessionId: input.sessionId,
           role: session.userRole,
           senderName: userSenderName,
           content: input.content,
           isAI: false,
         });
+
+        const sessionIsSTFForVote = session.instancia === 'terceira' || session.userRole === 'ministro';
+        if (sessionIsSTFForVote && session.userRole === 'ministro' && userParticipant) {
+          const structuredVote = createSTFVoteFromSpeech({
+            speech: input.content,
+            participant: userParticipant as any,
+            messageId: userMessageId,
+          });
+          if (structuredVote) await db.appendSTFVote(input.sessionId, structuredVote);
+        }
 
         // SISTEMA DE OBJEÇÕES: Detectar se usuário disse "OBJEÇÃO!"
         const isObjection = /\bobjeção\b/i.test(input.content) || /\bobjeçao\b/i.test(input.content);
@@ -1827,7 +1884,7 @@ Decida AGORA:`;
           
           const judgeContent = judgeResponse.choices[0].message.content;
           if (typeof judgeContent === 'string') {
-            await db.createMessage({
+            await createBroadcastMessage({
               sessionId: input.sessionId,
               role: 'juiz',
               content: judgeContent,
@@ -2186,7 +2243,7 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}), REAGINDO DIRETAM
         const aiContent = sanitizeAIResponse(rawAiContent, session.userRole, userParticipantName);
 
         // Salvar resposta da IA
-        await db.createMessage({
+        await createBroadcastMessage({
           sessionId: input.sessionId,
           role: nextRole,
           senderName: speakerName,
@@ -2353,7 +2410,7 @@ Responda AGORA:`;
               
               const followUpContent = followUpResponse.choices[0].message.content;
               if (typeof followUpContent === 'string') {
-                await db.createMessage({
+                await createBroadcastMessage({
                   sessionId: input.sessionId,
                   role: questionTarget,
                   content: followUpContent,
@@ -2401,7 +2458,7 @@ Responda AGORA:`;
                     const contradictionContent = contradictionResponse.choices[0].message.content;
                     if (typeof contradictionContent === 'string' && !contradictionContent.includes('SEM_CONTRADICAO')) {
                       // Contradição detectada! Advogado/Promotor aponta
-                      await db.createMessage({
+                      await createBroadcastMessage({
                         sessionId: input.sessionId,
                         role: session.userRole,
                         content: contradictionContent,
@@ -2434,7 +2491,7 @@ Responda AGORA:`;
                       
                       const reactionContent = witnessReaction.choices[0].message.content;
                       if (typeof reactionContent === 'string') {
-                        await db.createMessage({
+                        await createBroadcastMessage({
                           sessionId: input.sessionId,
                           role: 'testemunha',
                           content: reactionContent,
@@ -2533,7 +2590,7 @@ Responda AGORA:`;
             const openerName = presidente?.name || "Ministro Presidente";
             const relatorName = relator?.name || "Ministro Relator";
             const openingText = `Declaro aberta a Sessão Plenária do Supremo Tribunal Federal, com ${STF_TOTAL_SEATS} ministros e maioria de ${STF_MAJORITY} votos. Em julgamento os autos de "${trial?.title || "ação constitucional"}". Concedo a palavra ao eminente ${relatorName} para a leitura circunstanciada do relatório e resumo da controvérsia.`;
-            const created = await db.createMessage({
+            const created = await createBroadcastMessage({
               sessionId: input.sessionId,
               role: openerRole,
               senderName: openerName,
@@ -2550,7 +2607,7 @@ Responda AGORA:`;
             const openerPart = sessionParticipants.find(p => !p.isUser && p.role === openerRole);
             const openerName = openerPart?.name || (openerRole === "juiz" ? "Juiz de Direito" : "Promotor de Justiça");
             const openingText = `Declaro aberta a audiência de instrução e julgamento do caso "${trial?.title || "em pauta"}". Constate-se a presença das partes, seus procuradores e testemunhas. Passo a palavra para o início dos trabalhos.`;
-            const created = await db.createMessage({
+            const created = await createBroadcastMessage({
               sessionId: input.sessionId,
               role: openerRole,
               senderName: openerName,
@@ -2622,7 +2679,10 @@ Responda AGORA:`;
                         "pergunta",
                         "objecao",
                         "interrupcao",
+                        "aparte",
                         "reacao",
+                        "repreensao",
+                        "revelacao",
                         "passar_palavra",
                         "silencio",
                         "encerramento",
@@ -2906,13 +2966,23 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}). Lembre-se: APENA
         }
 
         // Salvar mensagem da IA (senderName identifica o ministro/personagem correto)
-        await db.createMessage({
+        const createdMessageId = await createBroadcastMessage({
           sessionId: input.sessionId,
           role: nextRole,
           content: aiContent,
           isAI: true,
           senderName: speakerName,
         });
+
+        if (isSTF && nextRole === "ministro") {
+          const speaker = participants.find(p => p.name === speakerName);
+          const structuredVote = speaker && createSTFVoteFromSpeech({
+            speech: aiContent,
+            participant: speaker as any,
+            messageId: createdMessageId,
+          });
+          if (structuredVote) await db.appendSTFVote(input.sessionId, structuredVote);
+        }
 
         // Se foi uma decisão final do juiz, marcar sessão como concluída e salvar veredicto
         if (shouldConclude && nextRole === 'juiz' && !isSTF) {
@@ -2947,7 +3017,8 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}). Lembre-se: APENA
           throw new Error("Ainda não houve debate suficiente para proclamar o resultado");
         }
 
-        const votes = collectSTFVotes(messages as any, participants as any);
+        const storedVotes = await db.getSTFVotes(input.sessionId);
+        const votes = collectSTFVotes(messages as any, participants as any, storedVotes as any);
         const tally = tallySTFVotes(votes);
         const aiMinisters = participants.filter(p => !p.isUser && p.role === "ministro");
         const presidente = findSTFOffice(aiMinisters, "presidente") || aiMinisters[0];
@@ -2958,7 +3029,9 @@ Responda AGORA como ${nextRole.toUpperCase()} (${speakerName}). Lembre-se: APENA
 
         const votesText = votes.length
           ? votes.map(v =>
-              `- ${v.ministerName}${v.isUser ? " (USUÁRIO)" : ""}: ${v.position} [${v.origin}]`
+              `- ${v.ministerName}${v.isUser ? " (USUÁRIO)" : ""} [${v.office || "ministro"}]: ${v.position} [${v.origin}]` +
+              `${v.divergencia ? " — divergência" : ""}${v.vista ? " — pediu vista" : ""}` +
+              `${v.tese ? `\n  Tese: ${v.tese}` : ""}`
             ).join("\n")
           : "- Nenhum voto marcado explicitamente; apurar pela manifestação das falas.";
 
@@ -3017,7 +3090,7 @@ Proclame:`;
         const userParticipantName = participants.find(p => p.isUser)?.name || "Usuário";
         const content = sanitizeAIResponse(rawContent, session.userRole, userParticipantName);
 
-        const created = await db.createMessage({
+        const created = await createBroadcastMessage({
           sessionId: input.sessionId,
           role: "ministro",
           senderName: presidenteName,
@@ -3033,6 +3106,9 @@ Proclame:`;
               : "parcialmente_procedente"
           : undefined;
 
+        const vencedores = votes.filter(v => v.position === tally.winningPosition);
+        const teseVencedora = vencedores.find(v => v.tese)?.tese || vencedores[0]?.excerpt || null;
+
         if (tally.majorityReached) {
           await db.updateSessionDecision(
             input.sessionId,
@@ -3041,9 +3117,14 @@ Proclame:`;
               sentencaFundamentada: content,
               votos: votes.map(v => ({
                 ministro: v.ministerName,
+                cargo: v.office || "ministro",
                 posicao: v.position,
                 origem: v.origin,
+                tese: v.tese || null,
+                vista: Boolean(v.vista),
+                divergencia: Boolean(v.divergencia),
               })),
+              teseVencedora,
               apuracao: tally,
               tipo: "acordao_stf",
             }),
@@ -3057,6 +3138,7 @@ Proclame:`;
           messageId: created.id,
           votes,
           tally,
+          teseVencedora,
           concluded: tally.majorityReached,
           presidenteName,
         };
@@ -3070,6 +3152,41 @@ Proclame:`;
       .query(async ({ ctx, input }) => {
         await requireTrialAccess(input.trialId, ctx.user.id);
         return await db.getTrialEvidences(input.trialId);
+      }),
+
+    confrontar: protectedProcedure
+      .input(z.object({
+        evidenceId: z.number(),
+        sessionId: z.number(),
+        texto: z.string().min(3),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const evidence = await db.getEvidenceById(input.evidenceId);
+        if (!evidence) throw new Error("Prova não encontrada");
+        await requireTrialAccess(evidence.trialId, ctx.user.id);
+        await requireOwnedSession(input.sessionId, ctx.user.id);
+
+        const session = await db.getSessionById(input.sessionId);
+        if (!session || session.trialId !== evidence.trialId) {
+          throw new Error("Esta prova não pertence ao caso desta sessão");
+        }
+
+        const autor = session.userRole;
+        const atualizada = await db.appendEvidenceConfrontation(input.evidenceId, {
+          texto: input.texto.trim(),
+          sessionId: input.sessionId,
+          autor,
+        });
+
+        await createBroadcastMessage({
+          sessionId: input.sessionId,
+          role: "sistema",
+          senderName: "Registro de audiência",
+          content: `CONFRONTO DE PROVA — ${evidence.title}: ${input.texto.trim()}`,
+          isAI: true,
+        });
+
+        return atualizada;
       }),
   }),
 
@@ -3443,7 +3560,7 @@ A ementa deve ser concisa (3-5 linhas), técnica e seguir o padrão dos tribunai
           const instanciaNome = isTerceiraInstancia ? "TERCEIRA INSTÂNCIA" : "SEGUNDA INSTÂNCIA";
           const julgadoresNome = isTerceiraInstancia ? "ministros" : "desembargadores";
           
-          await db.createMessage({
+          await createBroadcastMessage({
             sessionId: newSessionId!, role: "sistema",
             content: `**${instanciaNome} - ${tribunalNome.toUpperCase()}**\n\nO recurso de ${appeal.tipo} foi **${decisaoFinal.toUpperCase()}** pelos ${julgadoresNome}.\n\n**Ementa do Acórdão:**\n${ementa}\n\n**Votos:**\n${votos.map(v => `- **${v.nome}** (${v.cargo}): ${v.voto.toUpperCase()}\n  ${v.fundamentacao}`).join("\n\n")}\n\n---\n\nO julgamento agora prossegue em ${proximaInstancia} instância com os ${julgadoresNome}. Você continua como **${session.userRole}**.`,
             isAI: true,

@@ -12,7 +12,7 @@
 | **Projeto** | Simulador de Tribunal V7 |
 | **Diretório** | `/home/kali/simulador_tribunal_v7_gemini` |
 | **Stack** | React + TypeScript + tRPC + Vitest + IA (OpenRouter/Gemini/Ollama/OpenAI/Manus) |
-| **BD** | JSON local (`data/tribunal-local.json`) — sem MySQL, sem migrações |
+| **BD** | JSON local (`data/tribunal-runtime.json`), semeado a partir de `data/seed.local.json` — sem MySQL, sem migrações |
 | **Provedor IA padrão** | OpenCode (`AI_PROVIDER=auto`/`opencode`), com OpenRouter, Gemini, Ollama, OpenAI e Manus como fallback |
 | **Auth** | LOCAL_AUTH=true (Termux, sem OAuth externo) |
 
@@ -59,7 +59,9 @@ client/src/pages/
 drizzle/
   schema.ts               ← Schema de tipos (apenas para inferência TypeScript)
 data/
-  tribunal-local.json     ← Banco de dados JSON (dados locais persistidos)
+  seed.local.json         ← Semente versionada (cópia do antigo tribunal-local.json)
+  tribunal-runtime.json   ← Banco ativo (gerado/ignorado pelo Git)
+  tribunal-local.json     ← Banco legado preservado (migrado uma única vez)
 ```
 
 ---
@@ -105,9 +107,9 @@ data/
 # TypeScript Check:
 npm run check -> Exit code 0 (0 errors)
 
-# Vitest Suite (após validação funcional do tribunal e do STF):
-Test Files  15 passed (15)
-     Tests  95 passed (95)
+# Vitest Suite (após realismo, tempo real e higiene):
+Test Files  18 passed (18)
+     Tests  114 passed (114)
   Duration  ~4s
 ```
 
@@ -116,6 +118,8 @@ Test Files  15 passed (15)
 > ℹ️ `tribunal_integration.test.ts`: **5/5 passando** — fluxo completo de 1ª instância: `trial.generate` → `session.create` (juiz) → participantes → `message.send` → `message.continuar` → histórico → `session.generateFinalDecision` com status `sentenciado`.
 > ℹ️ `opencode.test.ts`: **7/7 passando** — descoberta de modelo gratuito, agente dedicado, rotação em falha, intercalação Nvidia/`opencode`, rejeição de fala com outro alfabeto e extração de JSON. Validação real: `OK` via `nvidia/google/gemma-4-31b-it`.
 > ℹ️ `speech-sanitizer.test.ts`: **11/11 passando** — fala preservada, remoção de metadados em português e inglês, rótulo de personagem repetido, fallback neutro, tags de contexto, múltiplos personagens e higienização de CJK/caracteres estrangeiros.
+> ℹ️ `persona-evals.test.ts`: **11/11 passando** — avaliações determinísticas para juiz, promotor, defesa, ministro e testemunha: primeira pessoa, português, ausência de metadados e remoção de caracteres estrangeiros.
+> ℹ️ `hearing-director.freedom.test.ts` (**2**), `stf.structured.test.ts` (**5**) e o novo teste de confronto em `tribunal_integration.test.ts` (**6/6 no arquivo**) cobrem as melhorias de realismo desta sessão.
 > ⚠️ Numa execução anterior apareceram 7 `EPERM: rename` em `server/db.ts` (Windows),
 > com 2 `.tmp` deixados em `data/`; não foram removidos.
 
@@ -144,7 +148,7 @@ OPENAI_API_KEY=...
 
 # Sistema:
 LOCAL_AUTH=true
-DATABASE_URL=                           # Não usado — BD é JSON local
+LOCAL_DB_PATH=                          # Opcional; padrão: data/tribunal-runtime.json
 NODE_ENV=development
 JWT_SECRET=...
 ```
@@ -173,11 +177,13 @@ JWT_SECRET=...
 | 2026-11-20 (imagens desativadas) | OpenCode (Big Pickle) | Geração de imagens via Forge foi **desativada por padrão** (`IMAGE_GENERATION_ENABLED=false`). A geração automática em background foi suprimida e a rota manual `enhancements.visualDocs.generate` agora recusa com erro claro. Isso evita consumo de créditos do Forge e o ruído de `[Background] Erro ao gerar ... BUILT_IN_FORGE_API_URL is not configured`. Os testes cobrem ambos os estados (desativado e ativado explicitamente). 82/82 testes passando. |
 | 2026-11-20 (correções gerais) | OpenCode (Big Pickle) | **`campaign.advanceCase`/`complete`**: passaram a buscar o progresso pelo `progressId` real e a validar posse (antes usavam `getCampaignProgress(0,0)`). **`server/db.ts`**: `persist()` não envenena mais a `saveQueue` após uma falha de escrita. **IDOR**: novo `server/access-control.ts` com `requireOwnedSession`, `requireTrialAccess` e `requireOwnedAppeal`, aplicados a sessões, provas/documentos/históricos, recursos e eventos/docs visuais; `customTrial.getById` deixou de devolver `objectiveTruth`. **UI**: botão "Ver Decisão Final" abre o diálogo do `FinalDecisionView`. **Testes**: `LOCAL_DB_PATH` isolado por worker (`server/test-setup.ts`), então `npm test` não altera mais `data/tribunal-local.json`. Novos testes: `campaign.test.ts`, `db.persistence.test.ts`, `ownership.test.ts`. Multiplayer **não** foi tocado (fora de escopo). 90/90 testes passando, TypeScript limpo. |
 | 2026-11-20 (validação funcional) | OpenCode (Big Pickle) | Antes do push, os fluxos reais foram exercitados via `appRouter.createCaller` com IA mockada: **5/5** no novo `tribunal_integration.test.ts` (1ª instância completa, inclusive sentença) e **8/8** no `stf_integration.test.ts` (plenário, falas, maioria e acórdão). Os mocks do STF foram ajustados para as chaves reais retornadas pelo backend e para não confundir o prompt de fala com o do Diretor de Audiência. Suíte final: **95/95 testes**, `npm run check` limpo, `data/tribunal-local.json` intacto. |
+| 2026-11-20 (realismo e tempo real) | OpenCode (Big Pickle) | **Realismo sem rigidez**: o Diretor de Audiência passou a aceitar `aparte`, `repreensao` e `revelacao` — personagens podem falar fora da vez, quem conduz pode chamar à ordem (não automaticamente) e fatos concretos podem desviar a atenção; prompt e enum do json_schema atualizados. **STF estruturado**: votos com cargo/tese/vista/divergência extraídos da fala e persistidos, apuração mesclada com os votos salvos e acórdão com `teseVencedora` e votação nominal na UI. **Sentença estruturada**: `relatorio`, `fundamentacao`, `dispositivo` e `dosimetria` no prompt/schema e em `FinalDecisionView`. **Provas**: origem, data de coleta e custódia geradas/persistidas; nova mutation `evidence.confrontar`, confronto exibido nos autos, no prompt da sentença e no contexto do Diretor. **Tempo real**: `getIO()` e `join-session`/`leave-session` validados em `_core/socket.ts`, `broadcastSessionMessage` em `_core/message-events.ts`, `createBroadcastMessage` no router principal e no de voz; `Trial.tsx` escuta `new-message` via Socket.IO e atualiza o cache tRPC, eliminando os `setTimeout` de refetch. **Higiene**: semente versionada em `data/seed.local.json`, banco ativo em `data/tribunal-runtime.json` (migração única do legado), script `npm run db:seed`, `.env.example` sem MySQL, `.gitignore` ajustado e 11 evals de persona. Multiplayer não foi alterado. **114/114 testes**, `npm run check` limpo. |
 
 ---
 
 ## 📌 Próximos Passos Sugeridos
 
-1. Testar o simulador na interface web interagindo em sessões normais e no novo STF (criar caso **novo** — sessões antigas têm nomes genéricos salvos).
+1. Testar na interface web: aparte/repreensão/revelação, votação nominal do STF, sentença com dosimetria, confronto de provas e atualização das falas sem recarregar (criar caso **novo** — sessões antigas têm nomes genéricos salvos).
 2. Se o OpenCode ficar indisponível de forma persistente, o usuário pode fornecer chaves individuais das IAs gratuitas; a cadeia OpenRouter e os fallbacks já cobrem esse cenário.
 3. Opcional: unificar Diretor + fala do personagem em uma única chamada (hoje `message.continuar` ainda faz duas; a abertura do STF já é determinística).
+4. Revisar `git status`/`git diff` desta sessão e decidir o commit das melhorias (o push anterior, com os testes de fluxo, já está no remoto).

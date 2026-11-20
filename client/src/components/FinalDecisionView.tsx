@@ -155,6 +155,58 @@ export default function FinalDecisionView({ sessionId, userRole, isSTF = false }
           </CardHeader>
         </Card>
 
+        {(decision.relatorio || decision.fundamentacao || decision.dispositivo) && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Estrutura da decisão
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {decision.relatorio && (
+                <div>
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">Relatório</p>
+                  <p className="text-sm whitespace-pre-wrap">{decision.relatorio}</p>
+                </div>
+              )}
+              {decision.fundamentacao && (
+                <div>
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">Fundamentação</p>
+                  <p className="text-sm whitespace-pre-wrap">{decision.fundamentacao}</p>
+                </div>
+              )}
+              {decision.dispositivo && (
+                <div>
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">Dispositivo</p>
+                  <p className="text-sm font-medium whitespace-pre-wrap">{decision.dispositivo}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {decision.dosimetria && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Gavel className="h-5 w-5" />
+                Dosimetria da pena
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm">
+                {Object.entries(decision.dosimetria).map(([campo, valor]) => (
+                  <li key={campo} className="flex justify-between gap-4 border-b pb-2 last:border-0 last:pb-0">
+                    <span className="font-medium capitalize">{campo.replace(/([A-Z])/g, " $1")}</span>
+                    <span className="text-right text-muted-foreground">{String(valor)}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Sentença Fundamentada */}
         <Card>
           <CardHeader>
@@ -169,6 +221,44 @@ export default function FinalDecisionView({ sessionId, userRole, isSTF = false }
             </div>
           </CardContent>
         </Card>
+
+        {decision.teseVencedora && (
+          <Card className="border-amber-300 bg-amber-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Gavel className="h-5 w-5" />
+                Tese vencedora
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm whitespace-pre-wrap">{decision.teseVencedora}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {decision.votos && decision.votos.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Votação nominal</CardTitle>
+              <CardDescription>
+                Cargo, posição e destaque de cada ministro na apuração.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm">
+                {decision.votos.map((voto: any, index: number) => (
+                  <li key={index} className="border-b pb-2 last:border-0 last:pb-0">
+                    <span className="font-medium">{voto.ministro}</span>
+                    <span className="text-muted-foreground"> — {voto.cargo || "ministro"} — {voto.posicao}</span>
+                    {voto.divergencia && <span className="text-amber-700"> — divergência</span>}
+                    {voto.vista && <span className="text-amber-700"> — pediu vista</span>}
+                    {voto.tese && <p className="mt-1 text-muted-foreground">Tese: {voto.tese}</p>}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Valores de Indenização */}
         {decision.valoresIndenizacao && (

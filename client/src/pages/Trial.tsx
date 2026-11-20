@@ -20,6 +20,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import HearingHistoryView from "@/components/HearingHistoryView";
 import FinalDecisionView from "@/components/FinalDecisionView";
 import { ThemeSelector } from "@/components/ThemeSelector";
+import { toast } from "sonner";
+import { io } from "socket.io-client";
 
 
 // Componente auxiliar para solicitar votação do júri
@@ -773,13 +775,16 @@ const roleStyles: Record<string, { bg: string; border: string; text: string; bad
 export default function Trial() {
   const { id } = useParams<{ id: string }>();
   const sessionId = parseInt(id || "0");
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, user } = useAuth();
   const [, navigate] = useLocation();
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showVoteTally, setShowVoteTally] = useState(false);
   const [showFinalDecision, setShowFinalDecision] = useState(false);
+  const [confrontEvidence, setConfrontEvidence] = useState<any>(null);
+  const [confrontText, setConfrontText] = useState("");
+  const utils = trpc.useUtils();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: session, isLoading: sessionLoading } = trpc.session.getById.useQuery(
@@ -813,6 +818,21 @@ export default function Trial() {
     { sessionId },
     { enabled: !!sessionId && isAuthenticated }
   );
+
+  const confrontarMutation = trpc.evidence.confrontar.useMutation({
+    onSuccess: async () => {
+      setConfrontEvidence(null);
+      setConfrontText("");
+      await Promise.all([
+        utils.evidence.list.invalidate(),
+        utils.message.list.invalidate(),
+      ]);
+      toast.success("Confronto registrado nos autos e na audiência.");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Não foi possível registrar o confronto.");
+    },
+  });
 
   // A instância é a fonte autoritativa: sessões STF antigas podem não ter a
   // área "stf_constitucional" preenchida.
@@ -852,17 +872,36 @@ export default function Trial() {
     if (isSTF) void refetchStfTally();
   }, [messages?.length, isSTF, refetchStfTally]);
 
+  useEffect(() => {
+    if (!isAuthenticated || !sessionId || !user?.id) return;
+
+    const socket = io({ path: "/socket.io/" });
+
+    socket.on("connect", () => {
+      socket.emit("join-session", { sessionId, userId: user.id });
+    });
+
+    socket.on("new-message", (novaMensagem: any) => {
+      utils.message.list.setData({ sessionId }, (anterior: any) => {
+        const atual = Array.isArray(anterior) ? anterior : [];
+        if (atual.some((m: any) => m.id === novaMensagem.id)) return atual;
+        return [...atual, novaMensagem];
+      });
+      if (isSTF) void refetchStfTally();
+      if (novaMensagem?.role === "sistema") void utils.session.getById.invalidate({ id: sessionId });
+    });
+
+    return () => {
+      socket.emit("leave-session", { sessionId });
+      socket.disconnect();
+    };
+  }, [isAuthenticated, sessionId, user?.id, isSTF, refetchStfTally, utils]);
+
   const sendMutation = trpc.message.send.useMutation({
     onSuccess: () => {
       setMessage("");
       setIsSending(false);
-      refetchMessages();
-      setTimeout(() => {
-        refetchMessages();
-      }, 500);
-      setTimeout(() => {
-        refetchMessages();
-      }, 1000);
+      void utils.message.list.invalidate({ sessionId });
     },
     onError: (error) => {
       console.error("Erro ao enviar mensagem:", error);
@@ -890,13 +929,7 @@ export default function Trial() {
 
   const continuarJulgamento = trpc.message.continuar.useMutation({
     onSuccess: () => {
-      refetchMessages();
-      setTimeout(() => {
-        refetchMessages();
-      }, 500);
-      setTimeout(() => {
-        refetchMessages();
-      }, 1000);
+      void utils.message.list.invalidate({ sessionId });
     },
     onError: (error) => {
       console.error("Erro ao continuar julgamento:", error);
@@ -908,8 +941,7 @@ export default function Trial() {
 
   const proclamarMutation = trpc.message.proclamar.useMutation({
     onSuccess: () => {
-      refetchMessages();
-      setTimeout(() => refetchMessages(), 500);
+      void utils.message.list.invalidate({ sessionId });
     },
     onError: (error: any) => {
       alert(error.message || "Erro ao proclamar o resultado.");
@@ -1223,6 +1255,33 @@ export default function Trial() {
                               <Streamdown>{evidence.details}</Streamdown>
                             </div>
                           )}
+                          {(evidence.origem || evidence.dataColeta || evidence.custodia) && (
+                            <div className="rounded-md bg-muted p-3 text-xs space-y-1">
+                              {evidence.origem && <p><span className="font-semibold">Origem:</span> {evidence.origem}</p>}
+                              {evidence.dataColeta && <p><span className="font-semibold">Coleta:</span> {evidence.dataColeta}</p>}
+                              {evidence.custodia && <p><span className="font-semibold">Custódia:</span> {evidence.custodia}</p>}
+                            </div>
+                          )}
+                          {evidence.confrontacoes && evidence.confrontacoes.length > 0 && (
+                            <div>
+                              <h5 className="font-semibold text-sm mb-1">Confrontos registrados</h5>
+                              <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1">
+                                {evidence.confrontacoes.map((confronto: any, cidx: number) => (
+                                  <li key={cidx}><strong>{confronto.autor || "Parte"}:</strong> {confronto.texto}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          <div className="flex justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 gap-2 text-xs"
+                              onClick={() => setConfrontEvidence(evidence)}
+                            >
+                              <MessageSquareText className="h-3 w-3" /> Confrontar prova
+                            </Button>
+                          </div>
                         </CardContent>
                       </Card>
                     ))}
@@ -1642,6 +1701,47 @@ export default function Trial() {
           </div>
         </div>
       </main>
+
+      <Dialog
+        open={!!confrontEvidence}
+        onOpenChange={(open) => {
+          if (!open) {
+            setConfrontEvidence(null);
+            setConfrontText("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Confrontar prova</DialogTitle>
+            <DialogDescription>
+              Registre a contradição ou o questionamento sobre "{confrontEvidence?.title}". O confronto entra nos autos e na audiência.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            placeholder="Ex.: A testemunha disse na polícia que o horário era 23h47, mas hoje afirmou 22h30."
+            value={confrontText}
+            onChange={(e) => setConfrontText(e.target.value)}
+            className="min-h-[110px]"
+          />
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" size="sm" onClick={() => setConfrontEvidence(null)}>
+              Cancelar
+            </Button>
+            <Button
+              size="sm"
+              disabled={confrontText.trim().length < 3 || confrontarMutation.isPending}
+              onClick={() => confrontarMutation.mutate({
+                evidenceId: confrontEvidence.id,
+                sessionId,
+                texto: confrontText.trim(),
+              })}
+            >
+              {confrontarMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Registrar confronto"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

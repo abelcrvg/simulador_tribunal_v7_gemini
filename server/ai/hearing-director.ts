@@ -5,7 +5,10 @@ export type HearingAction =
   | "pergunta"
   | "objecao"
   | "interrupcao"
+  | "aparte"
   | "reacao"
+  | "repreensao"
+  | "revelacao"
   | "passar_palavra"
   | "silencio"
   | "encerramento"
@@ -39,7 +42,10 @@ const VALID_ACTIONS: HearingAction[] = [
   "pergunta",
   "objecao",
   "interrupcao",
+  "aparte",
   "reacao",
+  "repreensao",
+  "revelacao",
   "passar_palavra",
   "silencio",
   "encerramento",
@@ -101,10 +107,20 @@ function buildEvidenceContext(evidences: any[]): string {
   return evidences
     .slice(0, 20)
     .map((evidence: any, index: number) => {
+      const confrontations = Array.isArray(evidence.confrontacoes)
+        ? evidence.confrontacoes
+            .map((c: any) => `- ${normalizeText(c.autor || "parte")}: ${normalizeText(c.texto)}`)
+            .join("\n")
+        : "";
+
       return [
         `${index + 1}. ${normalizeText(evidence.title)}`,
         `Descrição: ${normalizeText(evidence.description)}`,
-      ].join("\n");
+        evidence.origem ? `Origem: ${normalizeText(evidence.origem)}` : null,
+        evidence.dataColeta ? `Coleta: ${normalizeText(evidence.dataColeta)}` : null,
+        evidence.custodia ? `Custódia: ${normalizeText(evidence.custodia)}` : null,
+        confrontations ? `Confrontos registrados:\n${confrontations}` : null,
+      ].filter(Boolean).join("\n");
     })
     .join("\n\n");
 }
@@ -389,8 +405,28 @@ Um participante apresenta uma objeção.
 "interrupcao"
 Um participante interrompe outro de maneira plausível.
 
+"aparte"
+Um participante fala fora da vez, sem pedir licença ou sem esperar
+que a palavra lhe seja concedida. Pode ser um comentário rápido,
+uma reclamação, um insulto contido ou uma observação que ninguém
+esperava ouvir. Use quando a cena pedir espontaneidade.
+
 "reacao"
 Um participante reage ao que acabou de acontecer.
+
+"repreensao"
+Quem conduz a sessão chama alguém à ordem depois de uma fala fora
+de vez, de um excesso ou de uma provocação. Não é uma punição
+automática: pode haver riso nervoso, silêncio, resistência ou uma
+justificativa do repreendido. No STF, quem repreende é a presidência.
+
+"revelacao"
+Alguém traz um fato concreto e inesperado que muda a atenção de
+todos: um documento, uma contradição, uma data, uma gravação, uma
+confissão parcial, um detalhe material. Não invente prova nova sem
+base no caso; explore algo que já existe nos autos ou no depoimento.
+Depois de uma revelação, a reação dos outros participantes é parte
+natural da cena.
 
 "passar_palavra"
 Um participante passa a palavra para outro participante.
@@ -461,6 +497,30 @@ Interrupção:
   "content": "O promotor interrompe a manifestação da defesa."
 }
 
+Aparte fora de vez:
+{
+  "action": "aparte",
+  "speakerRole": "reu",
+  "targetRole": "juiz",
+  "content": "O réu se levanta e corrige a data que a testemunha acabou de dizer."
+}
+
+Repreensão:
+{
+  "action": "repreensao",
+  "speakerRole": "juiz",
+  "targetRole": "advogado_defesa",
+  "content": "O juiz pede silêncio e lembra que as perguntas devem ser formuladas com urbanidade."
+}
+
+Revelação:
+{
+  "action": "revelacao",
+  "speakerRole": "testemunha",
+  "targetRole": "promotor",
+  "content": "A testemunha recorda que o boletim registra outro horário e todos se voltam para o documento."
+}
+
 Passagem de palavra:
 {
   "action": "passar_palavra",
@@ -472,6 +532,16 @@ Passagem de palavra:
 ============================================================
 REGRAS IMPORTANTES
 ============================================================
+
+Não existe vez obrigatória. Qualquer participante pode falar fora
+da vez, interromper ou trazer um fato concreto que chame a atenção
+geral. Não transforme isso em regra mecânica: use "aparte",
+"revelacao", "repreensao" ou "reacao" apenas quando fizer sentido
+para a personalidade e o momento da cena.
+
+Uma repreensão não é automática. O juiz pode ignorar, advertir,
+pedir calma ou até ser provocado. Os participantes têm livre
+arbítrio e podem resistir, mentir, se contradizer ou mudar de tom.
 
 NUNCA use uma ação chamada "usuario".
 

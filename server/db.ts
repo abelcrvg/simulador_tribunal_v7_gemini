@@ -5,7 +5,7 @@
  * same db.* API used by the routers, but stores records in a local JSON file so
  * the application does not require a remote MySQL server.
  */
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { InsertUser, InsertTrial, InsertSession, InsertMessage, InsertEvidence, InsertParticipant, InsertVehicleHistory, InsertDocument, InsertJuryVote, InsertPoliceReport, InsertHearing, InsertCampaign, InsertCampaignProgress, InsertVisualDocument, InsertTrialEvent, InsertCustomTrial } from "../drizzle/schema";
 import { ENV } from "./_core/env";
@@ -40,7 +40,10 @@ type Store = Record<TableName, Table> & {
   counters: Record<string, number>;
 };
 
-const DB_PATH = resolve(process.env.LOCAL_DB_PATH || resolve(process.cwd(), "data/tribunal-local.json"));
+const RUNTIME_DB_PATH = resolve(process.cwd(), "data/tribunal-runtime.json");
+const LEGACY_DB_PATH = resolve(process.cwd(), "data/tribunal-local.json");
+const SEED_DB_PATH = resolve(process.cwd(), "data/seed.local.json");
+const DB_PATH = resolve(process.env.LOCAL_DB_PATH || RUNTIME_DB_PATH);
 let store: Store | null = null;
 let loading: Promise<Store> | null = null;
 let saveQueue: Promise<void> = Promise.resolve();
@@ -67,10 +70,33 @@ function revive(value: any): any {
   return out;
 }
 
+async function ensureRuntimeDb(): Promise<void> {
+  if (process.env.LOCAL_DB_PATH) return;
+  try {
+    await access(DB_PATH);
+    return;
+  } catch {
+    // O banco de runtime ainda não existe; semear abaixo.
+  }
+
+  for (const source of [LEGACY_DB_PATH, SEED_DB_PATH]) {
+    try {
+      await access(source);
+      await mkdir(dirname(DB_PATH), { recursive: true });
+      await copyFile(source, DB_PATH);
+      console.log(`[DB] Banco de runtime criado a partir de ${source}`);
+      return;
+    } catch {
+      // Tenta a próxima origem.
+    }
+  }
+}
+
 async function loadStore(): Promise<Store> {
   if (store) return store;
   if (!loading) {
     loading = (async () => {
+      await ensureRuntimeDb();
       try {
         const raw = await readFile(DB_PATH, "utf8");
         const parsed = revive(JSON.parse(raw)) as Store;
@@ -199,14 +225,19 @@ export async function getUserSessions(userId: number) { const s = await dbStore(
 export async function updateSessionStatus(id: number, status: "em_andamento" | "concluido" | "abandonado" | "sentenciado" | "em_recurso", verdict?: string) { const s = await dbStore(); const r = byId(s.sessions,id); if (!r) return; Object.assign(r,{status, ...(verdict !== undefined ? {verdict}:{}) ,updatedAt:now()}); await persist(); }
 export async function updateSessionJuryVoted(id: number, juriVotou: boolean) { const s=await dbStore(); const r=byId(s.sessions,id); if(r){r.juriVotou=juriVotou;r.updatedAt=now();await persist();} }
 export async function updateSessionDecision(id:number, decisionDetails:string, status?: "em_andamento"|"concluido"|"abandonado"|"sentenciado"|"em_recurso") { const s=await dbStore(); const r=byId(s.sessions,id); if(r){r.decisionDetails=decisionDetails;if(status)r.status=status;r.updatedAt=now();await persist();} }
+export async function getSTFVotes(sessionId: number): Promise<any[]> { const s = await dbStore(); const r = byId(s.sessions, sessionId); return Array.isArray(r?.stfVotes) ? r.stfVotes : []; }
+export async function appendSTFVote(sessionId: number, vote: any) { const s = await dbStore(); const r = byId(s.sessions, sessionId); if (!r) return; const votes = Array.isArray(r.stfVotes) ? r.stfVotes.filter((v: any) => v.ministerName !== vote.ministerName) : []; votes.push(vote); r.stfVotes = votes; r.updatedAt = now(); await persist(); }
 export async function getChildSessions(parentSessionId:number) { const s=await dbStore(); return filter(s.sessions,"parentSessionId",parentSessionId); }
 export async function getTrialSessions(trialId:number) { const s=await dbStore(); return filter(s.sessions,"trialId",trialId); }
 
 export async function createMessage(message: InsertMessage) { return (await insertOne("messages", message, {createdAt:now()})).id; }
 export async function getSessionMessages(sessionId: number) { const s=await dbStore(); return sortAsc(filter(s.messages,"sessionId",sessionId),"createdAt"); }
+export async function getMessageById(id: number) { const s = await dbStore(); return byId(s.messages, id); }
 
 export async function createEvidence(evidence: InsertEvidence) { return (await insertOne("evidences", evidence,{createdAt:now()})).id; }
 export async function getTrialEvidences(trialId: number) { const s=await dbStore(); return sortAsc(filter(s.evidences,"trialId",trialId),"createdAt"); }
+export async function getEvidenceById(id: number) { const s = await dbStore(); return byId(s.evidences, id); }
+export async function appendEvidenceConfrontation(id: number, confrontation: { texto: string; sessionId?: number; autor?: string }) { const s = await dbStore(); const r = byId(s.evidences, id); if (!r) return null; const list = Array.isArray(r.confrontacoes) ? r.confrontacoes : []; list.push({ ...confrontation, createdAt: now() }); r.confrontacoes = list; await persist(); return r; }
 export async function createMultipleEvidences(list: InsertEvidence[]) {
   const out: any[] = [];
   await persist(async (store) => {
