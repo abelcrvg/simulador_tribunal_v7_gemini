@@ -105,14 +105,15 @@ data/
 # TypeScript Check:
 npm run check -> Exit code 0 (0 errors)
 
-# Vitest Suite (após correções de campanha, persistência, posse e testes isolados):
-Test Files  14 passed (14)
-     Tests  90 passed (90)
+# Vitest Suite (após validação funcional do tribunal e do STF):
+Test Files  15 passed (15)
+     Tests  95 passed (95)
   Duration  ~4s
 ```
 
 > ℹ️ `openrouter.test.ts`: **13/13 passando** (cadeia em lotes, reasoning, retentativas, ordem de fallback e short-circuit de cota diária).
-> ℹ️ `stf_integration.test.ts`: **8/8 passando** — 10 ministros IA + usuário, cargos, PGR/AGU e proclamação com maioria.
+> ℹ️ `stf_integration.test.ts`: **8/8 passando** — 10 ministros IA + usuário, cargos, PGR/AGU e proclamação com maioria. Mocks de provas/documentos/cronologia/audiências corrigidos para as chaves reais (`evidences`, `documents`, `timeline`, `hearings`) e o do Diretor passou a só capturar o prompt da decisão, evitando que JSON aparecesse como fala.
+> ℹ️ `tribunal_integration.test.ts`: **5/5 passando** — fluxo completo de 1ª instância: `trial.generate` → `session.create` (juiz) → participantes → `message.send` → `message.continuar` → histórico → `session.generateFinalDecision` com status `sentenciado`.
 > ℹ️ `opencode.test.ts`: **7/7 passando** — descoberta de modelo gratuito, agente dedicado, rotação em falha, intercalação Nvidia/`opencode`, rejeição de fala com outro alfabeto e extração de JSON. Validação real: `OK` via `nvidia/google/gemma-4-31b-it`.
 > ℹ️ `speech-sanitizer.test.ts`: **11/11 passando** — fala preservada, remoção de metadados em português e inglês, rótulo de personagem repetido, fallback neutro, tags de contexto, múltiplos personagens e higienização de CJK/caracteres estrangeiros.
 > ⚠️ Numa execução anterior apareceram 7 `EPERM: rename` em `server/db.ts` (Windows),
@@ -171,6 +172,7 @@ JWT_SECRET=...
 | 2026-11-20 (metadados em inglês) | OpenCode (Big Pickle) | Apareceu também `MAXIMUM STEPS LIMIT REACHED -` e o rótulo `Dra. Sandra Battistella [Procurador-Geral da República (PGR)](IA)` dentro da fala. O sanitizador passou a reconhecer marcadores em inglês (`MAXIMUM/MAX STEPS`, `STEP LIMIT REACHED`, `TOOL CALLS DISABLED`, `NEXT USER PROMPT`, `SYSTEM STATUS`, `CONVERSATION CHECKPOINT`) e a remover linhas de rótulo `[...](IA)` repetidas pelo modelo; se sobrar só metadado, devolve fala neutra. Instrução e agente `tribunal-speaker` reforçados. 81/81 testes passando. |
 | 2026-11-20 (imagens desativadas) | OpenCode (Big Pickle) | Geração de imagens via Forge foi **desativada por padrão** (`IMAGE_GENERATION_ENABLED=false`). A geração automática em background foi suprimida e a rota manual `enhancements.visualDocs.generate` agora recusa com erro claro. Isso evita consumo de créditos do Forge e o ruído de `[Background] Erro ao gerar ... BUILT_IN_FORGE_API_URL is not configured`. Os testes cobrem ambos os estados (desativado e ativado explicitamente). 82/82 testes passando. |
 | 2026-11-20 (correções gerais) | OpenCode (Big Pickle) | **`campaign.advanceCase`/`complete`**: passaram a buscar o progresso pelo `progressId` real e a validar posse (antes usavam `getCampaignProgress(0,0)`). **`server/db.ts`**: `persist()` não envenena mais a `saveQueue` após uma falha de escrita. **IDOR**: novo `server/access-control.ts` com `requireOwnedSession`, `requireTrialAccess` e `requireOwnedAppeal`, aplicados a sessões, provas/documentos/históricos, recursos e eventos/docs visuais; `customTrial.getById` deixou de devolver `objectiveTruth`. **UI**: botão "Ver Decisão Final" abre o diálogo do `FinalDecisionView`. **Testes**: `LOCAL_DB_PATH` isolado por worker (`server/test-setup.ts`), então `npm test` não altera mais `data/tribunal-local.json`. Novos testes: `campaign.test.ts`, `db.persistence.test.ts`, `ownership.test.ts`. Multiplayer **não** foi tocado (fora de escopo). 90/90 testes passando, TypeScript limpo. |
+| 2026-11-20 (validação funcional) | OpenCode (Big Pickle) | Antes do push, os fluxos reais foram exercitados via `appRouter.createCaller` com IA mockada: **5/5** no novo `tribunal_integration.test.ts` (1ª instância completa, inclusive sentença) e **8/8** no `stf_integration.test.ts` (plenário, falas, maioria e acórdão). Os mocks do STF foram ajustados para as chaves reais retornadas pelo backend e para não confundir o prompt de fala com o do Diretor de Audiência. Suíte final: **95/95 testes**, `npm run check` limpo, `data/tribunal-local.json` intacto. |
 
 ---
 

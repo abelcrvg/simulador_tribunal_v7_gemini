@@ -65,49 +65,47 @@ vi.mock("./_core/llm", () => {
     }
 
     // --- Geração de provas ---
-    if (
-      userContent.includes("provas") ||
-      userContent.includes("evidências") ||
-      userContent.includes("evidencias") ||
-      userContent.includes("Evidências")
-    ) {
+    if (userContent.includes("Gere provas realistas e detalhadas")) {
       return { choices: [{ message: { content: JSON.stringify({
-        evidencias: [
-          { title: "Texto do Art. 12 da Lei nº 14.555/2023", description: "Dispositivo legal impugnado." },
-          { title: "Relatório ANPD", description: "Risco alto ao direito fundamental de privacidade." },
+        evidences: [
+          { type: "documental", title: "Texto do Art. 12 da Lei nº 14.555/2023", description: "Dispositivo legal impugnado.", details: "Autoriza acesso a metadados sem ordem judicial." },
+          { type: "pericial", title: "Relatório ANPD", description: "Risco alto ao direito fundamental de privacidade.", details: "Auditoria técnica de impacto à privacidade." },
+        ],
+      }) } }] };
+    }
+
+    // --- Geração de documentos ---
+    if (userContent.includes("Gere documentos realistas e COMPLETOS")) {
+      return { choices: [{ message: { content: JSON.stringify({
+        documents: [
+          { type: "parecer_juridico", title: "Parecer da OAB", description: "Fundamentos da ADI.", content: "Parecer completo.", issueDate: "2023-04-10", issuer: "Conselho Federal da OAB", relevance: "alta" },
         ],
       }) } }] };
     }
 
     // --- Cronologia ---
-    if (userContent.includes("cronologia") || userContent.includes("timeline")) {
+    if (userContent.includes("CRONOLOGIA COMPLETA")) {
       return { choices: [{ message: { content: JSON.stringify({
-        events: [
+        timeline: [
           { date: "2023-03-01", description: "Publicação da Lei nº 14.555/2023." },
           { date: "2023-04-10", description: "OAB ajuíza ADI 9999." },
         ],
+        crimeSceneReport: "Não aplicável.",
         policeStatements: [],
+        evidenceQuality: "alta",
+        evidenceQualityNote: "Documentação robusta.",
       }) } }] };
     }
 
     // --- Histórico de audiências ---
-    if (
-      userContent.includes("audiência") ||
-      userContent.includes("audiencias") ||
-      systemContent.includes("audiência")
-    ) {
+    if (userContent.includes("ESCRIVÃO DE TRIBUNAL")) {
       return { choices: [{ message: { content: JSON.stringify({
-        audiencias: [{ data: "2024-02-01", tipo: "Sustentação Oral", resumo: "Partes apresentaram sustentação oral." }],
+        hearings: [{ type: "inicial", date: "2024-02-01 às 14h", summary: "Sustentação oral das partes.", intermediateDecisions: "Nenhuma.", wasPostponed: "nao", postponementReason: null }],
       }) } }] };
     }
 
     // --- Diretor de Audiência (timestamp garante unicidade contra deduplicação) ---
-    if (
-      systemContent.includes("Diretor") ||
-      systemContent.includes("diretor") ||
-      userContent.includes("PRINCÍPIO CENTRAL") ||
-      userContent.includes("DIRETOR DE AUDIÊNCIA")
-    ) {
+    if (userContent.includes("Você é o DIRETOR DE AUDIÊNCIA de um simulador")) {
       const ts = Date.now();
       return { choices: [{ message: { content: JSON.stringify({
         action: "fala",

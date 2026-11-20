@@ -182,4 +182,5 @@
 - [x] **Acesso a dados de outras sessões (IDOR)**: checagem de posse centralizada em `server/access-control.ts` e aplicada a sessões, provas/documentos, recursos, eventos e documentos visuais.
 - [x] **Vazamento da verdade objetiva**: `customTrial.getById` (público) removia `objectiveTruth` antes de devolver o caso.
 - [x] **Testes sujavam o banco versionado**: `LOCAL_DB_PATH` agora aponta para arquivo temporário por worker do Vitest.
+- [x] **Validação funcional antes do push**: fluxo de 1ª instância coberto por `server/tribunal_integration.test.ts` (5/5) e fluxo do STF por `server/stf_integration.test.ts` (8/8), ambos com IA determinística e banco isolado. 95/95 testes passando, TypeScript limpo.
 - [ ] **Multiplayer**: fora de escopo nesta rodada (permanece em aberto, ver bugs reportados).
